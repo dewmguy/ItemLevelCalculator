@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Item Form</title>
+    <style>
+        .form-section {
+            display: inline-block;
+            vertical-align: top;
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <form>
+        <div class="form-section">
+            <h3>Item Level</h3>
+            <label for="itemLevel">Max</label>
+            <input type="number" id="itemLevel" name="itemLevel" value=""><br>
+            <label for="entryID">Entry ID</label>
+            <input type="number" id="entryID" name="entryID">
+        </div>
+
+        <div class="form-section">
+            <h3>Binding</h3>
+            <input type="radio" id="noneBinding" name="binding" value="none">
+            <label for="noneBinding">None</label><br>
+            <input type="radio" id="bindOnPickup" name="binding" value="bindOnPickup">
+            <label for="bindOnPickup">Bind on Pickup</label><br>
+            <input type="radio" id="bindOnEquip" name="binding" value="bindOnEquip">
+            <label for="bindOnEquip">Bind on Equip</label>
+        </div>
+
+        <div class="form-section">
+            <h3>MaxCount</h3>
+            <input type="radio" id="noneMaxCount" name="maxCount" value="none" checked>
+            <label for="noneMaxCount">None</label><br>
+            <input type="radio" id="unique" name="maxCount" value="unique">
+            <label for="unique">Unique</label><br>
+            <input type="radio" id="uniqueEquipped" name="maxCount" value="uniqueEquipped">
+            <label for="uniqueEquipped">Unique-Equipped</label>
+        </div>
+
+        <div class="form-section">
+            <h3>Quality</h3>
+            <input type="checkbox" id="common" name="quality" value="common">
+            <label for="common">Common</label><br>
+            <input type="checkbox" id="uncommon" name="quality" value="uncommon">
+            <label for="uncommon">Uncommon</label><br>
+            <input type="checkbox" id="rare" name="quality" value="rare">
+            <label for="rare">Rare</label><br>
+            <input type="checkbox" id="epic" name="quality" value="epic" checked>
+            <label for="epic">Epic</label><br>
+            <input type="checkbox" id="legendary" name="quality" value="legendary">
+            <label for="legendary">Legendary</label><br>
+            <input type="checkbox" id="artifact" name="quality" value="artifact">
+            <label for="artifact">Artifact</label>
+        </div>
+
+        <div class="form-section">
+            <h3>Naming</h3>
+            <input type="checkbox" id="nouns" name="naming" value="nouns">
+            <label for="nouns">Nouns</label><br>
+            <input type="checkbox" id="verbs" name="naming" value="verbs">
+            <label for="verbs">Verbs</label><br>
+            <input type="checkbox" id="adjectives" name="naming" value="adjectives">
+            <label for="adjectives">Adjectives</label><br>
+            <input type="checkbox" id="adverbs" name="naming" value="adverbs">
+            <label for="adverbs">Adverbs</label><br>
+            <input type="checkbox" id="properNouns" name="naming" value="properNouns" checked>
+            <label for="properNouns">Proper Nouns</label>
+        </div>
+
+        <div class="form-section">
+            <h3>Inventory Type</h3>
+            <input type="checkbox" id="mainHand" name="inventoryType" value="mainHand">
+            <label for="mainHand">Main hand</label><br>
+            <input type="checkbox" id="oneHand" name="inventoryType" value="oneHand">
+            <label for="oneHand">One-Hand</label><br>
+            <input type="checkbox" id="offHand" name="inventoryType" value="offHand">
+            <label for="offHand">Off Hand</label><br>
+            <input type="checkbox" id="head" name="inventoryType" value="head">
+            <label for="head">Head</label><br>
+            <input type="checkbox" id="shoulder" name="inventoryType" value="shoulder">
+            <label for="shoulder">Shoulder</label><br>
+            <input type="checkbox" id="chest" name="inventoryType" value="chest">
+            <label for="chest">Chest</label><br>
+            <input type="checkbox" id="waist" name="inventoryType" value="waist">
+            <label for="waist">Waist</label><br>
+            <input type="checkbox" id="legs" name="inventoryType" value="legs">
+            <label for="legs">Legs</label><br>
+            <input type="checkbox" id="feet" name="inventoryType" value="feet">
+            <label for="feet">Feet</label><br>
+            <input type="checkbox" id="wrists" name="inventoryType" value="wrists">
+            <label for="wrists">Wrists</label><br>
+            <input type="checkbox" id="hands" name="inventoryType" value="hands" checked>
+            <label for="hands">Hands</label><br>
+            <input type="checkbox" id="back" name="inventoryType" value="back">
+            <label for="back">Back</label><br>
+            <input type="checkbox" id="finger" name="inventoryType" value="finger">
+            <label for="finger">Finger</label><br>
+            <input type="checkbox" id="neck" name="inventoryType" value="neck">
+            <label for="neck">Neck</label><br>
+            <input type="checkbox" id="trinket" name="inventoryType" value="trinket">
+            <label for="trinket">Trinket</label><br>
+            <input type="checkbox" id="heldInOffHand" name="inventoryType" value="heldInOffHand">
+            <label for="heldInOffHand">Held in Off-Hand</label>
+        </div>
+
+        <div class="form-section">
+            <h3>Subclass</h3>
+            <input type="checkbox" id="1hAxe" name="subclass" value="1hAxe">
+            <label for="1hAxe">1H Axe</label><br>
+            <input type="checkbox" id="2hAxe" name="subclass" value="2hAxe">
+            <label for="2hAxe">2H Axe</label><br>
+            <input type="checkbox" id="1hMace" name="subclass" value="1hMace">
+            <label for="1hMace">1H Mace</label><br>
+            <input type="checkbox" id="2hMace" name="subclass" value="2hMace">
+            <label for="2hMace">2H Mace</label><br>
+            <input type="checkbox" id="1hSword" name="subclass" value="1hSword">
+            <label for="1hSword">1H Sword</label><br>
+            <input type="checkbox" id="2hSword" name="subclass" value="2hSword">
+            <label for="2hSword">2H Sword</label><br>
+            <input type="checkbox" id="polearm" name="subclass" value="polearm">
+            <label for="polearm">Polearm</label><br>
+            <input type="checkbox" id="dagger" name="subclass" value="dagger">
+            <label for="dagger">Dagger</label><br>
+            <input type="checkbox" id="staff" name="subclass" value="staff">
+            <label for="staff">Staff</label><br>
+            <input type="checkbox" id="fist" name="subclass" value="fist">
+            <label for="fist">Fist</label><br>
+            <input type="checkbox" id="bow" name="subclass" value="bow">
+            <label for="bow">Bow</label><br>
+            <input type="checkbox" id="gun" name="subclass" value="gun">
+            <label for="gun">Gun</label><br>
+            <input type="checkbox" id="crossbow" name="subclass" value="crossbow">
+            <label for="crossbow">Crossbow</label><br>
+            <input type="checkbox" id="thrown" name="subclass" value="thrown">
+            <label for="thrown">Thrown</label><br>
+            <input type="checkbox" id="wand" name="subclass" value="wand">
+            <label for="wand">Wand</label><br>
+            <input type="checkbox" id="miscellaneous" name="subclass" value="miscellaneous">
+            <label for="miscellaneous">Miscellaneous</label><br>
+            <input type="checkbox" id="cloth" name="subclass" value="cloth" checked>
+            <label for="cloth">Cloth</label><br>
+            <input type="checkbox" id="leather" name="subclass" value="leather">
+            <label for="leather">Leather</label><br>
+            <input type="checkbox" id="mail" name="subclass" value="mail">
+            <label for="mail">Mail</label><br>
+            <input type="checkbox" id="plate" name="subclass" value="plate">
+            <label for="plate">Plate</label><br>
+            <input type="checkbox" id="shield" name="subclass" value="shield">
+            <label for="shield">Shield</label><br>
+            <input type="checkbox" id="libram" name="subclass" value="libram">
+            <label for="libram">Libram</label><br>
+            <input type="checkbox" id="idol" name="subclass" value="idol">
+            <label for="idol">Idol</label><br>
+            <input type="checkbox" id="totem" name="subclass" value="totem">
+            <label for="totem">Totem</label><br>
+            <input type="checkbox" id="sigil" name="subclass" value="sigil">
+            <label for="sigil">Sigil</label>
+        </div>
+
+        <div class="form-section">
+            <h3>Stats</h3>
+            <input type="checkbox" id="stamina" name="stats" value="stamina" checked>
+            <label for="stamina">Stamina</label><br>
+            <input type="checkbox" id="strength" name="stats" value="strength">
+            <label for="strength">Strength</label><br>
+            <input type="checkbox" id="agility" name="stats" value="agility">
+            <label for="agility">Agility</label><br>
+            <input type="checkbox" id="intellect" name="stats" value="intellect">
+            <label for="intellect">Intellect</label><br>
+            <input type="checkbox" id="spirit" name="stats" value="spirit">
+            <label for="spirit">Spirit</label><br>
+            <input type="checkbox" id="hit" name="stats" value="hit">
+            <label for="hit">Hit</label><br>
+            <input type="checkbox" id="crit" name="stats" value="crit">
+            <label for="crit">Crit</label><br>
+            <input type="checkbox" id="haste" name="stats" value="haste">
+            <label for="haste">Haste</label><br>
+            <input type="checkbox" id="expertise" name="stats" value="expertise">
+            <label for="expertise">Expertise</label><br>
+            <input type="checkbox" id="armorPen" name="stats" value="armorPen">
+            <label for="armorPen">ArmorPen</label><br>
+            <input type="checkbox" id="spellPen" name="stats" value="spellPen">
+            <label for="spellPen">SpellPen</label><br>
+            <input type="checkbox" id="defense" name="stats" value="defense">
+            <label for="defense">Defense</label><br>
+            <input type="checkbox" id="dodge" name="stats" value="dodge">
+            <label for="dodge">Dodge</label><br>
+            <input type="checkbox" id="parry" name="stats" value="parry">
+            <label for="parry">Parry</label><br>
+            <input type="checkbox" id="blockRating" name="stats" value="blockRating">
+            <label for="blockRating">BlockRating</label><br>
+            <input type="checkbox" id="blockValue" name="stats" value="blockValue">
+            <label for="blockValue">BlockValue</label><br>
+            <input type="checkbox" id="attackPower" name="stats" value="attackPower">
+            <label for="attackPower">AttackPower</label><br>
+            <input type="checkbox" id="spellPower" name="stats" value="spellPower">
+            <label for="spellPower">SpellPower</label><br>
+            <input type="checkbox" id="hp5" name="stats" value="hp5">
+            <label for="hp5">Hp5</label><br>
+            <input type="checkbox" id="mp5" name="stats" value="mp5">
+            <label for="mp5">Mp5</label><br>
+            <input type="checkbox" id="resilience" name="stats" value="resilience">
+            <label for="resilience">Resilience</label><br>
+            <input type="checkbox" id="fireRes" name="stats" value="fireRes">
+            <label for="fireRes">Fire Res</label><br>
+            <input type="checkbox" id="frostRes" name="stats" value="frostRes">
+            <label for="frostRes">Frost Res</label><br>
+            <input type="checkbox" id="natureRes" name="stats" value="natureRes">
+            <label for="natureRes">Nature Res</label><br>
+            <input type="checkbox" id="arcaneRes" name="stats" value="arcaneRes">
+            <label for="arcaneRes">Arcane Res</label><br>
+            <input type="checkbox" id="shadowRes" name="stats" value="shadowRes">
+            <label for="shadowRes">Shadow Res</label>
+        </div>
+    </form>
+</body>
+</html>
