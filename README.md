@@ -135,11 +135,13 @@ Base Armor is inherent to the ilvl of the item and varies based on item type and
 
 ## Shield Block Calculation
 
-Shield Block Value
+Base Shield Block Value
 
+```
 Uncommon = ilvl * 0.5 * 1
 Rare = ilvl * 0.5 * 1.22
 Epic = ilvl * 0.5 * 1.5616
+```
 
 ## Weapon DPS
 
