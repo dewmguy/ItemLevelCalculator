@@ -1,6 +1,6 @@
 # ItemLevelCalculator
 
-An item level calculator for World of Warcraft emulators, designed to help create, modify, and validate ilvl balanced armor and weapons.
+An item level calculator for World of Warcraft emulators, designed to help create, modify, and validate ilvl balanced armor and weapons. Currently focusing the equation on balancing items for the Wrath of the Lich King expansion. Vanilla and Burning Crusade equations and data will be coming.
 
 ### Key Terms
 
@@ -8,31 +8,34 @@ The formula is based on the following parameters:
 
 - **StatValue**: The quantity of a stat on an item.
 - **StatMod**: The weight coefficient per stat.
-- **ItemValue**: The total budget of stat points for an item.
+- **StatBudget**: The total budget of stat points for an item.
 - **SlotMod**: The weight coefficient per equipment slot.
-- **ItemSlotValue**: The modified budget of stat points per item type.
+- **ItemBudget**: The modified budget of stat points per item type.
 - **QualityMods**: The weight coefficients per equipment quality.
 - **ilvl**: The effective level of an item.
 
 ### Formula
 
-The formula is designed to calculate the ItemValue by taking each modified stat value to the power of 1.7095, summing these powered terms, and then finding the 1.7095 root of the sum. This method ensures that single, high-value stats are more expensive compared to multiple, lower-value stats.
+The formula is designed to calculate the ItemValue by taking each modified stat value to the power of 1.5, summing these powered terms. This method ensures that single, high-value stats are more expensive compared to multiple, lower-value stats.
 
 The formula for calculating **ItemValue** is:
 
 ```
-ItemValue = [(StatValue[1] * StatMod[1])^1.7095 + (StatValue[2] * StatMod[2])^1.7095 + ...]^(1/1.7095)
+StatBudget = [(StatValue[1] * StatMod[1])^1.5 + (StatValue[2] * StatMod[2])^1.5 + ...]^(1/1.5)
 
-ItemSlotValue = ItemValue / SlotMod
+ItemBudget = StatBudget / SlotMod
 
-ilvl = ItemSlotValue * QualityMult + QualityBase
+ilvl = ItemBudget * qualityMult + qualityBase
 ```
 
-If the ItemSlotValue is 100, and the item quality is Rare (QualityMult: 9/5, QualityBase: 3/4), then the ilvl would be 180.75
+If the ItemBudget is 100 and the item quality is:
+- Epic: (100 \* 3/2 + 26/1), then the ilvl would be 176
+- Rare: (100 \* 9/5 + 3/4), then the ilvl would be 180.75
+- Uncommon: (100 \* 2/1 + 8/1), then the ilvl would be 208
 
 ## QualityMods
 
-| Item Quality | QualityMult | QualityBase |
+| Item Quality | qualityMult | qualityBase |
 |--------------|-------------|-------------|
 | Uncommon     | (2/1)       | (8/1)       |
 | Rare         | (9/5)       | (3/4)       |
@@ -97,11 +100,11 @@ Lastly, the quality of the item provides the final modification, resulting in a 
 
 | Item Type                                   | SlotMod Value |
 |---------------------------------------------|---------------|
-| Head, Chest, Legs, 2H Weapon                | 1/1           |
-| Shoulder, Hands, Waist, Feet                | 3/4           |
-| Wrist, Neck, Back, Finger, Off-hand, Shield | 9/16          |
-| 1H Weapon                                   | 27/64         |
-| Ranged                                      | 8/25          |
+| Head, Chest, Legs, 2H Weapon                | 1.000000      |
+| Shoulder, Hands, Waist, Feet                | 0.770000      |
+| Wrist, Neck, Back, Finger, Off-hand, Shield | 0.562500      |
+| 1H Weapon                                   | 0.421875      |
+| Ranged                                      | 0.320000      |
 
 ## Armor Calculation
 
@@ -168,6 +171,8 @@ Caster and Druid weapons sacrifice a portion of their DPS to raise the ceiling f
 
 The values outlined in the documentation above are based on various wiki articles, including:
 
+- [TurtleWoW Forums](https://forum.turtle-wow.org/viewtopic.php?t=1567)
+- [Allakhazam Forums](https://wow.allakhazam.com/wiki/Itemization_Formulas_%28wow%29)
 - [Wowwiki Archive](https://wowwiki-archive.fandom.com/wiki/Item_level)
 - [Wowpedia](https://wowpedia.fandom.com/wiki/Stat_budget)
 - [Classic WoW Archive](https://classic-wow-archive.fandom.com/wiki/Item_level)

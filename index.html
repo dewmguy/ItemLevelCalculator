@@ -3,119 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WoW Item Level Calculator</title>
+    <title>Warcraft Item Level Calculator</title>
     <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <div class="container">
-        <h1>WoW Item Level Calculator</h1>
-        <form id="ilvl-form">
-            <!-- Item Level -->
-            <label for="itemLevel">Item Level:</label>
-            <input type="number" id="itemLevel" name="itemLevel" required>
-
-            <!-- Quality -->
-            <label>Quality:</label>
-            <div id="quality">
-                <input type="radio" name="quality" value="common" required> Common<br>
-                <input type="radio" name="quality" value="uncommon"> Uncommon<br>
-                <input type="radio" name="quality" value="rare"> Rare<br>
-                <input type="radio" name="quality" value="epic"> Epic<br>
-                <input type="radio" name="quality" value="legendary"> Legendary<br>
-                <input type="radio" name="quality" value="artifact"> Artifact<br>
-            </div>
-
-            <!-- Inventory Type -->
-            <label>Inventory Type:</label>
-            <div id="inventoryType">
-                <input type="radio" name="inventoryType" value="mainHand" required> Main Hand<br>
-                <input type="radio" name="inventoryType" value="oneHand"> One Hand<br>
-                <input type="radio" name="inventoryType" value="offHand"> Off Hand<br>
-                <input type="radio" name="inventoryType" value="head"> Head<br>
-                <input type="radio" name="inventoryType" value="shoulder"> Shoulder<br>
-                <input type="radio" name="inventoryType" value="chest"> Chest<br>
-                <input type="radio" name="inventoryType" value="waist"> Waist<br>
-                <input type="radio" name="inventoryType" value="legs"> Legs<br>
-                <input type="radio" name="inventoryType" value="feet"> Feet<br>
-                <input type="radio" name="inventoryType" value="hands"> Hands<br>
-                <input type="radio" name="inventoryType" value="wrists"> Wrists<br>
-                <input type="radio" name="inventoryType" value="back"> Back<br>
-                <input type="radio" name="inventoryType" value="finger"> Finger<br>
-                <input type="radio" name="inventoryType" value="neck"> Neck<br>
-                <input type="radio" name="inventoryType" value="trinket"> Trinket<br>
-                <input type="radio" name="inventoryType" value="heldInOffHand"> Held in Off-Hand<br>
-            </div>
-
-            <!-- Subclass -->
-            <label>Subclass:</label>
-            <div id="subclass">
-                <!-- Armor Types -->
-                <input type="radio" name="subclass" value="cloth" required> Cloth<br>
-                <input type="radio" name="subclass" value="leather"> Leather<br>
-                <input type="radio" name="subclass" value="mail"> Mail<br>
-                <input type="radio" name="subclass" value="plate"> Plate<br>
-                <input type="radio" name="subclass" value="shield"> Shield<br>
-
-                <!-- Weapon Types -->
-                <input type="radio" name="subclass" value="1hAxe"> 1H Axe<br>
-                <input type="radio" name="subclass" value="2hAxe"> 2H Axe<br>
-                <input type="radio" name="subclass" value="1hMace"> 1H Mace<br>
-                <input type="radio" name="subclass" value="2hMace"> 2H Mace<br>
-                <input type="radio" name="subclass" value="1hSword"> 1H Sword<br>
-                <input type="radio" name="subclass" value="2hSword"> 2H Sword<br>
-                <input type="radio" name="subclass" value="polearm"> Polearm<br>
-                <input type="radio" name="subclass" value="dagger"> Dagger<br>
-                <input type="radio" name="subclass" value="staff"> Staff<br>
-                <input type="radio" name="subclass" value="fist"> Fist Weapon<br>
-                <input type="radio" name="subclass" value="bow"> Bow<br>
-                <input type="radio" name="subclass" value="gun"> Gun<br>
-                <input type="radio" name="subclass" value="crossbow"> Crossbow<br>
-                <input type="radio" name="subclass" value="thrown"> Thrown<br>
-                <input type="radio" name="subclass" value="wand"> Wand<br>
-                <input type="radio" name="subclass" value="miscellaneous"> Miscellaneous<br>
-                <input type="radio" name="subclass" value="libram"> Libram<br>
-                <input type="radio" name="subclass" value="idol"> Idol<br>
-                <input type="radio" name="subclass" value="sigil"> Sigil<br>
-                <input type="radio" name="subclass" value="totem"> Totem<br>
-            </div>
-
-            <!-- Stats -->
-            <label>Stats:</label>
-            <div id="stats">
-                <input type="checkbox" name="stats" value="stamina"> Stamina<br>
-                <input type="checkbox" name="stats" value="strength"> Strength<br>
-                <input type="checkbox" name="stats" value="agility"> Agility<br>
-                <input type="checkbox" name="stats" value="intellect"> Intellect<br>
-                <input type="checkbox" name="stats" value="spirit"> Spirit<br>
-                <input type="checkbox" name="stats" value="hit"> Hit<br>
-                <input type="checkbox" name="stats" value="crit"> Crit<br>
-                <input type="checkbox" name="stats" value="haste"> Haste<br>
-                <input type="checkbox" name="stats" value="expertise"> Expertise<br>
-                <input type="checkbox" name="stats" value="armorPen"> Armor Penetration<br>
-                <input type="checkbox" name="stats" value="spellPen"> Spell Penetration<br>
-                <input type="checkbox" name="stats" value="defense"> Defense<br>
-                <input type="checkbox" name="stats" value="dodge"> Dodge<br>
-                <input type="checkbox" name="stats" value="parry"> Parry<br>
-                <input type="checkbox" name="stats" value="blockRating"> Block Rating<br>
-                <input type="checkbox" name="stats" value="blockValue"> Block Value<br>
-                <input type="checkbox" name="stats" value="attackPower"> Attack Power<br>
-                <input type="checkbox" name="stats" value="spellPower"> Spell Power<br>
-                <input type="checkbox" name="stats" value="hp5"> HP5<br>
-                <input type="checkbox" name="stats" value="mp5"> MP5<br>
-                <input type="checkbox" name="stats" value="resilience"> Resilience<br>
-                <input type="checkbox" name="stats" value="fireRes"> Fire Resistance<br>
-                <input type="checkbox" name="stats" value="frostRes"> Frost Resistance<br>
-                <input type="checkbox" name="stats" value="natureRes"> Nature Resistance<br>
-                <input type="checkbox" name="stats" value="arcaneRes"> Arcane Resistance<br>
-                <input type="checkbox" name="stats" value="shadowRes"> Shadow Resistance<br>
-            </div>
-
-            <button type="button" id="calculateButton">Calculate</button>
-        </form>
-        <div id="result"></div>
-    </div>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="script.js"></script>
+</head>
+<body>
+    <div id="float">
+        <h1>Warcraft Item Level Calculator</h1>
+        <div id="container">
+        <form id="calculator">
+            <div class="group">
+                <input type="text" id="item-name" value="" placeholder="Item Name" />
+            </div>
+            <div class="group">
+                <input class="no-spinners" type="number" id="item-level" name="itemLevel" placeholder="Item Level (Optional)" />
+            </div>
+            <div class="group">
+                <div class="item"><input type="radio" id="nounique" name="itemUnique" value="nounique" required> <label for="nounique">Not Unique</label></div>
+                <div class="item"><input type="radio" id="unique" name="itemUnique" value="unique" required> <label for="unique">Unique</label></div>
+                <div class="item"><input type="radio" id="equipped" name="itemUnique" value="equipped" required> <label for="equipped">Unique-Equipped</label></div>
+            </div>
+            <div class="group">
+                <div class="item"><input type="radio" id="nobind" name="itemBind" value="nobind" required> <label for="nobind">No Bind</label></div>
+                <div class="item"><input type="radio" id="boe" name="itemBind" value="boe" required> <label for="boe">Bind on Equip</label></div>
+                <div class="item"><input type="radio" id="bop" name="itemBind" value="bop" required> <label for="bop">Bind on Pickup</label></div>
+            </div>
+            <div class="group">
+                <div class="item"><input type="radio" id="uncommon" name="itemQuality" value="uncommon" required> <label class="uncommon" for="uncommon">Uncommon</label></div>
+                <div class="item"><input type="radio" id="rare" name="itemQuality" value="rare" required> <label class="rare" for="rare">Rare</label></div>
+                <div class="item"><input type="radio" id="epic" name="itemQuality" value="epic" required> <label class="epic" for="epic">Epic</label></div>
+                <div class="item"><input type="radio" id="legendary" name="itemQuality" value="legendary" required> <label class="legendary" for="legendary">Legendary</label></div>
+                <div class="item"><input type="radio" id="artifact" name="itemQuality" value="artifact" required> <label class="artifact" for="artifact">Artifact</label></div>
+            </div>
+            <div class="group">
+                <select id="item-slot" name="itemSlot" required></select>
+            </div>
+            <div class="group">
+                <button type="button" id="remove-stat">Remove Stat</button>
+                <button type="button" id="add-stat">Add Stat</button>
+            </div>
+            <div class="group">
+                <button type="submit">Calculate</button>
+            </div>
+        </form>
+        <div id="stats"></div>
+        <div id="tooltip" class="tooltip"></div>
+        </div>
+    </div>
 </body>
 </html>
