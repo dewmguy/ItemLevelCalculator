@@ -71,6 +71,8 @@ $(document).ready(function() {
   };
 
   const statData = {
+    "0": { label: "Mana", value: 2, type: 0 },
+    "1": { label: "Health", value: 2, type: 0 },
     "3": { label: "Agility", value: 1, type: 0 },
     "4": { label: "Strength", value: 1, type: 0 },
     "5": { label: "Intellect", value: 1, type: 0 },
@@ -92,6 +94,7 @@ $(document).ready(function() {
     "46": { label: "Health Regen HP5", value: 1, type: 1 },
     "47": { label: "Spell Penetration", value: 0.9, type: 1 },
     "48": { label: "Block Value", value: 0.65, type: 1 },
+    "armor": { label: "Bonus Armor", value: 0.07, type: 2 },
     "arcane_res": { label: "Resist Arcane", value: 1, type: 0 },
     "fire_res": { label: "Resist Fire", value: 1, type: 0 },
     "holy_res": { label: "Resist Holy", value: 1, type: 0 },
@@ -139,10 +142,30 @@ $(document).ready(function() {
   }
 
   function populateWeaponDamageTypes() {
-    const damageTypeSelect = $('#item-damage');
-    damageTypeSelect.empty().append('<option value="">Extra Damage</option>');
-    $.each(weaponDamage, function(key, data) {
-      damageTypeSelect.append(`<option value="${key}">${data.label}</option>`);
+    const damageSelects = ['#item-damage1', '#item-damage2'];
+    damageSelects.forEach(id => {
+      const selectElement = $(id);
+      selectElement.empty().append('<option value="">Extra Damage</option>');
+      $.each(weaponDamage, function(key, data) {
+        selectElement.append(`<option value="${key}">${data.label}</option>`);
+      });
+    });
+  }
+
+  function updateWeaponDamageOptions() {
+    const selectedDamage1 = $('#item-damage1').val();
+    const selectedDamage2 = $('#item-damage2').val();
+    
+    $('#item-damage1 option').each(function() {
+      const value = $(this).val();
+      if (value && value === selectedDamage2) { $(this).hide(); }
+      else { $(this).show(); }
+    });
+
+    $('#item-damage2 option').each(function() {
+      const value = $(this).val();
+      if (value && value === selectedDamage1) { $(this).hide(); }
+      else { $(this).show(); }
     });
   }
 
@@ -176,7 +199,7 @@ $(document).ready(function() {
       if (statCount < 11) {
         const statHtml = `
           <div class="group select" id="stat-group-${statCount}">
-            <input type="number" class="stat-amount" id="stat-amount-${statCount}" value="0" />
+            <input type="number" class="stat-amount" data-calc="" id="stat-amount-${statCount}" value="0" />
             ${createStatDropdown(statCount)}
             <div class="delete"></div>
           </div>`;
@@ -193,20 +216,43 @@ $(document).ready(function() {
     if (statCount == 10) { $("#add-stat").hide(); } else { $("#add-stat").show(); }
   }
 
-  function calculateStatValue() {
-    let totalValue = 0;
-    let statValue = 0;
+  function getItemQualityCoefficient(itemQuality) {
+    switch (itemQuality) {
+      case 'uncommon': return ilvl => ilvl * 0.5 - 2;
+      case 'rare': return ilvl => ilvl * 0.625 - 1.15;
+      case 'epic': return ilvl => ilvl * 0.77 - 1;
+      case 'legendary': return ilvl => ilvl * 0.90; // i made this up
+      case 'artifact': return ilvl => ilvl; // i made this up
+      default: return () => 0;
+    }
+  }
+
+  function calculateStats(itemLevel, itemSlot) {
+    console.error(`calculating stats from level`);
+    const itemQuality = $('input[name="itemQuality"]:checked').val();
+    let itemQualityCoefficient = getItemQualityCoefficient(itemQuality);
+    const itemBudget = Math.floor(Math.pow(itemQualityCoefficient(itemLevel) * itemSlot, 1.5)); // total item value
+    console.log(`itemBudget: ${itemBudget}`);
+    const statValues = {};
     $('#stats .group').each(function() {
-      let statType = $(this).find('.stat-type').val();
-      let statAmount = parseFloat($(this).find('.stat-amount').val());
-      let statCoefficient = statData[statType] ? statData[statType].value : 1;
-      console.log(`stat type: ${statType} / ${statAmount} / ${statCoefficient}`);
-      statValue = Math.pow(statAmount * statCoefficient, 1.5);
-      console.log(`stat value: ${statValue}`);
-      totalValue += statValue;
+      // get values
+      const statName = $(this).find('.stat-type option:selected').text();
+      console.log(`statName: ${statName}`);
+      const statType = $(this).find('.stat-type').val();
+      console.log(`statType: ${statType}`);
+      const percent = parseFloat($(this).find('.stat-amount').val()) / 100 || 0;
+      console.log(`percent: ${percent * 100}%`);
+      const statCoefficient = statData[statType] ? statData[statType].value : 1;
+      console.log(`statCoefficient: ${statCoefficient}`);
+      // do the math
+      const statBudget = itemBudget * percent;
+      console.log(`statBudget: ${statBudget}`);
+      const statAmount = Math.pow(statBudget / statCoefficient, 2/3);
+      console.log(`statAmount: ${statAmount}`);
+      statValues[statType] = Math.floor(statAmount);
     });
-    console.log(`estimated statBudget: ${totalValue}`);
-    return totalValue;
+    console.log(`returned statValues: ${JSON.stringify(statValues)}`);
+    return statValues;
   }
 
   function isTypeVisible(typeKey, typeList) {
@@ -244,21 +290,42 @@ $(document).ready(function() {
     }
   }
   
-  function createTooltipHTML(itemQuality, itemName, itemLevel, itemReqLevel, bindHTML, uniqueHTML, slotHTML, typeHTML, bonusDamage, whiteStatsHtml, greenStatsHtml) {
+  function createTooltipHTML(itemQuality, itemName, itemLevel, itemReqLevel, bindHTML, uniqueHTML, slotHTML, typeHTML, armor, bonusDamage1, bonusDamage2, whiteStatsHtml, greenStatsHtml) {
     return `
       <div class="item-name ${itemQuality}">${itemName}</div>
+      <div class="item-level">Item Level ${itemLevel}</div>
       ${bindHTML}
       ${uniqueHTML}
-      <div class="group spread">
-        <div class="item-slot">${slotHTML}</div>
-        ${typeHTML}
-      </div>
-      ${bonusDamage}
+      <div class="group spread"><div class="item-slot">${slotHTML}</div>${typeHTML}</div>
+      ${armor}
+      ${bonusDamage1}
+      ${bonusDamage2}
       <div class="white stats">${whiteStatsHtml}</div>
       <div class="item-reqlvl">Requires Level ${itemReqLevel}</div>
-      <div class="item-level">Item Level ${itemLevel}</div>
       <div class="green stats">${greenStatsHtml}</div>
     `;
+  }
+
+  function getBonusDamage(index) {
+    const damageTypeSelector = `#item-damage${index} option:selected`;
+    const minSelector = `#damageMin${index}`;
+    const maxSelector = `#damageMax${index}`;
+
+    if ($(damageTypeSelector).val() !== "" && $(minSelector).val() > 0 && $(maxSelector).val() > 0) {
+        let bonusDamageType = $(damageTypeSelector).text();
+        let bonusDamageMin = $(minSelector).val();
+        let bonusDamageMax = $(maxSelector).val();
+        return `<div>+${bonusDamageMin} - ${bonusDamageMax} ${bonusDamageType} Damage</div>`;
+    }
+    return '';
+  }
+  
+  function sumStatValues() {
+    let sum = 0;
+    $('.stat-amount').each(function() {
+        sum += parseFloat($(this).val()) || 0;
+    });
+    return sum;
   }
 
   $(document).on('click', '#stats .group .delete', function() {
@@ -268,7 +335,22 @@ $(document).ready(function() {
 
   $(document).on('change input', '#stats .stat-amount', function() {
     if ($(this).val() <= 0) { $(this).val(''); }
-    if ($(this).val() >= 999) { $(this).val('999'); }
+    const val = 999;
+    const pct = 100;
+    let sum = 0;
+
+    if($("#selectStats").is(":checked")) {
+      $('.stat-amount').attr('max', pct);
+      if ($(this).val() >= pct) { $(this).val(pct); }
+      $('.stat-amount').each(function() { sum += parseFloat($(this).val()) || 0; });
+      if(sum != pct) { $('.stat-amount').addClass('error'); }
+      else { $('.stat-amount').removeClass('error'); }
+    }
+    else {
+      $('.stat-amount').attr('max', val);
+      if ($(this).val() > val) { $(this).val(val); }
+    }
+
   });
 
   $("#output").hide();
@@ -299,7 +381,8 @@ $(document).ready(function() {
     $(".textStats").hide();
     $(".textLevel").show();
     $("#statMethod").html("number");
-    $("#item-level").attr("required", false)
+    $("#item-level").attr("required", false);
+    $('.stat-amount').removeClass('error');
   });
   $("#selectStats").click(function() {
     $("#item-level").val('').show();
@@ -308,6 +391,11 @@ $(document).ready(function() {
     $("#statMethod").html("percentage");
     $("#item-level").attr("required", true);
     $("#item-level").focus();
+    let sum = 0;
+    $('.stat-amount').each(function() {
+      sum += parseFloat($(this).val()) || 0;
+    });
+    if(sum > 100) { $('.stat-amount').addClass('error'); }
   });
   $('#item-level').on('change input', function() { if ($(this).val() <= 0) { $(this).val(''); } });
   $('#add-stat').click(function() { updateStatGroup('add'); });
@@ -316,13 +404,18 @@ $(document).ready(function() {
     $("#item-name").removeClass("uncommon rare epic legendary artifact");
     $("#item-name").addClass($(this).val());
   });
-
+  
   $('#item-type').on('change', function() {
     const selectedType = $("#item-slot option:selected").data('type');
     if (selectedType == 2) {
+      updateWeaponDamageOptions();
       $(".damageType").show();
       populateWeaponDamageTypes();
     }
+  });
+  
+  $("#item-damage1, #item-damage2").on('change',function() {
+    updateWeaponDamageOptions();
   });
   
   $('#item-slot').on('change', function() {
@@ -335,83 +428,85 @@ $(document).ready(function() {
   $('#calculator').submit(function(e) { e.preventDefault(); });
   
   populateItemSlots($('input[name="itemClass"]:checked').val());
-  
-  $('.calculate').click(function() {
 
-    if($('input[name="calcMethod"]:checked').val() == "stats" && ($("#item-level").val() == undefined || $("#item-level").val() == "")) { return; }
-    if(!$('input[name="itemQuality"]:checked').val()) { return; }
+  $('.calculate').click(function() { // calculate
+
+    const calcMethod = $('input[name="calcMethod"]:checked').val();
+    if (calcMethod === 'stats' && ($("#item-level").val() <= 0 || sumStatValues() != 100)) {
+      $(".stat-amount").addClass('error');
+      return;
+    }
+    if (!$('input[name="itemQuality"]:checked').val()) { return; }
 
     $("#output").show();
-    
-    let itemName = $("#item-name").val();
+
     let itemLevel = $('#item-level').val() || null;
-    console.log(`itemLevel: ${itemLevel}`);
-    let itemBind = $('input[name="itemBind"]:checked').val() || null;
-    let itemUnique = $('input[name="itemUnique"]:checked').val() || null;
-    let itemQuality = $('input[name="itemQuality"]:checked').val() || null;
-    console.log(`itemQuality: ${itemQuality}`);
-    let itemSlot = parseFloat($('#item-slot').val()) || null;
-    console.log(`itemSlot: ${$('#item-slot').val() ? itemSlots[Object.keys(itemSlots).find(key => itemSlots[key].value == $('#item-slot').val())].label : 'None selected'} (${itemSlot})`);
+    let statValue = null;
+    const itemBind = $('input[name="itemBind"]:checked').val() || null;
+    const itemUnique = $('input[name="itemUnique"]:checked').val() || null;
+    const itemQuality = $('input[name="itemQuality"]:checked').val() || null;
+    const itemQualityPretty = itemQuality.charAt(0).toUpperCase() + itemQuality.slice(1);
+    const itemSlot = parseFloat($('#item-slot').val()) || null;
 
-    let itemQualityCoefficient;
-    switch (itemQuality) {
-      case 'uncommon':
-        itemQualityCoefficient = ilvl => ilvl * 0.5 - 2;
-        break;
-      case 'rare':
-        itemQualityCoefficient = ilvl => ilvl * 0.625 - 1.15;
-        break;
-      case 'epic':
-        itemQualityCoefficient = ilvl => ilvl * 0.77 - 1;
-        break;
-      case 'legendary':
-        itemQualityCoefficient = ilvl => ilvl * 0.90;
-        break;
-      case 'artifact':
-        itemQualityCoefficient = ilvl => ilvl;
-        break;
-    }
+    const itemQualityCoefficient = getItemQualityCoefficient(itemQuality);
 
-    let statValue = calculateStatValue();
-
-    if (!itemLevel) {
-        let iterationCount = 0;
-        let maxIterations = 999;
-        let ilvl = 1;
-        while (iterationCount < maxIterations) {
-            let potentialBudget = Math.pow(itemQualityCoefficient(ilvl) * itemSlot, 1.5);
-            if (potentialBudget >= statValue) { itemLevel = ilvl; break; }
-            ilvl++;
-            iterationCount++;
+    if (calcMethod === 'level') { // level calc
+      console.error("calculating level from stats");
+      let itemValue = 0;
+      $('#stats .group').each(function() {
+        // gather values
+        const statName = $(this).find('.stat-type option:selected').text();
+        console.log(`statName: ${statName}`);
+        const statType = $(this).find('.stat-type').val();
+        console.log(`statType: ${statType}`);
+        const statCoefficient = statData[statType] ? statData[statType].value : 1;
+        console.log(`statCoefficient: ${statCoefficient}`);
+        const statAmount = parseFloat($(this).find('.stat-amount').val());
+        console.log(`statAmount: ${statAmount}`);
+        // do the math
+        const statValue = Math.ceil(Math.pow(statAmount * statCoefficient, 1.5));
+        console.log(`statValue: ${statValue}`);
+        itemValue += statValue;
+      });
+      console.log(`itemValue: ${itemValue}`);
+      let i = 0;
+      while (i < 999) {
+        const statBudgetIncremental = Math.ceil(Math.pow(itemQualityCoefficient(i) * itemSlot, 1.5));
+        if (statBudgetIncremental >= Math.ceil(itemValue)) {
+          itemLevel = i;
+          console.log(`itemLevel: ${itemLevel}`);
+          break;
         }
+        i++;
+      }
+    }
+    else if (calcMethod === 'stats') { // stat calc
+      const statValues = calculateStats(itemLevel, itemSlot);
+
+      $('#stats .group').each(function() {
+        let statType = $(this).find('.stat-type').val();
+        if (statValues[statType]) {
+          $(this).find('.stat-amount').data('calc', statValues[statType]);
+        }
+      });
+
+      statValue = Object.values(statValues).reduce((acc, val) => acc + val, 0);
     }
 
-    let statBudget = Math.pow(itemQualityCoefficient(itemLevel) * itemSlot, 1.5);
-    console.log(`statBudget limit: ${statBudget}`);
-    $("#budgetLimit").html(statBudget);
-    $("#budgetActual").html(statValue);
-    $("#budgetRemain").html(statBudget - statValue);
-    if (statBudget < statValue) {
-      let message = "The item has more stat points than allowed by the item level.";
-      $("#warning").show().html(message);
-      console.error(message);
-    }
-    else {
-      $("#warning").hide().html('');
-    }
-    
     // tooltip output
 
     let bindHTML = '';
     let uniqueHTML = '';
     let whiteStatsHtml = '';
     let greenStatsHtml = '';
-    let bonusDamage = '';
+    let armor = '';
+    let bonusDamage1 = '';
+    let bonusDamage2 = '';
 
-    $('#stats .group.select').each(function() {
-      let statTypeKey = $(this).find('.stat-type option:selected').val();
+    $('#stats .group').each(function() {
       let statTypeText = $(this).find('.stat-type option:selected').text();
-      let statAmount = $(this).find('.stat-amount').val();
+      let statTypeKey = $(this).find('.stat-type option:selected').val();
+      let statAmount = calcMethod == 'level' ? $(this).find('.stat-amount').val() : $(this).find('.stat-amount').data('calc'); // the literal generated stat value
       if (statTypeKey && statAmount > 0) {
         let stat = statData[statTypeKey];
         if (stat.type === 0) {
@@ -432,28 +527,35 @@ $(document).ready(function() {
     unique = unique == "unique" ? 'Unique' : unique == "equipped" ? 'Unique-Equipped' : null;
     if (unique) { uniqueHTML = `<div class="item-unique">${unique}</div>`; }
 
-    let slotHTML = $('#item-slot option:selected').text();
+    let slotName = $('#item-slot option:selected').text();
+    let slotHTML = slotName;
+    let slotNamePretty = slotName == "Back" ? "Cloak" : slotName;
     
     let itemReqLevel = $("#item-reqlvl").val() || 0;
 
     let itemtype = $('#item-slot option:selected').data('type');
+    
+    let itemName = $("#item-name").val() || `${itemQualityPretty} ${slotNamePretty}`;
+
     if (itemtype == 2) {
-      // output damage
-      if($("#item-damage option:selected").val() >= 0 && $("#damageMin").val() >= 0 && $("#damageMax").val() >= 0) {
-        let bonusDamageType = $("#item-damage option:selected").text();
-        let bonusDamageMin = $("#damageMin").val();
-        let bonusDamageMax = $("#damageMax").val();
-        bonusDamage = `<div>+${bonusDamageMin} - ${bonusDamageMax} ${bonusDamageType} Damage</div>`;
-      }
-      else { bonusDamage = ''; }
-    }
-    if (itemtype == 4) {
-      // output armor
+
+      // calculate real weapon damage
+      // min damage, max damage, speed, and dps avg
+
+      let bonusDamage1 = getBonusDamage(1);
+      let bonusDamage2 = getBonusDamage(2);
     }
 
-    let tooltipHtml = createTooltipHTML(itemQuality, itemName, itemLevel, itemReqLevel, bindHTML, uniqueHTML, slotHTML, getItemTypeHTML(), bonusDamage, whiteStatsHtml, greenStatsHtml);
+    if (itemtype == 4) {
+
+      // output armor
+      // calc armor first, then add bonus armor, then make the stat green
+      // extra armor is stored in ArmorDamageModifier
+    }
+
+    let tooltipHtml = createTooltipHTML(itemQuality, itemName, itemLevel, itemReqLevel, bindHTML, uniqueHTML, slotHTML, getItemTypeHTML(), armor, bonusDamage1, bonusDamage2, whiteStatsHtml, greenStatsHtml);
     $('#output .tooltip').html(tooltipHtml);
-    
+
   });
-  
+
 });

@@ -167,8 +167,6 @@ button {
 
 button:hover { background-color: #e6c200 }
 
-button.calculate { width: 70% }
-
 .text { white-space: nowrap }
 
 .delete {
@@ -254,7 +252,7 @@ button.calculate { width: 70% }
 }
 
 .error {
-  color: #FAA;
+  color: #F55;
 }
 
 .tooltip {

@@ -41,9 +41,14 @@
                     <select class="itemType" id="item-type" name="itemType" required></select>
                 </div>
                 <div class="group damageType">
-                    <select id="item-damage" name="damageType"></select>
-                    <div class="item"><input type="number" id="damageMin" name="damageMin" placeholder="Min" /></div>
-                    <div class="item"><input type="number" id="damageMax" name="damageMax" placeholder="Max" /></div>
+                    <select id="item-damage1" name="damageType1"></select>
+                    <div class="item"><input type="number" id="damageMin1" name="damageMin1" placeholder="Min" /></div>
+                    <div class="item"><input type="number" id="damageMax1" name="damageMax1" placeholder="Max" /></div>
+                </div>
+                <div class="group damageType">
+                    <select id="item-damage2" name="damageType2"></select>
+                    <div class="item"><input type="number" id="damageMin2" name="damageMin2" placeholder="Min" /></div>
+                    <div class="item"><input type="number" id="damageMax2" name="damageMax2" placeholder="Max" /></div>
                 </div>
                 <div class="group select">
                     <div class="item"><input type="radio" id="boe" name="itemBind" value="boe" checked /> <label for="boe">Bind on Equip</label></div>
@@ -65,21 +70,13 @@
                 <p class="text note">Calculation interprets a stat value as a <span id="statMethod">number</span>.</p>
                 <div id="stats"></div>
                 <button type="button" id="add-stat">Add a Stat</button>
+                <button class="calculate" type="submit">Calculate</button>
             </div>
             <div id="output">
                 <h3>Item Tooltip Preview</h3>
                 <div class="tooltip"></div>
                 <p id="warning" class="note error"></p>
             </div>
-        </div>
-        <hr />
-        <div class="group column">
-            <button class="calculate" type="submit">Calculate</button>
-        </div>
-        <div id="debug">
-            <p class="text note">Stat Budget Limit: <span id="budgetLimit"></span></p>
-            <p class="text note">Used Stat Budget: <span id="budgetActual"></span></p>
-            <p class="text note">Stat Budget Left: <span id="budgetRemain"></span></p>
         </div>
     </div>
 </body>
