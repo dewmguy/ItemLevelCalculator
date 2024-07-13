@@ -99,10 +99,8 @@ a:hover {
 
 form {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 360px;
-  width: 360px;
+  flex-direction: row;
+  gap: 20px;
 }
 
 input, select, button, label {
@@ -168,6 +166,14 @@ button {
 button:hover { background-color: #e6c200 }
 
 .text { white-space: nowrap }
+
+.configure {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+  min-width: 360px;
+  width: 360px;
+}
 
 .delete {
   width: 20px;

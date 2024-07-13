@@ -2,31 +2,31 @@ $(document).ready(function() {
   let statCount = 0;
   
   const itemSlots = {
-    "1": { label: "Head", value: 1.00, type: 4, types: [1, 2, 3, 4] },
-    "2": { label: "Neck", value: 0.55, type: 4, types: [0] },
-    "3": { label: "Shoulder", value: 0.77, type: 4, types: [1, 2, 3, 4] },
-    "16": { label: "Back", value: 0.55, type: 4, types: [1] },
-    "5": { label: "Chest", value: 1.00, type: 4, types: [1, 2, 3, 4] },
-    "20": { label: "Chest (Robe)", value: 1.00, type: 4, types: [1, 2, 3, 4] },
-    "4": { label: "Shirt", value: 0.55, type: 4, types: [1, 2, 3, 4] },
-    "19": { label: "Tabard", value: 0.55, type: 4, types: [0] },
-    "9": { label: "Wrists", value: 0.55, type: 4, types: [1, 2, 3, 4] },
-    "10": { label: "Hands", value: 0.77, type: 4, types: [1, 2, 3, 4] },
-    "6": { label: "Waist", value: 0.77, type: 4, types: [1, 2, 3, 4] },
-    "7": { label: "Legs", value: 1.00, type: 4, types: [1, 2, 3, 4] },
-    "8": { label: "Feet", value: 0.77, type: 4, types: [1, 2, 3, 4] },
-    "11": { label: "Finger", value: 0.55, type: 4, types: [0] },
-    "12": { label: "Trinket", value: 0.70, type: 4, types: [0] },
-    "14": { label: "Shield", value: 0.55, type: 4, types: [6] },
-    "23": { label: "Held in Off-hand", value: 0.55, type: 4, types: [0] },
-    "28": { label: "Relic", value: 0.55, type: 4, types: [7, 8, 9, 10] },
-    "21": { label: "Main-Hand", value: 0.42, type: 2, types: [0, 4, 7, 15, 13] },
-    "22": { label: "Off-Hand", value: 0.42, type: 2, types: [0, 4, 7, 15, 13] },
-    "13": { label: "One-Hand", value: 0.42, type: 2, types: [0, 4, 7, 15, 13] },
-    "17": { label: "Two-Hand", value: 1.00, type: 2, types: [1, 5, 8, 6, 10] },
-    //"15": { label: "Bow", value: 1.00, type: 2, types: [2] },
-    "25": { label: "Thrown", value: 0.42, type: 2, types: [16] },
-    "26": { label: "Ranged", value: 0.42, type: 2, types: [2, 3, 18, 19] }, // modified to include bow
+    "1": { label: "Head", value: 1.00, type: 4, armor: 1, types: [1, 2, 3, 4] },
+    "2": { label: "Neck", value: 0.55, type: 4, armor: 0, types: [0] },
+    "3": { label: "Shoulder", value: 0.77, type: 4, armor: 1, types: [1, 2, 3, 4] },
+    "16": { label: "Back", value: 0.55, type: 4, armor: 1, types: [1] },
+    "5": { label: "Chest", value: 1.00, type: 4, armor: 1, types: [1, 2, 3, 4] },
+    "20": { label: "Chest (Robe)", value: 1.00, armor: 1, type: 4, types: [1, 2, 3, 4] },
+    "4": { label: "Shirt", value: 0.55, type: 4, armor: 0, types: [1, 2, 3, 4] },
+    "19": { label: "Tabard", value: 0.55, type: 4, armor: 0, types: [0] },
+    "9": { label: "Wrists", value: 0.55, type: 4, armor: 1, types: [1, 2, 3, 4] },
+    "10": { label: "Hands", value: 0.77, type: 4, armor: 1, types: [1, 2, 3, 4] },
+    "6": { label: "Waist", value: 0.77, type: 4, armor: 1, types: [1, 2, 3, 4] },
+    "7": { label: "Legs", value: 1.00, type: 4, armor: 1, types: [1, 2, 3, 4] },
+    "8": { label: "Feet", value: 0.77, type: 4, armor: 1, types: [1, 2, 3, 4] },
+    "11": { label: "Finger", value: 0.55, type: 4, armor: 0, types: [0] },
+    "12": { label: "Trinket", value: 0.70, type: 4, armor: 0, types: [0] },
+    "14": { label: "Shield", value: 0.55, type: 4, armor: 1, types: [6] },
+    "23": { label: "Held in Off-hand", value: 0.55, armor: 0, type: 4, types: [0] },
+    "28": { label: "Relic", value: 0.55, type: 4, armor: 0, types: [7, 8, 9, 10] },
+    "21": { label: "Main-Hand", value: 0.42, type: 2, armor: 0, types: [0, 4, 7, 15, 13] },
+    "22": { label: "Off-Hand", value: 0.42, type: 2, armor: 0, types: [0, 4, 7, 15, 13] },
+    "13": { label: "One-Hand", value: 0.42, type: 2, armor: 0, types: [0, 4, 7, 15, 13] },
+    "17": { label: "Two-Hand", value: 1.00, type: 2, armor: 0, types: [1, 5, 8, 6, 10] },
+    "15": { label: "Bow", value: 1.00, type: 2, armor: 0, types: [2] },
+    "25": { label: "Thrown", value: 0.42, type: 2, armor: 0, types: [16] },
+    "26": { label: "Ranged", value: 0.42, type: 2, armor: 0, types: [22, 3, 18, 19] },
   };
 
   const armorTypes = {
@@ -41,6 +41,56 @@ $(document).ready(function() {
     "9": { label: "Totem", see: 1 },
     "10": { label: "Sigil", see: 1 },
   };
+  
+  const armorBaseCalc = {
+    Back:    ilvl => ilvl * 1.19 + 5.1,
+    Cloth:   ilvl => ilvl * 1.19 + 5.1,
+    Leather: ilvl => ilvl * 2.22 + 10,
+    Mail:    ilvl => ilvl * 4.9 + 29,
+    Plate:   ilvl => ilvl * 9 + 23,
+    Shield:  ilvl => ilvl * 85 / 3 + 133
+  };
+
+  const armorQualityModifiers = {
+    uncommon: 1,
+    rare: {
+      normal: 1.1,
+      Shield: 1.22
+    },
+    epic: {
+      normal: 1.375,
+      Shield: 1.5616
+    },
+    legendary: {
+      normal: 1.55,
+      Shield: 1.75
+    },
+    artifact: {
+      normal: 1.75,
+      Shield: 1.95
+    }
+  };
+
+  const armorSlotCoefficients = {
+    Chest:     16/16,
+    Legs:      14/16,
+    Head:      13/16,
+    Shoulders: 12/16,
+    Feet:      11/16,
+    Hands:     10/16,
+    Waist:     9/16,
+    Wrists:    7/16,
+    Back:      5/16,
+    Shield:    1
+  };
+  
+  const shieldBlockModifiers = {
+    uncommon: 1,
+    rare: 1.22,
+    epic: 1.5616,
+    legendary: 1.75,
+    artifact: 1.95
+  };
 
   const weaponTypes = {
     "0": { label: "Axe", see: 1 },
@@ -54,7 +104,8 @@ $(document).ready(function() {
     "8": { label: "Sword", see: 1 },
     "6": { label: "Polearm", see: 1 },
     "10": { label: "Staff", see: 1 },
-    "2": { label: "Bow", see: 1 },
+    "2": { label: "Bow", see: 0 },
+    "22": { label: "Bow", see: 1 }, //Fake Bow Entry
     "3": { label: "Gun", see: 1 },
     "18": { label: "Crossbow", see: 1 },
     "19": { label: "Wand", see: 1 },
@@ -69,6 +120,67 @@ $(document).ready(function() {
     "5": { label: "Shadow" },
     "6": { label: "Arcane" },
   };
+  
+  const weaponBaseDamageCalc = {
+    "13": { // One-Hand
+      uncommon:  ilvl => ilvl <= 97 ? ilvl * 0.3448 + 16.7552 : ilvl * 0.6333 - 10.7,
+      rare:      ilvl => ilvl <= 97 ? ilvl * 0.4350 + 15.8250 : ilvl * 0.7488 - 14.4905,
+      epic:      ilvl => ilvl <= 97 ? ilvl * 0.4500 + 36.1000 : ilvl * 0.6 + 15.5,
+      legendary: ilvl => ilvl <= 97 ? ilvl * 0.475 + 50.0 : ilvl * 0.7 + 30.0,
+      artifact:  ilvl => ilvl <= 97 ? ilvl * 0.5 + 70.0 : ilvl * 0.8 + 50.0
+    },
+    "15": { // Bow
+      uncommon:  ilvl => (ilvl <= 97 ? ilvl * 0.3448 + 16.7552 : ilvl * 0.6333 - 10.7) * 1.3,
+      rare:      ilvl => (ilvl <= 97 ? ilvl * 0.435 + 15.825 : ilvl * 0.7488 - 14.4905) * 1.3,
+      epic:      ilvl => (ilvl <= 97 ? ilvl * 0.45 + 36.1 : ilvl * 0.6 + 15.5) * 1.3,
+      legendary: ilvl => (ilvl <= 97 ? ilvl * 0.475 + 50.0 : ilvl * 0.7 + 30.0) * 1.3,
+      artifact:  ilvl => (ilvl <= 97 ? ilvl * 0.5 + 70.0 : ilvl * 0.8 + 50.0) * 1.3
+    },
+    "17": { // Two-Hand
+      uncommon:  ilvl => (ilvl <= 97 ? ilvl * 0.3448 + 16.7552 : ilvl * 0.6333 - 10.7) * 1.3,
+      rare:      ilvl => (ilvl <= 97 ? ilvl * 0.435 + 15.825 : ilvl * 0.7488 - 14.4905) * 1.3,
+      epic:      ilvl => (ilvl <= 97 ? ilvl * 0.45 + 36.1 : ilvl * 0.6 + 15.5) * 1.3,
+      legendary: ilvl => (ilvl <= 97 ? ilvl * 0.475 + 50.0 : ilvl * 0.7 + 30.0) * 1.3,
+      artifact:  ilvl => (ilvl <= 97 ? ilvl * 0.5 + 70.0 : ilvl * 0.8 + 50.0) * 1.3
+    },
+    "26": { // Ranged
+      "2": { // Bow
+        uncommon:  ilvl => (ilvl <= 97 ? ilvl * 0.3448 + 16.7552 : ilvl * 0.6333 - 10.7) * 1.3,
+        rare:      ilvl => (ilvl <= 97 ? ilvl * 0.435 + 15.825 : ilvl * 0.7488 - 14.4905) * 1.3,
+        epic:      ilvl => (ilvl <= 97 ? ilvl * 0.45 + 36.1 : ilvl * 0.6 + 15.5) * 1.3,
+        legendary: ilvl => (ilvl <= 97 ? ilvl * 0.475 + 50.0 : ilvl * 0.7 + 30.0) * 1.3,
+        artifact:  ilvl => (ilvl <= 97 ? ilvl * 0.5 + 70.0 : ilvl * 0.8 + 50.0) * 1.3
+      },
+      "3": { // Gun
+        uncommon:  ilvl => ilvl * 0.5 + 1.4,
+        rare:      ilvl => ilvl * 0.58 - 0.3,
+        epic:      ilvl => ilvl * 0.4047 + 32.84,
+        legendary: ilvl => ilvl * 0.5 + 40.0,
+        artifact:  ilvl => ilvl * 0.6 + 60.0
+      },
+      "18": { // Crossbow
+        uncommon:  ilvl => ilvl * 0.5 + 1.4,
+        rare:      ilvl => ilvl * 0.58 - 0.3,
+        epic:      ilvl => ilvl * 0.4047 + 32.84,
+        legendary: ilvl => ilvl * 0.5 + 40.0,
+        artifact:  ilvl => ilvl * 0.6 + 60.0
+      },
+      "19": { // Wand
+        uncommon:  ilvl => (ilvl <= 97 ? ilvl * 0.3448 + 16.7552 : ilvl * 0.6333 - 10.7) * 1.77,
+        rare:      ilvl => (ilvl <= 97 ? ilvl * 0.435 + 15.825 : ilvl * 0.7488 - 14.4905) * 1.80,
+        epic:      ilvl => (ilvl <= 97 ? ilvl * 0.45 + 36.1 : ilvl * 0.6 + 15.5) * 1.83,
+        legendary: ilvl => (ilvl <= 97 ? ilvl * 0.475 + 50.0 : ilvl * 0.7 + 30.0) * 1.85,
+        artifact:  ilvl => (ilvl <= 97 ? ilvl * 0.5 + 70.0 : ilvl * 0.8 + 50.0) * 1.87
+      }
+    },
+    "25": { // Thrown
+      uncommon:  ilvl => ilvl * 0.5542 - 8.8045,
+      rare:      ilvl => ilvl * 0.6191 - 6.9569,
+      epic:      ilvl => ilvl * 0.4047 + 32.84,
+      legendary: ilvl => ilvl * 0.5 + 40.0,
+      artifact:  ilvl => ilvl * 0.6 + 60.0
+    }
+  };
 
   const statData = {
     "0": { label: "Mana", value: 2, type: 0 },
@@ -77,7 +189,7 @@ $(document).ready(function() {
     "4": { label: "Strength", value: 1, type: 0 },
     "5": { label: "Intellect", value: 1, type: 0 },
     "6": { label: "Spirit", value: 1, type: 0 },
-    "7": { label: "Stamina", value: 0.67, type: 0 },
+    "7": { label: "Stamina", value: (2/3), type: 0 },
     "12": { label: "Defense Rating", value: 1, type: 1 },
     "13": { label: "Dodge Rating", value: 1, type: 1 },
     "14": { label: "Parry Rating", value: 1, type: 1 },
@@ -87,14 +199,14 @@ $(document).ready(function() {
     "35": { label: "Resilience Rating", value: 1, type: 1 },
     "36": { label: "Haste Rating", value: 1, type: 1 },
     "37": { label: "Expertise Rating", value: 1, type: 1 },
-    "38": { label: "Attack Power", value: 0.5, type: 1 },
-    "43": { label: "Mana Regen MP5", value: 2.5, type: 1 },
-    "44": { label: "Armor Penetration Rating", value: 1, type: 1 },
-    "45": { label: "Spell Power", value: 0.7, type: 1 },
-    "46": { label: "Health Regen HP5", value: 1, type: 1 },
-    "47": { label: "Spell Penetration", value: 0.9, type: 1 },
-    "48": { label: "Block Value", value: 0.65, type: 1 },
-    "armor": { label: "Bonus Armor", value: 0.07, type: 2 },
+    "38": { label: "Attack Power", value: (1/2), type: 1 },
+    "43": { label: "Mana Regen MP5", value: (5/2), type: 1 },
+    "44": { label: "Armor Penetration Rating", value: (1/7), type: 1 },
+    "45": { label: "Spell Power", value: (6/7), type: 1 },
+    "46": { label: "Health Regen HP5", value: (3/2), type: 1 },
+    "47": { label: "Spell Penetration", value: (4/5), type: 1 },
+    "48": { label: "Block Value", value: (2/3), type: 1 },
+    "armor": { label: "Bonus Armor", value: (1/14), type: 2 },
     "arcane_res": { label: "Resist Arcane", value: 1, type: 0 },
     "fire_res": { label: "Resist Fire", value: 1, type: 0 },
     "holy_res": { label: "Resist Holy", value: 1, type: 0 },
@@ -254,6 +366,36 @@ $(document).ready(function() {
     console.log(`returned statValues: ${JSON.stringify(statValues)}`);
     return statValues;
   }
+  
+  function calculateArmor(slot, type, level, quality) {
+    const slotData = itemSlots[slot];
+    if (!slotData || !slotData.armor) { return; }
+    console.error("generating armor");
+    let qualityModifier;
+    const baseCalc = armorBaseCalc[type];
+    const baseValue = baseCalc(level);
+    console.log(`baseValue: ${baseValue}`);
+    if (type === 'Shield') {
+        if (quality === 'rare') { qualityModifier = armorQualityModifiers.rare.Shield; }
+        else if (quality === 'epic') { qualityModifier = armorQualityModifiers.epic.Shield; }
+        else if (quality === 'legendary') { qualityModifier = armorQualityModifiers.legendary.Shield; }
+        else if (quality === 'artifact') { qualityModifier = armorQualityModifiers.artifact.Shield; }
+        else { qualityModifier = armorQualityModifiers[quality]; }
+    }
+    else { qualityModifier = armorQualityModifiers[quality].normal || armorQualityModifiers[quality]; }
+    console.log(`qualityModifier: ${qualityModifier}`);
+    const slotCoefficient = armorSlotCoefficients[slotData.label];
+    const totalArmor = Math.ceil(baseValue * qualityModifier * slotCoefficient);
+    console.log(`totalArmor: ${totalArmor}`);
+    return `<div>${totalArmor} Armor</div>`;
+  }
+
+  function calculateShieldBlock(level, quality) {
+    const baseBlock = level * 0.5;
+    const modifier = shieldBlockModifiers[quality];
+    const totalBlock = Math.ceil(baseBlock * modifier);
+    return `<div>${totalBlock} Block</div>`;
+  }
 
   function isTypeVisible(typeKey, typeList) {
     return typeList[typeKey] ? typeList[typeKey].see : false;
@@ -290,16 +432,16 @@ $(document).ready(function() {
     }
   }
   
-  function createTooltipHTML(itemQuality, itemName, itemLevel, itemReqLevel, bindHTML, uniqueHTML, slotHTML, typeHTML, armor, bonusDamage1, bonusDamage2, whiteStatsHtml, greenStatsHtml) {
+  function createTooltipHTML(itemQuality, itemName, itemLevel, itemReqLevel, bindHTML, uniqueHTML, slotHTML, typeHTML, weaponDamage, itemArmor, blockValue, whiteStatsHtml, greenStatsHtml) {
     return `
       <div class="item-name ${itemQuality}">${itemName}</div>
       <div class="item-level">Item Level ${itemLevel}</div>
       ${bindHTML}
       ${uniqueHTML}
       <div class="group spread"><div class="item-slot">${slotHTML}</div>${typeHTML}</div>
-      ${armor}
-      ${bonusDamage1}
-      ${bonusDamage2}
+      ${weaponDamage}
+      ${itemArmor}
+      ${blockValue}
       <div class="white stats">${whiteStatsHtml}</div>
       <div class="item-reqlvl">Requires Level ${itemReqLevel}</div>
       <div class="green stats">${greenStatsHtml}</div>
@@ -319,7 +461,69 @@ $(document).ready(function() {
     }
     return '';
   }
-  
+
+  function reverseEngineerDPS(dps, type) {
+    const assumedMinMaxRatio = 0.9; // Assuming min damage is 90% of max damage
+    let attackSpeed;
+
+    switch(type) {
+      case "13": // One-Hand
+        attackSpeed = 2.6;
+        break;
+      case "15": // Bow
+        attackSpeed = 2.8;
+        break;
+      case "17": // Two-Hand
+        attackSpeed = 3.5;
+        break;
+      case "26_2": // Bow
+        attackSpeed = 2.8;
+        break;
+      case "26_2": // Bow
+        attackSpeed = 2.8;
+        break;
+      case "26_3": // Gun
+      case "26_18": // Crossbow
+        attackSpeed = 2.8;
+        break;
+      case "26_19": // Wand
+        attackSpeed = 1.7;
+        break;
+      case "25": // Thrown
+        attackSpeed = 1.7;
+        break;
+      default:
+        attackSpeed = 2.5;
+        break;
+    }
+
+    const avgDamage = dps * attackSpeed;
+    const maxDamage = avgDamage / ((1 + assumedMinMaxRatio) / 2);
+    const minDamage = maxDamage * assumedMinMaxRatio;
+
+    return { minDamage, maxDamage, attackSpeed };
+  }
+
+  function calculateWeaponDamage(type, subtype, level, quality, bonusDamage1 = '', bonusDamage2 = '') {
+    console.error('calculating weapon damage');
+    let baseCalc;
+    if (type == "26") { baseCalc = weaponBaseDamageCalc[type][subtype][quality]; }
+    else { baseCalc = weaponBaseDamageCalc[type][quality]; }
+    console.log(`baseCalc: ${baseCalc}`);
+    const dps = baseCalc(level);
+    console.log(`dps: ${dps}`);
+    const { minDamage, maxDamage, attackSpeed } = reverseEngineerDPS(dps, type + (subtype ? `_${subtype}` : ''));
+    return `
+      <div class="group spread">
+        <div>${Math.ceil(minDamage)} - ${Math.ceil(maxDamage)} Damage</div>
+        <div>Speed ${attackSpeed.toFixed(2)}</div>
+      </div>
+      ${bonusDamage1}
+      ${bonusDamage2}
+      <div>(${dps.toFixed(2)} damage per second)</div>
+    `;
+  }
+
   function sumStatValues() {
     let sum = 0;
     $('.stat-amount').each(function() {
@@ -407,10 +611,13 @@ $(document).ready(function() {
   
   $('#item-type').on('change', function() {
     const selectedType = $("#item-slot option:selected").data('type');
-    if (selectedType == 2) {
+    if (selectedType == 2) { // is a weapon
       updateWeaponDamageOptions();
-      $(".damageType").show();
       populateWeaponDamageTypes();
+      if ($("#item-slot option:selected").data('key') == 26) { $(".damageType").hide(); }
+      else if ($("#item-slot option:selected").data('key') == 25) { $(".damageType").hide(); }
+      else if ($("#item-slot option:selected").data('key') == 2) { $(".damageType").hide(); }
+      else { $(".damageType").show(); }
     }
   });
   
@@ -423,13 +630,14 @@ $(document).ready(function() {
     const selectedType = $(this).find('option:selected').data('type');
     if (selectedSlot) { populateItemTypes(itemSlots[selectedSlot].types, selectedType); }
     $(".itemType").show();
+    if(selectedSlot == 26 || selectedSlot == 25 || selectedSlot == 15) { $(".damageType").hide(); }
   });
 
-  $('#calculator').submit(function(e) { e.preventDefault(); });
-  
   populateItemSlots($('input[name="itemClass"]:checked').val());
 
-  $('.calculate').click(function() { // calculate
+  $('#calculator').submit(function(e) {
+    e.preventDefault();
+    //$('.calculate').click(function() { // calculate
 
     const calcMethod = $('input[name="calcMethod"]:checked').val();
     if (calcMethod === 'stats' && ($("#item-level").val() <= 0 || sumStatValues() != 100)) {
@@ -499,9 +707,11 @@ $(document).ready(function() {
     let uniqueHTML = '';
     let whiteStatsHtml = '';
     let greenStatsHtml = '';
-    let armor = '';
+    let itemArmor = '';
+    let blockValue = '';
     let bonusDamage1 = '';
     let bonusDamage2 = '';
+    let weaponDamage = '';
 
     $('#stats .group').each(function() {
       let statTypeText = $(this).find('.stat-type option:selected').text();
@@ -533,27 +743,33 @@ $(document).ready(function() {
     
     let itemReqLevel = $("#item-reqlvl").val() || 0;
 
-    let itemtype = $('#item-slot option:selected').data('type');
-    
+    let itemClass = $('#item-slot option:selected').data('type');
+    let itemSlotKey = $('#item-slot option:selected').data('key');
+    let itemType = $('#item-type option:selected').text();
+    let itemTypeKey = $('#item-type option:selected').val();
+
     let itemName = $("#item-name").val() || `${itemQualityPretty} ${slotNamePretty}`;
 
-    if (itemtype == 2) {
-
-      // calculate real weapon damage
-      // min damage, max damage, speed, and dps avg
-
+    if (itemClass == 2) { // weapon properties
       let bonusDamage1 = getBonusDamage(1);
       let bonusDamage2 = getBonusDamage(2);
+      weaponDamage = calculateWeaponDamage(itemSlotKey, itemTypeKey, itemLevel, itemQuality, bonusDamage1, bonusDamage2);
     }
 
-    if (itemtype == 4) {
+    if (itemClass == 4) { // armor properties
 
       // output armor
+      itemArmor = calculateArmor(itemSlotKey, itemType, itemLevel, itemQuality);
       // calc armor first, then add bonus armor, then make the stat green
       // extra armor is stored in ArmorDamageModifier
+      if(itemSlotKey == 14) {
+        blockValue = calculateShieldBlock(itemLevel, itemQuality);
+      }
     }
+    
+    // durability
 
-    let tooltipHtml = createTooltipHTML(itemQuality, itemName, itemLevel, itemReqLevel, bindHTML, uniqueHTML, slotHTML, getItemTypeHTML(), armor, bonusDamage1, bonusDamage2, whiteStatsHtml, greenStatsHtml);
+    let tooltipHtml = createTooltipHTML(itemQuality, itemName, itemLevel, itemReqLevel, bindHTML, uniqueHTML, slotHTML, getItemTypeHTML(), weaponDamage, itemArmor, blockValue, whiteStatsHtml, greenStatsHtml);
     $('#output .tooltip').html(tooltipHtml);
 
   });

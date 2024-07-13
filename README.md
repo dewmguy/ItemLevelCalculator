@@ -2,6 +2,8 @@
 
 An item level calculator for World of Warcraft emulators, designed to help create, modify, and validate ilvl balanced armor and weapons. Currently focusing the equation on balancing items for the Wrath of the Lich King expansion. Vanilla and Burning Crusade equations and data will be coming.
 
+## The values and coefficients in their current form are greatly inaccurate 
+
 ### Key Terms
 
 The formula is based on the following parameters:
@@ -21,7 +23,7 @@ The formula is designed to calculate the ItemValue by taking each modified stat 
 The formula for calculating **ItemValue** is:
 
 ```
-StatBudget = [(StatValue[1] * StatMod[1])^1.5 + (StatValue[2] * StatMod[2])^1.5 + ...]^(1/1.5)
+StatBudget^1.5 = [(StatValue[1] * StatMod[1])^1.5 + (StatValue[2] * StatMod[2])^1.5 + ...]
 
 ItemBudget = StatBudget / SlotMod
 
@@ -110,20 +112,20 @@ Lastly, the quality of the item provides the final modification, resulting in a 
 
 Base Armor is inherent to the ilvl of the item and varies based on item type and quality. Base Armor is not to be confused with Bonus Armor, which is applied to an item as an additional stat like stamina.
 
-### Armor Type Calculation
+### Armor Item Type per Quality Calculation
 
-| Armor Type | Base Calculation  | Uncommon | Rare        | Epic          |
+| Item Type  | Base Calculation  | Uncommon | Rare        | Epic          |
 |------------|-------------------|----------|-------------|---------------|
-| Back/Cloak | ilvl * 1.19 + 5.1 | Base * 1 | Base * 1.1  | Base * 1.375  |
+| Back       | ilvl * 1.19 + 5.1 | Base * 1 | Base * 1.1  | Base * 1.375  |
 | Cloth      | ilvl * 1.19 + 5.1 | Base * 1 | Base * 1.1  | Base * 1.375  |
 | Leather    | ilvl * 2.22 + 10  | Base * 1 | Base * 1.1  | Base * 1.375  |
 | Mail       | ilvl * 4.9 + 29   | Base * 1 | Base * 1.1  | Base * 1.375  |
 | Plate      | ilvl * 9 + 23     | Base * 1 | Base * 1.1  | Base * 1.375  |
 | Shield     | ilvl * 85/3 + 133 | Base * 1 | Base * 1.22 | Base * 1.5616 |
 
-### Armor Slot Modifiers
+### Armor Item Slot Modifiers
 
-| Armor Slot | Coefficient |
+| Item Slot | Coefficient |
 |------------|-------------|
 | Chest      | 16/16       |
 | Legs       | 14/16       |
@@ -132,19 +134,17 @@ Base Armor is inherent to the ilvl of the item and varies based on item type and
 | Feet       | 11/16       |
 | Hands      | 10/16       |
 | Waist      | 9/16        |
-| Wrist      | 7/16        |
+| Wrists     | 7/16        |
 | Back       | 5/16        |
 | Shield     | 1/1         |
 
 ## Shield Block Calculation
 
-Base Shield Block Value
-
-```
-Uncommon = ilvl * 0.5 * 1
-Rare = ilvl * 0.5 * 1.22
-Epic = ilvl * 0.5 * 1.5616
-```
+| Quality  | Base Block Value    |
+|----------|---------------------|
+| Uncommon | ilvl * 0.5 * 1      |
+| Rare     | ilvl * 0.5 * 1.22   |
+| Epic     | ilvl * 0.5 * 1.5616 |
 
 ## Weapon DPS
 
