@@ -27,7 +27,7 @@
                         <div class="text note textStats">The calculator will determine the stat values based on the ilvl.</div>
                     </div>
                     <div class="group select">
-                        <div class="item"><input type="radio" id="uncommon" name="itemQuality" value="uncommon" required /> <label class="uncommon" for="uncommon">Uncommon</label></div>
+                        <div class="item"><input type="radio" id="uncommon" name="itemQuality" value="uncommon" checked required /> <label class="uncommon" for="uncommon">Uncommon</label></div>
                         <div class="item"><input type="radio" id="rare" name="itemQuality" value="rare" required /> <label class="rare" for="rare">Rare</label></div>
                         <div class="item"><input type="radio" id="epic" name="itemQuality" value="epic" required /> <label class="epic" for="epic">Epic</label></div>
                         <div class="item"><input type="radio" id="legendary" name="itemQuality" value="legendary" required /> <label class="legendary" for="legendary">Legendary</label></div>
@@ -41,12 +41,17 @@
                         <select class="itemSlot" id="item-slot" name="itemSlot" required></select>
                         <select class="itemType" id="item-type" name="itemType" required></select>
                     </div>
-                    <div class="group damageType">
+                    <div class="group weaponDamage">
+                        <div class="item"><input type="number" id="damageMin" name="damageMin" placeholder="Min" /></div>
+                        <div class="item"><input type="number" id="damageMax" name="damageMax" placeholder="Max" /></div>
+                        <div class="item"><input type="number" id="attackSpeed" name="attackSpeed" step="0.1" placeholder="Speed" /></div>
+                    </div>
+                    <div class="group weaponDamageExtra">
                         <select id="item-damage1" name="damageType1"></select>
                         <div class="item"><input type="number" id="damageMin1" name="damageMin1" placeholder="Min" /></div>
                         <div class="item"><input type="number" id="damageMax1" name="damageMax1" placeholder="Max" /></div>
                     </div>
-                    <div class="group damageType">
+                    <div class="group weaponDamageExtra">
                         <select id="item-damage2" name="damageType2"></select>
                         <div class="item"><input type="number" id="damageMin2" name="damageMin2" placeholder="Min" /></div>
                         <div class="item"><input type="number" id="damageMax2" name="damageMax2" placeholder="Max" /></div>

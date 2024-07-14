@@ -7,8 +7,8 @@ $(document).ready(function() {
     "3": { label: "Shoulder", value: 0.77, type: 4, armor: 1, types: [1, 2, 3, 4] },
     "16": { label: "Back", value: 0.55, type: 4, armor: 1, types: [1] },
     "5": { label: "Chest", value: 1.00, type: 4, armor: 1, types: [1, 2, 3, 4] },
-    "20": { label: "Chest (Robe)", value: 1.00, armor: 1, type: 4, types: [1, 2, 3, 4] },
-    "4": { label: "Shirt", value: 0.55, type: 4, armor: 0, types: [1, 2, 3, 4] },
+    "20": { label: "Robe", value: 1.00, armor: 1, type: 4, types: [1, 2, 3, 4] },
+    "4": { label: "Shirt", value: 0.55, type: 4, armor: 0, types: [1] },
     "19": { label: "Tabard", value: 0.55, type: 4, armor: 0, types: [0] },
     "9": { label: "Wrists", value: 0.55, type: 4, armor: 1, types: [1, 2, 3, 4] },
     "10": { label: "Hands", value: 0.77, type: 4, armor: 1, types: [1, 2, 3, 4] },
@@ -24,9 +24,9 @@ $(document).ready(function() {
     "22": { label: "Off-Hand", value: 0.42, type: 2, armor: 0, types: [0, 4, 7, 15, 13] },
     "13": { label: "One-Hand", value: 0.42, type: 2, armor: 0, types: [0, 4, 7, 15, 13] },
     "17": { label: "Two-Hand", value: 1.00, type: 2, armor: 0, types: [1, 5, 8, 6, 10] },
-    "15": { label: "Bow", value: 1.00, type: 2, armor: 0, types: [2] },
+    "15": { label: "Bow", value: 1.00, type: 2, armor: 0, types: [2] }, // real bow
     "25": { label: "Thrown", value: 0.42, type: 2, armor: 0, types: [16] },
-    "26": { label: "Ranged", value: 0.42, type: 2, armor: 0, types: [22, 3, 18, 19] },
+    "26": { label: "Ranged", value: 0.42, type: 2, armor: 0, types: [3, 18, 19] },
   };
 
   const armorTypes = {
@@ -72,10 +72,12 @@ $(document).ready(function() {
   };
 
   const armorSlotCoefficients = {
+    //Shirt:     1/16,
     Chest:     16/16,
+    Robe:      16/16,
     Legs:      14/16,
     Head:      13/16,
-    Shoulders: 12/16,
+    Shoulder:  12/16,
     Feet:      11/16,
     Hands:     10/16,
     Waist:     9/16,
@@ -383,7 +385,7 @@ $(document).ready(function() {
   
   function calculateArmor(slot, type, level, quality) {
     const slotData = itemSlots[slot];
-    if (!slotData || !slotData.armor) { return; }
+    if (slotData.armor == 0) { return ''; }
     console.error("generating armor");
     let qualityModifier;
     const baseCalc = armorBaseCalc[type];
@@ -468,72 +470,49 @@ $(document).ready(function() {
     const maxSelector = `#damageMax${index}`;
 
     if ($(damageTypeSelector).val() !== "" && $(minSelector).val() > 0 && $(maxSelector).val() > 0) {
-        let bonusDamageType = $(damageTypeSelector).text();
-        let bonusDamageMin = $(minSelector).val();
-        let bonusDamageMax = $(maxSelector).val();
-        return `<div>+${bonusDamageMin} - ${bonusDamageMax} ${bonusDamageType} Damage</div>`;
+      let bonusDamageType = $(damageTypeSelector).text();
+      let bonusDamageMin = parseFloat($(minSelector).val());
+      let bonusDamageMax = parseFloat($(maxSelector).val());
+      return {
+        min: bonusDamageMin,
+        max: bonusDamageMax,
+        type: bonusDamageType,
+        display: `<div>+${bonusDamageMin} - ${bonusDamageMax} ${bonusDamageType} Damage</div>`
+      };
     }
-    return '';
+    return null;
   }
 
-  function reverseEngineerDPS(dps, type) {
-    const assumedMinMaxRatio = 0.9; // Assuming min damage is 90% of max damage
-    let attackSpeed;
-
-    switch(type) {
-      case "13": // One-Hand
-        attackSpeed = 2.6;
-        break;
-      case "15": // Bow
-        attackSpeed = 2.8;
-        break;
-      case "17": // Two-Hand
-        attackSpeed = 3.5;
-        break;
-      case "26_2": // Bow
-        attackSpeed = 2.8;
-        break;
-      case "26_2": // Bow
-        attackSpeed = 2.8;
-        break;
-      case "26_3": // Gun
-      case "26_18": // Crossbow
-        attackSpeed = 2.8;
-        break;
-      case "26_19": // Wand
-        attackSpeed = 1.7;
-        break;
-      case "25": // Thrown
-        attackSpeed = 1.7;
-        break;
-      default:
-        attackSpeed = 2.5;
-        break;
-    }
-
-    const avgDamage = dps * attackSpeed;
-    const maxDamage = avgDamage / ((1 + assumedMinMaxRatio) / 2);
-    const minDamage = maxDamage * assumedMinMaxRatio;
-
-    return { minDamage, maxDamage, attackSpeed };
+  function calculateDPS(min, max, rate) {
+    const avg = (min + max) / 2;
+    return avg / rate;
   }
 
-  function calculateWeaponDamage(type, subtype, level, quality, bonusDamage1 = '', bonusDamage2 = '') {
+  function calculateWeaponDamage(damageMin, damageMax, attackSpeed, bonusDamages = []) {
     console.error('calculating weapon damage');
-    let baseCalc;
-    if (type == "26") { baseCalc = weaponBaseDamageCalc[type][subtype][quality]; }
-    else { baseCalc = weaponBaseDamageCalc[type][quality]; }
-    console.log(`baseCalc: ${baseCalc}`);
-    const dps = baseCalc(level);
+
+    let totalMinDamage = damageMin;
+    let totalMaxDamage = damageMax;
+    let bonusDamageHTML = '';
+
+    bonusDamages.forEach(bonus => {
+      if (bonus) {
+        console.log("bonus damage exists")
+        totalMinDamage += bonus.min;
+        totalMaxDamage += bonus.max;
+        bonusDamageHTML += bonus.display;
+      }
+    });
+
+    const dps = calculateDPS(totalMinDamage, totalMaxDamage, attackSpeed);
     console.log(`dps: ${dps}`);
-    const { minDamage, maxDamage, attackSpeed } = reverseEngineerDPS(dps, type + (subtype ? `_${subtype}` : ''));
+
     return `
       <div class="group spread">
-        <div>${Math.ceil(minDamage)} - ${Math.ceil(maxDamage)} Damage</div>
+        <div>${Math.ceil(totalMinDamage)} - ${Math.ceil(totalMaxDamage)} Damage</div>
         <div>Speed ${attackSpeed.toFixed(2)}</div>
       </div>
-      ${bonusDamage1}
-      ${bonusDamage2}
+      ${bonusDamageHTML}
       <div>(${dps.toFixed(2)} damage per second)</div>
     `;
   }
@@ -574,26 +553,30 @@ $(document).ready(function() {
   $("#output").hide();
   $("#warning").hide();
   $(".itemType").hide();
+  let lastSelected = null;
 
-  $("#armor").click(function() {
+  $('input[name="itemClass"]').click(function() {
+    const currentSelection = $(this).val();
+    if (lastSelected === currentSelection) { return; }
+    lastSelected = currentSelection;
+
     let itemClass = $('input[name="itemClass"]:checked').val();
     populateItemSlots(itemClass);
     $('.itemSlot').show();
     $(".itemType").hide();
-    $("#item-damage").empty();
-    $("#damageMax, #damageMin").val('');
-    $(".damageType").hide();
-  });
-  $("#weapon").click(function() {
-    let itemClass = $('input[name="itemClass"]:checked').val();
-    populateItemSlots(itemClass);
-    $('.itemSlot').show();
-    $(".itemType").hide();
+    if (currentSelection == 4) {
+      $("#item-damage").empty();
+      $("#damageMax, #damageMin").val('');
+      $(".weaponDamage").hide();
+      $('.weaponDamageExtra input').val('');
+      $(".weaponDamageExtra").hide();
+    }
   });
 
   $('#item-level').hide();
   $('.textStats').hide();
-  $(".damageType").hide();
+  $(".weaponDamage").hide();
+  $(".weaponDamageExtra").hide();
   $("#selectLevel").click(function() {
     $("#item-level").val('').hide();
     $(".textStats").hide();
@@ -628,10 +611,20 @@ $(document).ready(function() {
     if (selectedType == 2) { // is a weapon
       updateWeaponDamageOptions();
       populateWeaponDamageTypes();
-      if ($("#item-slot option:selected").data('key') == 26) { $(".damageType").hide(); }
-      else if ($("#item-slot option:selected").data('key') == 25) { $(".damageType").hide(); }
-      else if ($("#item-slot option:selected").data('key') == 2) { $(".damageType").hide(); }
-      else { $(".damageType").show(); }
+      $(".weaponDamage").show();
+      if ($("#item-slot option:selected").data('key') == 26) {
+        $('.weaponDamageExtra input').val('');
+        $(".weaponDamageExtra").hide();
+      }
+      else if ($("#item-slot option:selected").data('key') == 25) {
+        $('.weaponDamageExtra input').val('');
+        $(".weaponDamageExtra").hide();
+      }
+      else if ($("#item-slot option:selected").data('key') == 2) {
+        $('.weaponDamageExtra input').val('');
+        $(".weaponDamageExtra").hide();
+      }
+      else { $(".weaponDamageExtra").show(); }
     }
   });
   
@@ -644,7 +637,10 @@ $(document).ready(function() {
     const selectedType = $(this).find('option:selected').data('type');
     if (selectedSlot) { populateItemTypes(itemSlots[selectedSlot].types, selectedType); }
     $(".itemType").show();
-    if(selectedSlot == 26 || selectedSlot == 25 || selectedSlot == 15) { $(".damageType").hide(); }
+    if(selectedSlot == 26 || selectedSlot == 25 || selectedSlot == 15) {
+      $('.weaponDamageExtra input').val('');
+      $(".weaponDamageExtra").hide();
+    }
   });
 
   populateItemSlots($('input[name="itemClass"]:checked').val());
@@ -723,8 +719,6 @@ $(document).ready(function() {
     let greenStatsHtml = '';
     let itemArmor = '';
     let blockValue = '';
-    let bonusDamage1 = '';
-    let bonusDamage2 = '';
     let weaponDamage = '';
 
     $('#stats .group').each(function() {
@@ -752,8 +746,7 @@ $(document).ready(function() {
     if (unique) { uniqueHTML = `<div class="item-unique">${unique}</div>`; }
 
     let slotName = $('#item-slot option:selected').text();
-    let slotHTML = slotName;
-    let slotNamePretty = slotName == "Back" ? "Cloak" : slotName;
+    let itemName = $("#item-name").val() || `${itemQualityPretty} ${slotName}`;
     
     let itemReqLevel = $("#item-reqlvl").val() || 0;
 
@@ -762,12 +755,12 @@ $(document).ready(function() {
     let itemType = $('#item-type option:selected').text();
     let itemTypeKey = $('#item-type option:selected').val();
 
-    let itemName = $("#item-name").val() || `${itemQualityPretty} ${slotNamePretty}`;
-
     if (itemClass == 2) { // weapon properties
-      let bonusDamage1 = getBonusDamage(1);
-      let bonusDamage2 = getBonusDamage(2);
-      weaponDamage = calculateWeaponDamage(itemSlotKey, itemTypeKey, itemLevel, itemQuality, bonusDamage1, bonusDamage2);
+      const damageMin = parseFloat($("#damageMin").val());
+      const damageMax = parseFloat($("#damageMax").val());
+      const attackSpeed = parseFloat($("#attackSpeed").val());
+      const bonusDamages = [getBonusDamage(1), getBonusDamage(2)];
+      weaponDamage = calculateWeaponDamage(damageMin, damageMax, attackSpeed, bonusDamages);
     }
 
     if (itemClass == 4) { // armor properties
@@ -783,7 +776,7 @@ $(document).ready(function() {
     
     // durability
 
-    let tooltipHtml = createTooltipHTML(itemQuality, itemName, itemLevel, itemReqLevel, bindHTML, uniqueHTML, slotHTML, getItemTypeHTML(), weaponDamage, itemArmor, blockValue, whiteStatsHtml, greenStatsHtml);
+    let tooltipHtml = createTooltipHTML(itemQuality, itemName, itemLevel, itemReqLevel, bindHTML, uniqueHTML, slotName, getItemTypeHTML(), weaponDamage, itemArmor, blockValue, whiteStatsHtml, greenStatsHtml);
     $('#output .tooltip').html(tooltipHtml);
 
   });
