@@ -85,14 +85,6 @@ $(document).ready(function() {
     Back:      5/16,
     Shield:    1
   };
-  
-  const shieldBlockModifiers = {
-    uncommon: 1,
-    rare: 1.22,
-    epic: 1.5616,
-    legendary: 1.75,
-    artifact: 1.95
-  };
 
   const weaponTypes = {
     "0": { label: "Axe", see: 1 },
@@ -407,9 +399,19 @@ $(document).ready(function() {
   }
 
   function calculateShieldBlock(level, quality) {
-    const baseBlock = level * 0.5;
-    const modifier = shieldBlockModifiers[quality];
-    const totalBlock = Math.ceil(baseBlock * modifier);
+    let baseBlock;
+    switch (quality) {
+      case 'uncommon':
+        baseBlock = 0.4725 * level - 0.00668 * Math.pow(level, 2) + 0.0001745 * Math.pow(level, 3) - 0.00000094 * Math.pow(level, 4) + 0.0000000015 * Math.pow(level, 5);
+        break;
+      case 'rare':
+        baseBlock = 3.0 + 0.12125 * level + 0.00838 * Math.pow(level, 2) - 0.000018 * Math.pow(level, 3) + 0.00000001 * Math.pow(level, 4) - 0.0000000001 * Math.pow(level, 5);
+        break;
+      default: // epic or better
+        baseBlock = 3.0 + 0.35622 * level + 0.0057 * Math.pow(level, 2) + 0.0000505 * Math.pow(level, 3) - 0.000000507 * Math.pow(level, 4) + 0.000000001 * Math.pow(level, 5);
+        break;
+    }
+    const totalBlock = Math.ceil(baseBlock);
     return `<div>${totalBlock} Block</div>`;
   }
 

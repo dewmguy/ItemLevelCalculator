@@ -171,8 +171,7 @@ button:hover { background-color: #e6c200 }
   display: flex;
   gap: 10px;
   flex-direction: column;
-  min-width: 360px;
-  width: 360px;
+  min-width: 375px;
 }
 
 .delete {
