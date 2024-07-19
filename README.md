@@ -1,8 +1,14 @@
-# ItemLevelCalculator
+# [ItemLevelCalculator](https://dewmguy.github.io/ItemLevelCalculator/)
 
-An item level calculator for World of Warcraft emulators, designed to help create, modify, and validate ilvl balanced armor and weapons. Currently focusing the equation on balancing items for the Wrath of the Lich King expansion. Vanilla and Burning Crusade equations and data will be coming.
+This WIP web application functions as an item level calculator, aiding in the creation, modification, and validation of item level balanced armor and weapons from World of Warcraft Wrath of the Lich King 3.3.5 emulators, such as AzerothCore or TrinityCore.
 
-## The values and coefficients in their current form are greatly inaccurate 
+The polynomial curves used in calculation are intended to be as accurate to the original items as possible. The curves will replace the mathematical assumptions of community-collected data that has largely been inspired by the mathematics introduced by a user known as Hyzenthlei.
+
+Many of the values and coefficients in their current form are greatly inaccurate, generally referred to by most of the community as "good enough." The new polynomial curves being introduced will provide significantly more reliable output, intended to match the in-game values as closely as possible.
+
+I am not a data scientist nor am I highly mathematically inclined. The data curves used in these calculations were created with [Polynomial Visualizer](https://github.com/dewmguy/PolynomialVisualizer), another web application I wrote specifically to help me calculate, fine-tune, and graph polynomial coefficients based on plottable item data.
+
+![Screenshot](screenshot.png?raw=true "Screenshot of Item Calculator Interface")
 
 ### Key Terms
 
@@ -16,7 +22,7 @@ The formula is based on the following parameters:
 - **QualityMods**: The weight coefficients per equipment quality.
 - **ilvl**: The effective level of an item.
 
-### Formula
+### Stats Formula
 
 The formula is designed to calculate the ItemValue by taking each modified stat value to the power of 1.5, summing these powered terms. This method ensures that single, high-value stats are more expensive compared to multiple, lower-value stats.
 
@@ -140,11 +146,26 @@ Base Armor is inherent to the ilvl of the item and varies based on item type and
 
 ## Shield Block Calculation
 
-| Quality  | Base Block Value    |
-|----------|---------------------|
-| Uncommon | ilvl * 0.5 * 1      |
-| Rare     | ilvl * 0.5 * 1.22   |
-| Epic     | ilvl * 0.5 * 1.5616 |
+### Uncommon
+
+$$ 
+0.4725 \cdot \text{ilvl} - 0.00668 \cdot \text{ilvl}^2 + 0.0001745 \cdot \text{ilvl}^3 - 0.00000094 \cdot \text{ilvl}^4 + 0.0000000015 \cdot \text{ilvl}^5 
+$$
+
+### Rare
+
+$$ 
+3.0 + 0.12125 \cdot \text{level} + 0.00838 \cdot \text{level}^2 - 0.000018 \cdot \text{level}^3 + 0.00000001 \cdot \text{level}^4 - 0.0000000001 \cdot \text{level}^5 
+$$
+
+### Epic
+
+$$ 
+3.0 + 0.35622 \cdot \text{level} + 0.0057 \cdot \text{level}^2 + 0.0000505 \cdot \text{level}^3 - 0.000000507 \cdot \text{level}^4 + 0.000000001 \cdot \text{level}^5 
+$$
+
+Note: There isn't enough reliable data for higher quality items. I will leave it to someone more mathematically inclined to recommend corrections or suggestions for what those curves would or should look like. For now, the calculator defaults to the epic curve.
+
 
 ## Weapon DPS
 
@@ -179,3 +200,7 @@ The values outlined in the documentation above are based on various wiki article
 - [Wowwiki (HU)](https://wowwiki.fandom.com/hu/wiki/Level_(Item)#Calculating_Item_Level)
 - [Elitist Jerks (archive)](https://web.archive.org/web/20111109062432/http://elitistjerks.com/f15/t44718-item_level_mechanics/)
 - [Elitist Jerks Summary](https://web.archive.org/web/20120510064628/http://elitistjerks.com/f15/t6928-looking_good_summary_known_info_itemization/#11)
+
+The images for item display were compiled by [reynoldscahoon](https://github.com/ReynoldsCahoon).
+
+A not insignificant amount of inspiration for this application was derived from a spreadsheet created by (RS_Degen)[https://old.reddit.com/r/wowservers/comments/wipl9j/wotlk_random_item_generator/]
