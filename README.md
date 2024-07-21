@@ -1,4 +1,4 @@
-# [ItemLevelCalculator](https:///ItemLevelCalculator/)
+# [ItemLevelCalculator](https://dewmguy.github.io/ItemLevelCalculator/)
 
 This WIP web application functions as an item level calculator, aiding in the creation, modification, and validation of item level balanced armor and weapons from World of Warcraft Wrath of the Lich King 3.3.5 emulators, such as AzerothCore or TrinityCore.
 
