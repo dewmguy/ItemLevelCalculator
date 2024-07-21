@@ -256,12 +256,12 @@ button:hover { background-color: #e6c200 }
   font-size: 10px;
 }
 
-.error {
-  color: #F55;
-}
+.flavor { color: #FFD100 }
+
+.error { color: #F55 }
 
 .tooltip {
-  min-width: 280px;
+  width: 275px;
   background-color: #080D22;
   padding: 10px;
   border: 1px solid #555;
