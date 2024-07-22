@@ -37,7 +37,7 @@ $$
 
 | Item Quality | qualityMult | qualityBase |
 |--------------|-------------|-------------|
-| Uncommon     | 2/1 (2.0)   |  8/1 (8.0)  |
+| Uncommon     | 2/1 (2.0)   |  8/1 ( 8.0) |
 | Rare         | 9/5 (1.8)   |  3/4 (0.75) |
 | Epic         | 3/2 (1.5)   | 26/1 (26.0) |
 
@@ -48,92 +48,76 @@ If the ItemBudget is `100` and the item quality is:
 
 ## StatMod
 
-| General Stats     | StatMod Value |
-|-------------------|---------------|
-| Bonus Armor       | (1/14)        |
-| Strength          | (1/1)         |
-| Agility           | (1/1)         |
-| Intellect         | (1/1)         |
-| Spirit            | (1/1)         |
-| Stamina           | (2/3)         |
-| Hit Rating        | (1/1)         |
-| Crit Rating       | (1/1)         |
-| Haste Rating      | (1/1)         |
-| Defense Rating    | (1/1)         |
-| Expertise Rating  | (1/1)         |
-| Dodge Rating      | (1/1)         |
-| Parry Rating      | (1/1)         |
-| Block Rating      | (1/1)         |
-| Attack Power      | (1/2)         |
-| Spell Damage      | (6/7)         |
-| Resiliance        | (1/1)         |
-| Resistance        | (1/1)         |
-| Armor Penetration | (1/7)         |
-| Spell Penetration | (4/5)         |
-| Block Value       | (2/3)         |
-| Mana Regen Per 5  | (5/2)         |
-| Life Regen Per 5  | (3/2)         |
+| General Stats      | StatMod |
+|--------------------|---------|
+| Mana               | (32/16) |
+| Health             | (32/16) |
+| Agility            | (16/16) |
+| Strength           | (16/16) |
+| Intellect          | (16/16) |
+| Spirit             | (16/16) |
+| Stamina            | (11/16) |
+| Defense Rating     | (16/16) |
+| Dodge Rating       | (16/16) |
+| Parry Rating       | (16/16) |
+| Block Rating       | (16/16) |
+| Hit Rating         | (16/16) |
+| Crit Rating        | (16/16) |
+| Resiliance         | (16/16) |
+| Haste Rating       | (16/16) |
+| Expertise Rating   | (16/16) |
+| Attack Power       |  (8/16) |
+| Mana Regen Per 5   | 273/200 |
+| Armor Penetration  |  (2/16) |
+| Spell Power        | (14/16) |
+| Health Regen Per 5 |  91/400 |
+| Spell Penetration  | (12/16) |
+| Block Value        | (11/16) |
+| Bonus Armor        |  (1/16) |
+| Resistances        | (16/16) |
 
-| Ring Only Stats         | StatMod Value |
-|-------------------------|---------------|
-| Resistance (All)        | (9/5)         |
-| Resistance (One School) | (18/25)       |
-| Life Regen Per 5        | (7/2)         |
+| Ring Only Stats   | StatMod |
+|-------------------|---------|
+| Resistance (All)  | (9/5)   |
+| Resistance (One)  | (18/25) |
+| Life Regen Per 5  | (7/2)   |
 
-| Neck Only Stats  | StatMod Value |
-|------------------|---------------|
-| Life Regen Per 5 | (7/2)         |
+| Neck Only Stats   | StatMod |
+|-------------------|---------|
+| Life Regen Per 5  | (7/2)   |
 
-| Shield Only Stats | StatMod Value |
-|-------------------|---------------|
-| Block Value       | (3/5)         |
-| Defense           | (6/5)         |
+| Shield Only Stats | StatMod |
+|-------------------|---------|
+| Block Value       | (3/5)   |
+| Defense           | (6/5)   |
 
 ## Slot Modifiers
 
-| Item Type       | SlotMod Value | Old Values |
-|-----------------|---------------|------------|
-| Head            | 16/16         | 1          |
-| Neck            |  9/16         | .5625      |
-| Shoulder        | 12/16         | .77        |
-| Back            |  8/16         | .5625      |
-| Chest           | 16/16         | 1          |
-| Robe (Chest)    | 16/16         | 1          |
-| Shirt           |  3/16         | .5625      |
-| Tabard          |  3/16         | .5625      |
-| Wrists          |  7/16         | .5625      |
-| Hands           | 10/16         | .77        |
-| Waist           |  9/16         | .77        |
-| Legs            | 14/16         | 1          |
-| Feet            | 11/16         | .77        |
-| Finger          |  9/16         | .5625      |
-| Trinket         | 12/16         | .77        |
-| Shield          | 16/16         | .5625      |
-| Off-hand Frill  |  6/16         | .421875    |
-| One Hand Weapon |  5/16         | .421875    |
-| Two Hand Weapon | 16/16         | 1          |
-| Thrown          |  5/16         | .32        |
-| Ranged          |  5/16         | .32        |
+These values were derived by dividing the armor value of one of each type of armor of equivalent item level by the chest piece. The chest piece is assumed to have 100% of the armor assigned by its item level. Cloak was derived by dividing against a cloth chestpiece of equivalent item level. Non-armor types are assumed or borrowed from other documentation.
 
-### Armor Slot Modifiers
-
-These values were derived by dividing the armor value of one of each type of armor of equivalent item level by the chest piece. The chest piece is assumed to have 100% of the armor assigned by its item level.
-
-I believe these values extend beyond armor valuation.
-
-| Item Slot | Coefficient |
-|-----------|-------------|
-| Shield    | 16/16       |
-| Chest     | 16/16       |
-| Legs      | 14/16       |
-| Head      | 13/16       |
-| Shoulders | 12/16       |
-| Feet      | 11/16       |
-| Hands     | 10/16       |
-| Waist     |  9/16       |
-| Wrists    |  7/16       |
-| Back      |  5/16       |
-
+| Item Type       | SlotMod |
+|-----------------|---------|
+| Head            | 13/16   |
+| Neck            |  9/16   |
+| Shoulder        | 12/16   |
+| Shirt           |  3/16   |
+| Chest           | 16/16   |
+| Waist           |  9/16   |
+| Legs            | 14/16   |
+| Feet            | 11/16   |
+| Wrists          |  7/16   |
+| Hands           | 10/16   |
+| Finger          |  9/16   |
+| Trinket         | 12/16   |
+| One Hand Weapon |  7/16   |
+| Shield          | 16/16   |
+| Two Hand Weapon | 16/16   |
+| Back            |  8/16   |
+| Tabard          |  3/16   |
+| Robe (Chest)    | 16/16   |
+| Off-hand Frill  |  9/16   |
+| Thrown          |  5/16   |
+| Ranged          |  5/16   |
 
 ## Armor Calculation
 
@@ -143,13 +127,13 @@ Base Armor is not to be confused with Bonus Armor, which is applied to an item a
 |---------------------|------------------|---------|
 | [Uncommon](https://dewmguy.github.io/PolynomialVisualizer/?a=-9.1068691810&b=9.7517833041&c=-0.0037013807&min-x=0&max-x=400&min-y=0&max-y=4000&order=2&graph-title=Uncommon+Chest+-+Armor+-+Plate&csvPoints=W3sieCI6NDEsInkiOjMwMH0seyJ4Ijo0MiwieSI6MzM5fSx7IngiOjQzLCJ5IjozODJ9LHsieCI6NDQsInkiOjQyOH0seyJ4Ijo0NSwieSI6NDM3fSx7IngiOjQ2LCJ5Ijo0NDZ9LHsieCI6NDcsInkiOjQ1NH0seyJ4Ijo0OCwieSI6NDYzfSx7IngiOjQ5LCJ5Ijo0NzF9LHsieCI6NTAsInkiOjQ4MH0seyJ4Ijo1MSwieSI6NDg5fSx7IngiOjUyLCJ5Ijo0OTd9LHsieCI6NTMsInkiOjUwNn0seyJ4Ijo1NCwieSI6NTE1fSx7IngiOjU1LCJ5Ijo1MjR9LHsieCI6NTYsInkiOjUzNH0seyJ4Ijo1NywieSI6NTQzfSx7IngiOjU4LCJ5Ijo1NTJ9LHsieCI6NTksInkiOjU2MX0seyJ4Ijo2MCwieSI6NTcwfSx7IngiOjYxLCJ5Ijo1Nzl9LHsieCI6NjIsInkiOjU4OH0seyJ4Ijo2MywieSI6NTk3fSx7IngiOjY1LCJ5Ijo2MTV9LHsieCI6ODEsInkiOjc1OH0seyJ4Ijo4NCwieSI6Nzg1fSx7IngiOjg3LCJ5Ijo4MTJ9LHsieCI6OTAsInkiOjgzOH0seyJ4Ijo5MywieSI6ODY0fSx7IngiOjk2LCJ5Ijo4OTF9LHsieCI6OTksInkiOjkxN30seyJ4IjoxMDIsInkiOjk0M30seyJ4IjoxMDUsInkiOjk3MH0seyJ4IjoxMDgsInkiOjk5Nn0seyJ4IjoxMTEsInkiOjEwMjN9LHsieCI6MTE0LCJ5IjoxMDUwfSx7IngiOjExNywieSI6MTA3Nn0seyJ4IjoxMjAsInkiOjExMDN9LHsieCI6MTMwLCJ5IjoxMTkxfSx7IngiOjEzNCwieSI6MTIyNn0seyJ4IjoxMzgsInkiOjEyNjJ9LHsieCI6MTQyLCJ5IjoxMjk3fSx7IngiOjE0NiwieSI6MTMzMn0seyJ4IjoxNTAsInkiOjEzNjh9LHsieCI6MTU0LCJ5IjoxNDAzfSx7IngiOjE1OCwieSI6MTQzOH0seyJ4IjoxNjIsInkiOjE0NzR9LHsieCI6MTY2LCJ5IjoxNTA5fSx7IngiOjE3MCwieSI6MTU0NX0seyJ4IjoxNzQsInkiOjE1ODB9LHsieCI6MTc4LCJ5IjoxNjE1fSx7IngiOjE4MiwieSI6MTY1MX1d) | any | $y = - 9.1068691810 + 9.7517833041x - 0.0037013807x^2$ |
 | [Rare](https://dewmguy.github.io/PolynomialVisualizer/?a=-945.7560305396&b=52.8506875668&c=-0.6639548312&d=0.0042400859&e=-0.0000092706&min-x=0&max-x=400&min-y=0&max-y=4000&order=4&graph-title=Rare+Chest+-+Armor+-+Plate&csvPoints=W3sieCI6NDIsInkiOjM3M30seyJ4Ijo0OSwieSI6NTE5fSx7IngiOjU0LCJ5Ijo1Njd9LHsieCI6NTUsInkiOjU3N30seyJ4Ijo1NywieSI6NTk3fSx7IngiOjU5LCJ5Ijo2MTd9LHsieCI6NjAsInkiOjYyN30seyJ4Ijo2MSwieSI6NjM3fSx7IngiOjYzLCJ5Ijo2NTd9LHsieCI6NjgsInkiOjcwNn0seyJ4Ijo3MCwieSI6NzI2fSx7IngiOjgyLCJ5Ijo4NDR9LHsieCI6ODUsInkiOjg3M30seyJ4Ijo4OCwieSI6OTAyfSx7IngiOjkxLCJ5Ijo5MzJ9LHsieCI6OTQsInkiOjk2MX0seyJ4IjoxMDAsInkiOjEwMTh9LHsieCI6MTAzLCJ5IjoxMDQ4fSx7IngiOjEwNiwieSI6MTA3N30seyJ4IjoxMDksInkiOjExMDZ9LHsieCI6MTEyLCJ5IjoxMTM1fSx7IngiOjExNCwieSI6MTE1NH0seyJ4IjoxMTUsInkiOjExNjR9LHsieCI6MTU1LCJ5IjoxNzUzfSx7IngiOjE1OCwieSI6MTc4OX0seyJ4IjoxNjYsInkiOjE4ODZ9LHsieCI6MTY3LCJ5IjoxODk4fSx7IngiOjE3OSwieSI6MjA0M30seyJ4IjoxODMsInkiOjIwNjh9LHsieCI6MTg3LCJ5IjoyMDkzfSx7IngiOjIwMCwieSI6MjE2Nn1d) | 42 to 201 | $y = - 945.7560305396 + 52.8506875668x - 0.6639548312x^2 + 0.0042400859x^3 - 0.0000092706x^4$ |
-| [Epic](https://dewmguy.github.io/PolynomialVisualizer/?a=-420.2583047025&b=23.2563875305&c=-0.0701667539&d=0.0000977670&min-x=0&max-x=400&min-y=0&max-y=4000&order=3&graph-title=Epic+Chest+-+Armor+-+Plate&csvPoints=W3sieCI6NjAsInkiOjc4MX0seyJ4Ijo2MiwieSI6ODA2fSx7IngiOjY1LCJ5Ijo4NDJ9LHsieCI6NjYsInkiOjg1NX0seyJ4Ijo3MiwieSI6OTI5fSx7IngiOjczLCJ5Ijo5NDF9LHsieCI6NzQsInkiOjk1NH0seyJ4Ijo3NiwieSI6OTc4fSx7IngiOjc3LCJ5Ijo5OTB9LHsieCI6ODAsInkiOjEwMjd9LHsieCI6ODUsInkiOjEwODd9LHsieCI6ODgsInkiOjExMjR9LHsieCI6OTIsInkiOjExNzJ9LHsieCI6MTAwLCJ5IjoxMjY4fSx7IngiOjEwNSwieSI6MTMyOX0seyJ4IjoxMDcsInkiOjEzNTN9LHsieCI6MTE1LCJ5IjoxNDUwfSx7IngiOjEyMCwieSI6MTUxMH0seyJ4IjoxMjMsInkiOjE1NDd9LHsieCI6MTI1LCJ5IjoxNTcxfSx7IngiOjEyNywieSI6MTU5NX0seyJ4IjoxMjgsInkiOjE2MDd9LHsieCI6MTMzLCJ5IjoxNjY4fSx7IngiOjEzNiwieSI6MTcwNH0seyJ4IjoxMzgsInkiOjE3Mjh9LHsieCI6MTQxLCJ5IjoxNzY1fSx7IngiOjE0NiwieSI6MTgyNX0seyJ4IjoxNTEsInkiOjE4ODZ9LHsieCI6MTU5LCJ5IjoxOTgzfSx7IngiOjIwMCwieSI6MjI0MX0seyJ4IjoyMTMsInkiOjIyOTh9LHsieCI6MjE5LCJ5IjoyMzIyfSx7IngiOjIyNiwieSI6MjM0OH0seyJ4IjoyMzIsInkiOjIzNjl9LHsieCI6MjM5LCJ5IjoyNDIwfSx7IngiOjI0NSwieSI6MjQ3M30seyJ4IjoyNTEsInkiOjI1MjZ9LHsieCI6MjU4LCJ5IjoyNTg4fSx7IngiOjI2NCwieSI6MjY0MX0seyJ4IjoyNzAsInkiOjI2OTR9LHsieCI6Mjc3LCJ5IjoyNzU2fV0%3D) | 20 to 300 | $y = - 420.2583047025 + 23.2563875305x - 0.0701667539x^2 + 0.0000977670x^3$ |
+| [Epic](https://dewmguy.github.io/PolynomialVisualizer/?a=518.5790249086&b=-3.1316216776&c=0.1587774163&d=-0.0004607789&e=-0.00000105&f=0.00000000423&min-x=0&max-x=400&min-y=0&max-y=4000&order=5&graph-title=Epic+Chest+-+Armor+-+Plate&csvPoints=W3sieCI6NjAsInkiOjc4MX0seyJ4Ijo2MiwieSI6ODA2fSx7IngiOjY1LCJ5Ijo4NDJ9LHsieCI6NjYsInkiOjg1NX0seyJ4Ijo3MiwieSI6OTI5fSx7IngiOjczLCJ5Ijo5NDF9LHsieCI6NzQsInkiOjk1NH0seyJ4Ijo3NiwieSI6OTc4fSx7IngiOjc3LCJ5Ijo5OTB9LHsieCI6ODAsInkiOjEwMjd9LHsieCI6ODUsInkiOjEwODd9LHsieCI6ODgsInkiOjExMjR9LHsieCI6OTIsInkiOjExNzJ9LHsieCI6MTAwLCJ5IjoxMjY4fSx7IngiOjEwNSwieSI6MTMyOX0seyJ4IjoxMDcsInkiOjEzNTN9LHsieCI6MTE1LCJ5IjoxNDUwfSx7IngiOjEyMCwieSI6MTUxMH0seyJ4IjoxMjMsInkiOjE1NDd9LHsieCI6MTI1LCJ5IjoxNTcxfSx7IngiOjEyNywieSI6MTU5NX0seyJ4IjoxMjgsInkiOjE2MDd9LHsieCI6MTMzLCJ5IjoxNjY4fSx7IngiOjEzNiwieSI6MTcwNH0seyJ4IjoxMzgsInkiOjE3Mjh9LHsieCI6MTQxLCJ5IjoxNzY1fSx7IngiOjE0NiwieSI6MTgyNX0seyJ4IjoxNTEsInkiOjE4ODZ9LHsieCI6MTU5LCJ5IjoxOTgzfSx7IngiOjIwMCwieSI6MjI0MX0seyJ4IjoyMTMsInkiOjIyOTh9LHsieCI6MjE5LCJ5IjoyMzIyfSx7IngiOjIyNiwieSI6MjM0OH0seyJ4IjoyMzIsInkiOjIzNjl9LHsieCI6MjM5LCJ5IjoyNDIwfSx7IngiOjI0NSwieSI6MjQ3M30seyJ4IjoyNTEsInkiOjI1MjZ9LHsieCI6MjU4LCJ5IjoyNTg4fSx7IngiOjI2NCwieSI6MjY0MX0seyJ4IjoyNzAsInkiOjI2OTR9LHsieCI6Mjc3LCJ5IjoyNzU2fV0%3D) | 15 to 300 | $y = 798.1656398430 - 14.0579736482x + 0.3181534343x^2 - 0.0015491623x^3 + 0.0000024433x^4$ |
 
 | Mail Armor Quality | Item Level Range | Formula |
 |--------------------|------------------|---------|
 | [Uncommon](https://dewmguy.github.io/PolynomialVisualizer/?a=74.5806054126&b=3.9339643160&c=0.0043662540&min-x=0&max-x=400&min-y=0&max-y=4000&order=2&graph-title=Uncommon+Chest+-+Armor+-+Mail&csvPoints=W3sieCI6MTAsInkiOjEwOH0seyJ4IjoxMSwieSI6MTE1fSx7IngiOjEzLCJ5IjoxMjl9LHsieCI6MTUsInkiOjE0NH0seyJ4IjoxNiwieSI6MTUxfSx7IngiOjE4LCJ5IjoxNjJ9LHsieCI6MjAsInkiOjE2OH0seyJ4IjoyMSwieSI6MTcxfSx7IngiOjIyLCJ5IjoxNzR9LHsieCI6MjMsInkiOjE3N30seyJ4IjoyNCwieSI6MTgwfSx7IngiOjI1LCJ5IjoxODN9LHsieCI6MjYsInkiOjIwOH0seyJ4IjoyNywieSI6MTg5fSx7IngiOjI4LCJ5IjoxOTJ9LHsieCI6MjksInkiOjE5NX0seyJ4IjozMCwieSI6MTk4fSx7IngiOjMxLCJ5IjoyMDF9LHsieCI6MzIsInkiOjIwNH0seyJ4IjozMywieSI6MjA3fSx7IngiOjM0LCJ5IjoyMTB9LHsieCI6MzUsInkiOjIxM30seyJ4IjozNiwieSI6MjE2fSx7IngiOjM3LCJ5IjoyMTl9LHsieCI6MzgsInkiOjIyM30seyJ4IjozOSwieSI6MjI3fSx7IngiOjQwLCJ5IjoyMzF9LHsieCI6NDEsInkiOjIzNH0seyJ4Ijo0MiwieSI6MjM4fSx7IngiOjQzLCJ5IjoyNDJ9LHsieCI6NDQsInkiOjI0NX0seyJ4Ijo0NSwieSI6MjQ4fSx7IngiOjQ2LCJ5IjoyNTR9LHsieCI6NDcsInkiOjI1OH0seyJ4Ijo0OCwieSI6MjYzfSx7IngiOjQ5LCJ5IjoyNjh9LHsieCI6NTAsInkiOjI3M30seyJ4Ijo1MSwieSI6Mjc4fSx7IngiOjUyLCJ5IjoyODN9LHsieCI6NTMsInkiOjI4OH0seyJ4Ijo1NCwieSI6MjkzfSx7IngiOjU1LCJ5IjoyOTh9LHsieCI6NTYsInkiOjMwM30seyJ4Ijo1NywieSI6MzA3fSx7IngiOjU4LCJ5IjozMTN9LHsieCI6NTksInkiOjMxN30seyJ4Ijo2MCwieSI6MzIyfSx7IngiOjYxLCJ5IjozMjd9LHsieCI6NjIsInkiOjMzMn0seyJ4Ijo2NCwieSI6MzQyfSx7IngiOjY1LCJ5IjozNDd9LHsieCI6NzYsInkiOjQwMn0seyJ4Ijo4MSwieSI6NDI3fSx7IngiOjg0LCJ5Ijo0NDF9LHsieCI6ODcsInkiOjQ1Nn0seyJ4Ijo5MCwieSI6NDcwfSx7IngiOjkzLCJ5Ijo0ODV9LHsieCI6OTYsInkiOjQ5OX0seyJ4Ijo5OSwieSI6NTE0fSx7IngiOjEwMiwieSI6NTI4fSx7IngiOjEwNSwieSI6NTQzfSx7IngiOjEwOCwieSI6NTU4fSx7IngiOjExMSwieSI6NTczfSx7IngiOjExNCwieSI6NTg4fSx7IngiOjExNywieSI6NjAyfSx7IngiOjEyMCwieSI6NjE3fSx7IngiOjEzMCwieSI6NjY3fSx7IngiOjEzNCwieSI6Njg2fSx7IngiOjEzOCwieSI6NzA2fSx7IngiOjE0MiwieSI6NzI2fSx7IngiOjE0NiwieSI6NzQ2fSx7IngiOjE1MCwieSI6NzY1fSx7IngiOjE1NCwieSI6Nzg1fSx7IngiOjE1OCwieSI6ODA1fSx7IngiOjE2MiwieSI6ODI1fSx7IngiOjE2NiwieSI6ODQ1fSx7IngiOjE3MCwieSI6ODY0fSx7IngiOjE3NCwieSI6ODg0fSx7IngiOjE3OCwieSI6OTA0fSx7IngiOjE4MiwieSI6OTI0fV0%3D) | any | $y = 74.5806054126 + 3.9339643160x + 0.0043662540x^2$ |
 | [Rare](https://dewmguy.github.io/PolynomialVisualizer/?a=31.4458566610&b=8.0553432081&c=-0.0852902001&d=0.0007948793&e=-0.0000021079&min-x=0&max-x=400&min-y=0&max-y=4000&order=4&graph-title=Rare+Chest+-+Armor+-+Mail&csvPoints=W3sieCI6MjUsInkiOjIwMX0seyJ4IjoyNiwieSI6MjA0fSx7IngiOjI4LCJ5IjoyMTF9LHsieCI6MjksInkiOjIxNH0seyJ4IjozMCwieSI6MjE4fSx7IngiOjMxLCJ5IjoyMjF9LHsieCI6MzUsInkiOjIzNX0seyJ4IjozOCwieSI6MjQ1fSx7IngiOjM5LCJ5IjoyNTB9LHsieCI6NDIsInkiOjI2Mn0seyJ4Ijo0NCwieSI6MjcwfSx7IngiOjQ4LCJ5IjoyOTB9LHsieCI6NTEsInkiOjMwNn0seyJ4Ijo1MiwieSI6MzExfSx7IngiOjU0LCJ5IjozMjJ9LHsieCI6NTUsInkiOjMyN30seyJ4Ijo1NywieSI6MzM4fSx7IngiOjU4LCJ5IjozNDR9LHsieCI6NjEsInkiOjM2MH0seyJ4Ijo2MiwieSI6MzY1fSx7IngiOjYzLCJ5IjozNzB9LHsieCI6NjUsInkiOjM4MX0seyJ4Ijo2OCwieSI6Mzk4fSx7IngiOjgyLCJ5Ijo0NzV9LHsieCI6ODUsInkiOjQ5MX0seyJ4Ijo4OCwieSI6NTA3fSx7IngiOjkxLCJ5Ijo1MjN9LHsieCI6OTQsInkiOjUzOX0seyJ4IjoxMDAsInkiOjU3MH0seyJ4IjoxMDksInkiOjYxOX0seyJ4IjoxMTIsInkiOjYzNX0seyJ4IjoxMTQsInkiOjY0Nn0seyJ4IjoxMTUsInkiOjY1Mn0seyJ4IjoxNTgsInkiOjEwMDF9LHsieCI6MTY2LCJ5IjoxMDU1fSx7IngiOjE3MCwieSI6MTA4M30seyJ4IjoxNzEsInkiOjEwODl9LHsieCI6MTc0LCJ5IjoxMTEwfSx7IngiOjE3OSwieSI6MTE0M30seyJ4IjoxODMsInkiOjExNTh9LHsieCI6MTg3LCJ5IjoxMTcxfSx7IngiOjIwMCwieSI6MTIxMn1d) | 1 to 200 | $y = 31.4458566610 + 8.0553432081x - 0.0852902001x^2 + 0.0007948793x^3 - 0.0000021079x^4$ |
-| [Epic](https://dewmguy.github.io/PolynomialVisualizer/?a=-134.2869568235&b=11.0241030695&c=-0.0271961135&d=0.0000320858&min-x=0&max-x=400&min-y=0&max-y=4000&order=3&graph-title=Epic+Chest+-+Armor+-+Mail&csvPoints=W3sieCI6NDQsInkiOjMzNn0seyJ4Ijo1NywieSI6NDIxfSx7IngiOjYwLCJ5Ijo0NDF9LHsieCI6NjUsInkiOjQ3NX0seyJ4Ijo2NiwieSI6NDgyfSx7IngiOjY4LCJ5Ijo0OTZ9LHsieCI6NzIsInkiOjUyM30seyJ4Ijo3NCwieSI6NTM3fSx7IngiOjc2LCJ5Ijo1NTF9LHsieCI6ODAsInkiOjU3OH0seyJ4Ijo4OCwieSI6NjMxfSx7IngiOjkyLCJ5Ijo2NTh9LHsieCI6MTA1LCJ5Ijo3NDR9LHsieCI6MTA3LCJ5Ijo3NTd9LHsieCI6MTEwLCJ5Ijo3Nzh9LHsieCI6MTE1LCJ5Ijo4MTJ9LHsieCI6MTIwLCJ5Ijo4NDZ9LHsieCI6MTIzLCJ5Ijo4NjZ9LHsieCI6MTI1LCJ5Ijo4Nzl9LHsieCI6MTI3LCJ5Ijo4OTN9LHsieCI6MTI4LCJ5Ijo5MDB9LHsieCI6MTMzLCJ5Ijo5MzR9LHsieCI6MTM2LCJ5Ijo5NTR9LHsieCI6MTQxLCJ5Ijo5ODh9LHsieCI6MTQ2LCJ5IjoxMDIyfSx7IngiOjE1MSwieSI6MTA1NX0seyJ4IjoxNTksInkiOjExMTB9LHsieCI6MjAwLCJ5IjoxMjU0fSx7IngiOjIxMywieSI6MTI4Nn0seyJ4IjoyMTksInkiOjEyOTl9LHsieCI6MjI2LCJ5IjoxMzE0fSx7IngiOjIzMiwieSI6MTMyNX0seyJ4IjoyNDUsInkiOjEzODR9LHsieCI6MjUxLCJ5IjoxNDEzfSx7IngiOjI1OCwieSI6MTQ0OH0seyJ4IjoyNjQsInkiOjE0Nzd9LHsieCI6MjcwLCJ5IjoxNTA3fSx7IngiOjI3NywieSI6MTU0Mn1d) | 15 to 300 | $y = - 134.2869568235 + 11.0241030695x - 0.0271961135x^2 + 0.0000320858x^3$ |
+| [Epic](https://dewmguy.github.io/PolynomialVisualizer/?a=298.6093918649&b=-3.4214066738&c=0.1328334643&d=-0.0006791076&e=0.0000010936&min-x=0&max-x=400&min-y=0&max-y=4000&order=4&graph-title=Epic+Chest+-+Armor+-+Mail&csvPoints=W3sieCI6NDQsInkiOjMzNn0seyJ4Ijo1NywieSI6NDIxfSx7IngiOjYwLCJ5Ijo0NDF9LHsieCI6NjUsInkiOjQ3NX0seyJ4Ijo2NiwieSI6NDgyfSx7IngiOjY4LCJ5Ijo0OTZ9LHsieCI6NzIsInkiOjUyM30seyJ4Ijo3NCwieSI6NTM3fSx7IngiOjc2LCJ5Ijo1NTF9LHsieCI6ODAsInkiOjU3OH0seyJ4Ijo4OCwieSI6NjMxfSx7IngiOjkyLCJ5Ijo2NTh9LHsieCI6MTA1LCJ5Ijo3NDR9LHsieCI6MTA3LCJ5Ijo3NTd9LHsieCI6MTEwLCJ5Ijo3Nzh9LHsieCI6MTE1LCJ5Ijo4MTJ9LHsieCI6MTIwLCJ5Ijo4NDZ9LHsieCI6MTIzLCJ5Ijo4NjZ9LHsieCI6MTI1LCJ5Ijo4Nzl9LHsieCI6MTI3LCJ5Ijo4OTN9LHsieCI6MTI4LCJ5Ijo5MDB9LHsieCI6MTMzLCJ5Ijo5MzR9LHsieCI6MTM2LCJ5Ijo5NTR9LHsieCI6MTQxLCJ5Ijo5ODh9LHsieCI6MTQ2LCJ5IjoxMDIyfSx7IngiOjE1MSwieSI6MTA1NX0seyJ4IjoxNTksInkiOjExMTB9LHsieCI6MjAwLCJ5IjoxMjU0fSx7IngiOjIxMywieSI6MTI4Nn0seyJ4IjoyMTksInkiOjEyOTl9LHsieCI6MjI2LCJ5IjoxMzE0fSx7IngiOjIzMiwieSI6MTMyNX0seyJ4IjoyNDUsInkiOjEzODR9LHsieCI6MjUxLCJ5IjoxNDEzfSx7IngiOjI1OCwieSI6MTQ0OH0seyJ4IjoyNjQsInkiOjE0Nzd9LHsieCI6MjcwLCJ5IjoxNTA3fSx7IngiOjI3NywieSI6MTU0Mn1d) | 15 to 300 | $y = 298.6093918649 - 3.4214066738x + 0.1328334643x^2 - 0.0006791076x^3 + 0.0000010936x^4$ |
 
 | Leather Armor Quality | Item Level Range | Formula |
 |-----------------------|------------------|---------|

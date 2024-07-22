@@ -256,8 +256,6 @@ button:hover { background-color: #e6c200 }
   font-size: 10px;
 }
 
-.flavor { color: #FFD100 }
-
 .error { color: #F55 }
 
 .tooltip {
@@ -277,7 +275,7 @@ button:hover { background-color: #e6c200 }
   font-size: 13px;
 }
 
-.tooltip .item-level { color: #ffd700 }
+.tooltip .item-level, .flavor { color: #FFD100 }
 .tooltip .stat { color: #FFF }
 .tooltip .stat.green { color: #1EFF00 }
 .tooltip .specialstat { color: #1eff00 }
