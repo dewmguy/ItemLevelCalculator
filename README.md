@@ -21,11 +21,17 @@ The fundamentals of how an item level is calculated involves the following param
 
 ### StatBudget Formula
 
-$$StatBudget^(1.5) = [(StatValue[1] * StatMod[1])^(1.5) + (StatValue[2] * StatMod[2])^(1.5) + ...]$$
+$$
+\text{StatBudget}^{1.5} = \left[(\text{StatValue}[1] \times \text{StatMod}[1])^{1.5} + (\text{StatValue}[2] \times \text{StatMod}[2])^{1.5} + \ldots\right]
+$$
 
-$$ItemBudget = StatBudget / SlotMod$$
+$$
+\text{ItemBudget} = \frac{\text{StatBudget}}{\text{SlotMod}}
+$$
 
-$$ilvl = ItemBudget * QualityMod$$
+$$
+\text{ilvl} = \text{ItemBudget} \times \text{QualityMod}
+$$
 
 ## QualityMod
 
