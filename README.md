@@ -2,7 +2,7 @@
 
 This WIP web application functions as an item level calculator, aiding in the creation, modification, and validation of item level balanced armor and weapons designed for the mechanics of World of Warcraft Wrath of the Lich King 3.3.5.
 
-While many of the values and coefficients provided by the community are generally considered "good enough." I seek to bump up the reliability an accuracy of item level calculation by introducing polynomial regression. I believe the enhanced equations will provide significantly more reliable blizzlike output, intended to match the in-game values as closely as possible. The calculator is most effective for validating or creating items within the intended item level range of blizzlike items. Using the calculator to create items with item levels that extend beyond the existing in-game item level ranges may have undesireable output.
+While many of the values and coefficients provided by the community are generally considered "good enough." I seek to bump up the reliability and accuracy of item level calculation by introducing polynomial regression. I believe the enhanced equations will provide significantly more reliable blizzlike output, intended to match the in-game values as closely as possible. The calculator is most effective for validating or creating items within the intended item level range of blizzlike items. Using the calculator to create items with item levels that extend beyond the existing in-game item level ranges may have undesireable output.
 
 ![Screenshot](screenshot.png?raw=true "Screenshot of Item Calculator Interface")
 
@@ -11,27 +11,21 @@ While many of the values and coefficients provided by the community are generall
 The fundamentals of how an item level is calculated involves the following parameters:
 
 - **Stat**: The properties of an item, i.e. Stamina, Strength, etc.
-- **StatMod**: The weight coefficient of a stat.
-- **StatValue**: The imaginary value of the stat on an item, found by multiplying the Stat by the StatMod and raising to the power of 1.5.
+- **StatMod**: The weight coefficient of a Stat.
+- **StatValue**: The imaginary value of the Stat on an item, found by multiplying the Stat by the StatMod and raising to the power of 1.5.
 - **StatBudget**: The limit of the imaginary sum of all StatValues of an item, found by the sum of all StatValues.
 - **SlotMod**: The weight coefficient of an equipment slot.
 - **ItemBudget**: The limit of the imaginary sum of the StatBudget, found by dividing the StatBudget by the SlotMod.
 - **QualityMod**: The weight coefficient of item quality.
-- **item level (ilvl)**: The effective level of an item, found by multiplying the ItemBudget by the sum of the QualityMod.
+- **Item Level (ilvl)**: The effective level of an item, found by multiplying the ItemBudget by the sum of the QualityMod.
 
-### StatBudget
+### StatBudget Formula
 
-The StatBudget is calculated by taking the sum of each stat value, multiplying it by  to the power of 1.5, summing these powered terms. This method ensures that single, high-value stats are more expensive compared to multiple, lower-value stats.
+$$StatBudget^(1.5) = [(StatValue[1] * StatMod[1])^(1.5) + (StatValue[2] * StatMod[2])^(1.5) + ...]$$
 
-The formula for calculating **ItemValue** is:
+$$ItemBudget = StatBudget / SlotMod$$
 
-```math
-StatBudget^1.5 = [(StatValue[1] * StatMod[1])^1.5 + (StatValue[2] * StatMod[2])^1.5 + ...]
-
-ItemBudget = StatBudget / SlotMod
-
-ilvl = ItemBudget * QualityMod
-```
+$$ilvl = ItemBudget * QualityMod$$
 
 ## QualityMod
 
