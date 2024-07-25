@@ -48,6 +48,31 @@ If the ItemBudget is `100` and the item quality is:
 - Rare: `180.75 = (100 \* 9/5 + 3/4)`
 - Epic: `176 = (100 \* 3/2 + 26/1)`
 
+### alternate versions
+
+uncommon: ilvl * 0.5   - 2
+rare    : ilvl * 0.625 - 1.15
+epic    : ilvl * 0.77  -1
+
+---
+
+uncommon: slotValue * 2 + 8
+rare    : slotvalue * 1.8 + 0.75
+epic    : slotvalue * 1.2 + 26
+
+---
+
+uncommon: (slotvalue +  9.8) / 1.21
+rare    : (slotvalue +  4.2) / 1.42
+epic    : (slotvalue - 11.2) / 1.64
+
+---
+
+uncommon: (ilvl * 1.21 - 9.8) * SlotMod
+rare    : (ilvl * 1.42 - 4.2) * SlotMod
+epic    : (ilvl * 1.64 + 11.2) * SlotMod
+
+
 ## StatMod
 
 | General Stats      |  stat_type | StatMod |
@@ -118,7 +143,7 @@ These values were derived by dividing the armor value of one of each type of arm
 | Wrists          |             9 |    7/16 |
 | Hands           |            10 |   10/16 |
 | Finger          |            11 |    9/16 |
-| Trinket         |            12 |   12/16 |
+| Trinket         |            12 |   11/16 |
 | One Hand Weapon |            13 |    7/16 |
 | Shield          |            14 |   16/16 |
 | Bow             |            15 |   16/16 |
@@ -131,7 +156,7 @@ These values were derived by dividing the armor value of one of each type of arm
 | Held Off-hand   |            23 |    9/16 |
 | Thrown          |            25 |    5/16 |
 | Ranged          |            26 |    5/16 |
-| Relic           |            28 |    4/16 |
+| Relic           |            28 |    5/16 |
 
 ## Base Armor Calculation
 

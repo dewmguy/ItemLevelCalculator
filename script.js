@@ -21,7 +21,7 @@ $(document).ready(function() {
     "19": { name: "Tabard", slotMod: (3/16), itemClass: 4, armor: 0, subClass: [0] },
     "20": { name: "Chest (Robe)", slotMod: (16/16), itemClass: 4, armor: 1, subClass: [1, 2, 3, 4] },
     "21": { name: "Main-Hand", slotMod: (7/16), itemClass: 2, armor: 0, subClass: [0, 4, 7, 15, 13] },
-    "22": { name: "Off-Hand", slotMod: (9/16), itemClass: 2, armor: 0, subClass: [0, 4, 7, 15, 13] },
+    "22": { name: "Off-Hand", slotMod: (7/16), itemClass: 2, armor: 0, subClass: [0, 4, 7, 15, 13] },
     "23": { name: "Held Off-hand", slotMod: (9/16), itemClass: 4, armor: 0, subClass: [0] },
     "25": { name: "Thrown", slotMod: (5/16), itemClass: 2, armor: 0, subClass: [16] },
     "26": { name: "Ranged", slotMod: (5/16), itemClass: 2, armor: 0, subClass: [3, 18, 19] },
@@ -46,7 +46,7 @@ $(document).ready(function() {
     "36": { name: "Haste Rating", statMod: (16/16), type: 1 },
     "37": { name: "Expertise Rating", statMod: (16/16), type: 1 },
     "38": { name: "Attack Power", statMod: (8/16), type: 1 },
-    "43": { name: "Mana Regen MP5", statMod: (273/200), type: 1 },
+    "43": { name: "Mana Regen MP5", statMod: (330/200), type: 1 },
     "44": { name: "Armor Penetration Rating", statMod: (3/16), type: 1 },
     "45": { name: "Spell Power", statMod: (13/16), type: 1 },
     "46": { name: "Health Regen HP5", statMod: (91/400), type: 1 },
@@ -73,10 +73,10 @@ $(document).ready(function() {
     "36": statAmount => `Improves haste rating by ${statAmount}.`,
     "37": statAmount => `Improves expertise rating by ${statAmount}.`,
     "38": statAmount => `Increases attack power by ${statAmount}.`,
-    "43": statAmount => `Restores +${statAmount} mana per 5 sec.`,
+    "43": statAmount => `Restores ${statAmount} mana per 5 sec.`,
     "44": statAmount => `Increases your armor penetration rating by ${statAmount}.`,
     "45": statAmount => `Increases spell power by ${statAmount}.`,
-    "46": statAmount => `Restores +${statAmount} health per 5 sec.`,
+    "46": statAmount => `Restores ${statAmount} health per 5 sec.`,
     "47": statAmount => `Increases spell penetration by ${statAmount}.`,
     "48": statAmount => `Increases the block value of your shield by ${statAmount}.`
   };
@@ -130,7 +130,7 @@ $(document).ready(function() {
     "6": { name: "Arcane" }
   };
 
-  const armorData = {
+  const armorDataOLD = { // old
     artifact: {
       Cloth: ilvl => -35.9162438072 + 2.7177139937 * ilvl - 0.0069377995 * Math.pow(ilvl, 2) + 0.0000083546 * Math.pow(ilvl, 3),
       Leather: ilvl => -67.9413659377 + 5.3865646281 * ilvl - 0.0159938709 * Math.pow(ilvl, 2) + 0.0000230294 * Math.pow(ilvl, 3),
@@ -165,6 +165,44 @@ $(document).ready(function() {
       Mail: ilvl => 74.5806054126 + 3.9339643160 * ilvl + 0.0043662540 * Math.pow(ilvl, 2),
       Plate: ilvl => -9.1068691810 + 9.7517833041 * ilvl - 0.0037013807 * Math.pow(ilvl, 2),
       Shield: ilvl => -164.0465200000 + 33.9723200000 * ilvl - 0.0145401229 * Math.pow(ilvl, 2)
+    }
+  };
+  
+  const armorData = { // new
+    artifact: {
+      Cloth: ilvl => 2.5281010518232847 + 1.331747228269099 * ilvl + 0.00944593034412355 * Math.pow(ilvl, 2) - 0.00006849549050619422 * Math.pow(ilvl, 3) + 1.2354987243172888e-7 * Math.pow(ilvl, 4),
+      Leather: ilvl => 1.5555029361141006 + 3.0358551084632817 * ilvl + 0.010441421831956765 * Math.pow(ilvl, 2) - 0.00009593877599476476 * Math.pow(ilvl, 3) + 1.8476622137336274e-7 * Math.pow(ilvl, 4),
+      Mail: ilvl => -7.5320987581173 + 9.77641667353662 * ilvl - 0.07509546031114869 * Math.pow(ilvl, 2) + 0.0008277573203410827 * Math.pow(ilvl, 3) - 0.000003968983245793348 * Math.pow(ilvl, 4) + 6.374377745994348e-9 * Math.pow(ilvl, 5),
+      Plate: ilvl => 5.102460977820272 + 9.509093276356396 * ilvl + 0.07993511436723227 * Math.pow(ilvl, 2) - 0.0005654807309686971 * Math.pow(ilvl, 3) + 0.0000010185213184327804 * Math.pow(ilvl, 4),
+      Shield: ilvl => -68.32056773225723 + 52.05238254766441 * ilvl - 0.2633818416382036 * Math.pow(ilvl, 2) + 0.0032416668345449868 * Math.pow(ilvl, 3) - 0.000017286124455117578 * Math.pow(ilvl, 4) + 2.9484202941863735e-8 * Math.pow(ilvl, 5)
+    },
+    legendary: {
+      Cloth: ilvl => 2.5281010518232847 + 1.331747228269099 * ilvl + 0.00944593034412355 * Math.pow(ilvl, 2) - 0.00006849549050619422 * Math.pow(ilvl, 3) + 1.2354987243172888e-7 * Math.pow(ilvl, 4),
+      Leather: ilvl => 1.5555029361141006 + 3.0358551084632817 * ilvl + 0.010441421831956765 * Math.pow(ilvl, 2) - 0.00009593877599476476 * Math.pow(ilvl, 3) + 1.8476622137336274e-7 * Math.pow(ilvl, 4),
+      Mail: ilvl => -7.5320987581173 + 9.77641667353662 * ilvl - 0.07509546031114869 * Math.pow(ilvl, 2) + 0.0008277573203410827 * Math.pow(ilvl, 3) - 0.000003968983245793348 * Math.pow(ilvl, 4) + 6.374377745994348e-9 * Math.pow(ilvl, 5),
+      Plate: ilvl => 5.102460977820272 + 9.509093276356396 * ilvl + 0.07993511436723227 * Math.pow(ilvl, 2) - 0.0005654807309686971 * Math.pow(ilvl, 3) + 0.0000010185213184327804 * Math.pow(ilvl, 4),
+      Shield: ilvl => -68.32056773225723 + 52.05238254766441 * ilvl - 0.2633818416382036 * Math.pow(ilvl, 2) + 0.0032416668345449868 * Math.pow(ilvl, 3) - 0.000017286124455117578 * Math.pow(ilvl, 4) + 2.9484202941863735e-8 * Math.pow(ilvl, 5)
+    },
+    epic: {
+      Cloth: ilvl => 2.5281010518232847 + 1.331747228269099 * ilvl + 0.00944593034412355 * Math.pow(ilvl, 2) - 0.00006849549050619422 * Math.pow(ilvl, 3) + 1.2354987243172888e-7 * Math.pow(ilvl, 4),
+      Leather: ilvl => 1.5555029361141006 + 3.0358551084632817 * ilvl + 0.010441421831956765 * Math.pow(ilvl, 2) - 0.00009593877599476476 * Math.pow(ilvl, 3) + 1.8476622137336274e-7 * Math.pow(ilvl, 4),
+      Mail: ilvl => -7.5320987581173 + 9.77641667353662 * ilvl - 0.07509546031114869 * Math.pow(ilvl, 2) + 0.0008277573203410827 * Math.pow(ilvl, 3) - 0.000003968983245793348 * Math.pow(ilvl, 4) + 6.374377745994348e-9 * Math.pow(ilvl, 5),
+      Plate: ilvl => 5.102460977820272 + 9.509093276356396 * ilvl + 0.07993511436723227 * Math.pow(ilvl, 2) - 0.0005654807309686971 * Math.pow(ilvl, 3) + 0.0000010185213184327804 * Math.pow(ilvl, 4),
+      Shield: ilvl => -68.32056773225723 + 52.05238254766441 * ilvl - 0.2633818416382036 * Math.pow(ilvl, 2) + 0.0032416668345449868 * Math.pow(ilvl, 3) - 0.000017286124455117578 * Math.pow(ilvl, 4) + 2.9484202941863735e-8 * Math.pow(ilvl, 5)
+    },
+    rare: {
+      Cloth: ilvl => -1.3423883493277042 + 2.200587627369824 * ilvl - 0.023452920240817212 * Math.pow(ilvl, 2) + 0.0002057092987396633 * Math.pow(ilvl, 3) - 5.346376377648381e-7 * Math.pow(ilvl, 4),
+      Leather: ilvl => -4.3185941880426775 + 5.22367821032947 * ilvl - 0.06638307153372526 * Math.pow(ilvl, 2) + 0.0005313187225831865 * Math.pow(ilvl, 3) - 0.0000013052892289727186 * Math.pow(ilvl, 4),
+      Mail: ilvl => 31.445856660984333 + 8.055343208054605 * ilvl - 0.08529020006193702 * Math.pow(ilvl, 2) + 0.0007948792659050846 * Math.pow(ilvl, 3) - 0.0000021078789263816906 * Math.pow(ilvl, 4),
+      Plate: ilvl => -28.396604349521805 + 16.329061088393786 * ilvl - 0.16567265946139803 * Math.pow(ilvl, 2) + 0.0014420657876884682 * Math.pow(ilvl, 3) - 0.000003730547431550686 * Math.pow(ilvl, 4),
+      Shield: ilvl => -44.06927830732479 + 60.18645188729204 * ilvl - 4.54601783641102 * Math.pow(ilvl, 2) + 0.19213407170465685 * Math.pow(ilvl, 3) - 0.003571960126176484 * Math.pow(ilvl, 4) + 0.00003452904159703563 * Math.pow(ilvl, 5) - 1.8099081604737638e-7 * Math.pow(ilvl, 6) + 4.887914417526831e-10 * Math.pow(ilvl, 7) - 5.340719565656609e-13 * Math.pow(ilvl, 8)
+    },
+    uncommon: {
+      Cloth: ilvl => 8.528248246851293 + 1.13588900743772 * ilvl + 0.00018480865552209587 * Math.pow(ilvl, 2),
+      Leather: ilvl => 39.0574346793 + 1.8042785077 * ilvl + 0.0014831968 * Math.pow(ilvl, 2),
+      Mail: ilvl => 74.58060541262037 + 3.93396431596397 * ilvl + 0.004366253997171184 * Math.pow(ilvl, 2),
+      Plate: ilvl => -8.953978248173765 + 9.748506027592633 * ilvl - 0.003686683605302056 * Math.pow(ilvl, 2),
+      Shield: ilvl => 82.22823 + 29.92042 * ilvl - 0.01284 * Math.pow(ilvl, 2) + 0.00007097724866192495 * Math.pow(ilvl, 3)
     }
   };
 
@@ -349,9 +387,6 @@ $(document).ready(function() {
     let subClassName = '';
     if (subClassVisible(subClass, itemClass === 4 ? armorTypes : weaponTypes) === 1) { subClassName = $('#item-subclass option:selected').text(); }
     return subClassName ? `<div class="item-subclass">${subClassName}</div>` : subClassName;
-  }
-  
-  function statPhrasing(itemStat, statAmount) {
   }
   
   function createTooltipHTML(itemQuality, itemName, itemLevel, itemReqLevel, bindHTML, uniqueHTML, slotHTML, typeHTML, weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, greenStatsHTML, itemFlavorHTML) {
