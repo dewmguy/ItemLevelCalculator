@@ -165,7 +165,7 @@ $(document).ready(function() {
       }
     }
     else {
-      subClassObj.append(`<option value="">Choose ${$("#item-slot option:selected").val() == 2 ? 'Weapon' : 'Armor'} Type</option>`);
+      subClassObj.append(`<option value="">Choose ${$("#item-slot option:selected").data('class') == 2 ? 'Weapon' : 'Armor'} Type</option>`);
       $.each(subClass, function(_, classKey) {
         let classData = classList[classKey];
         if (classData) {
