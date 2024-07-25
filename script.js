@@ -2,30 +2,30 @@ $(document).ready(function() {
   
   const itemSlots = {
     "1": { name: "Head", slotMod: (13/16), itemClass: 4, armor: 1, subClass: [1, 2, 3, 4] },
-    "2": { name: "Neck", slotMod:  (9/16), itemClass: 4, armor: 0, subClass: [0] },
+    "2": { name: "Neck", slotMod: (9/16), itemClass: 4, armor: 0, subClass: [0] },
     "3": { name: "Shoulder", slotMod: (12/16), itemClass: 4, armor: 1, subClass: [1, 2, 3, 4] },
-    "4": { name: "Shirt", slotMod:  (3/16), itemClass: 4, armor: 0, subClass: [1] },
+    "4": { name: "Shirt", slotMod: (3/16), itemClass: 4, armor: 0, subClass: [1] },
     "5": { name: "Chest", slotMod: (16/16), itemClass: 4, armor: 1, subClass: [1, 2, 3, 4] },
-    "6": { name: "Waist", slotMod:  (9/16), itemClass: 4, armor: 1, subClass: [1, 2, 3, 4] },
+    "6": { name: "Waist", slotMod: (9/16), itemClass: 4, armor: 1, subClass: [1, 2, 3, 4] },
     "7": { name: "Legs", slotMod: (14/16), itemClass: 4, armor: 1, subClass: [1, 2, 3, 4] },
     "8": { name: "Feet", slotMod: (11/16), itemClass: 4, armor: 1, subClass: [1, 2, 3, 4] },
-    "9": { name: "Wrists", slotMod:  (7/16), itemClass: 4, armor: 1, subClass: [1, 2, 3, 4] },
+    "9": { name: "Wrists", slotMod: (7/16), itemClass: 4, armor: 1, subClass: [1, 2, 3, 4] },
     "10": { name: "Hands", slotMod: (10/16), itemClass: 4, armor: 1, subClass: [1, 2, 3, 4] },
-    "11": { name: "Finger", slotMod:  (9/16), itemClass: 4, armor: 0, subClass: [0] },
-    "12": { name: "Trinket", slotMod: (12/16), itemClass: 4, armor: 0, subClass: [0] },
-    "13": { name: "One-Hand", slotMod:  (9/16), itemClass: 2, armor: 0, subClass: [0, 4, 7, 15, 13] },
+    "11": { name: "Finger", slotMod: (9/16), itemClass: 4, armor: 0, subClass: [0] },
+    "12": { name: "Trinket", slotMod: (11/16), itemClass: 4, armor: 0, subClass: [0] },
+    "13": { name: "One-Hand", slotMod: (7/16), itemClass: 2, armor: 0, subClass: [0, 4, 7, 15, 13] },
     "14": { name: "Shield", slotMod: (16/16), itemClass: 4, armor: 1, subClass: [6] },
     "15": { name: "Bow", slotMod: (16/16), itemClass: 2, armor: 0, subClass: [2] },
-    "16": { name: "Back", slotMod:  (8/16), itemClass: 4, armor: 1, subClass: [1] },
+    "16": { name: "Back", slotMod: (8/16), itemClass: 4, armor: 1, subClass: [1] },
     "17": { name: "Two-Hand", slotMod: (16/16), itemClass: 2, armor: 0, subClass: [1, 5, 8, 6, 10] },
-    "19": { name: "Tabard", slotMod:  (3/16), itemClass: 4, armor: 0, subClass: [0] },
+    "19": { name: "Tabard", slotMod: (3/16), itemClass: 4, armor: 0, subClass: [0] },
     "20": { name: "Robe", slotMod: (16/16), itemClass: 4, armor: 1, subClass: [1, 2, 3, 4] },
-    "21": { name: "Main-Hand", slotMod:  (7/16), itemClass: 2, armor: 0, subClass: [0, 4, 7, 15, 13] },
-    "22": { name: "Off-Hand", slotMod:  (7/16), itemClass: 2, armor: 0, subClass: [0, 4, 7, 15, 13] },
-    "23": { name: "Held Off-hand", slotMod:  (9/16), itemClass: 4, armor: 0, subClass: [0] },
-    "25": { name: "Thrown", slotMod:  (5/16), itemClass: 2, armor: 0, subClass: [16] },
-    "26": { name: "Ranged", slotMod:  (5/16), itemClass: 2, armor: 0, subClass: [3, 18, 19] },
-    "28": { name: "Relic", slotMod:  (4/16), itemClass: 4, armor: 0, subClass: [7, 8, 9, 10] }
+    "21": { name: "Main-Hand", slotMod: (7/16), itemClass: 2, armor: 0, subClass: [0, 4, 7, 15, 13] },
+    "22": { name: "Off-Hand", slotMod: (9/16), itemClass: 2, armor: 0, subClass: [0, 4, 7, 15, 13] },
+    "23": { name: "Held Off-hand", slotMod: (9/16), itemClass: 4, armor: 0, subClass: [0] },
+    "25": { name: "Thrown", slotMod: (5/16), itemClass: 2, armor: 0, subClass: [16] },
+    "26": { name: "Ranged", slotMod: (5/16), itemClass: 2, armor: 0, subClass: [3, 18, 19] },
+    "28": { name: "Relic", slotMod: (5/16), itemClass: 4, armor: 0, subClass: [7, 8, 9, 10] }
   };
   
   const itemStats = {
@@ -47,11 +47,11 @@ $(document).ready(function() {
     "37": { name: "Expertise Rating", statMod: (16/16), type: 1 },
     "38": { name: "Attack Power", statMod: (8/16), type: 1 },
     "43": { name: "Mana Regen MP5", statMod: (273/200), type: 1 },
-    "44": { name: "Armor Penetration Rating", statMod: (2/16), type: 1 },
-    "45": { name: "Spell Power", statMod: (9/16), type: 1 },
+    "44": { name: "Armor Penetration Rating", statMod: (3/16), type: 1 },
+    "45": { name: "Spell Power", statMod: (13/16), type: 1 },
     "46": { name: "Health Regen HP5", statMod: (91/400), type: 1 },
-    "47": { name: "Spell Penetration", statMod: (12/16), type: 1 },
-    "48": { name: "Block Value", statMod: (11/16), type: 1 },
+    "47": { name: "Spell Penetration", statMod: (15/16), type: 1 },
+    "48": { name: "Block Value", statMod: (10/16), type: 1 },
     "armor": { name: "Bonus Armor", statMod: (1/16), type: 2 },
     "all_res": { name: "Resist All", statMod: (5/2), type: 0 },
     "arcane_res": { name: "Resist Arcane", statMod: (16/16), type: 0 },
@@ -280,7 +280,6 @@ $(document).ready(function() {
     let i = 0;
     while (i < 9999) {
       const statBudgetIncrement = Math.pow(quality(i) * itemSlots[slot].slotMod, 1.5);
-      //console.log(`statBudgetIncrement: ${statBudgetIncrement}`);
       if (statBudgetIncrement >= itemBudget) {
         itemLevel = i;
         console.log(`itemLevel: ${itemLevel}`);
@@ -342,7 +341,7 @@ $(document).ready(function() {
     return subClassName ? `<div class="item-subclass">${subClassName}</div>` : subClassName;
   }
   
-  function getCustomPhrasing(itemStat, statAmount) {
+  function statPhrasing(itemStat, statAmount) {
     switch(itemStat) {
       case "12": return `Increases defense rating by ${statAmount}.`;
       case "13": return `Increases your dodge rating by ${statAmount}.`;
@@ -648,7 +647,7 @@ $(document).ready(function() {
           whiteStatsHTML += `<div class="stat white">+${statAmount} ${statTypeText}</div>`;
         }
         else if (stat.type === 1) {
-          let customPhrase = getCustomPhrasing(statTypeKey, statAmount);
+          let customPhrase = statPhrasing(statTypeKey, statAmount);
           greenStatsHTML += `<div class="stat green">Equip: ${customPhrase}</div>`;
         }
       }
