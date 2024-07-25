@@ -25,7 +25,7 @@ $(document).ready(function() {
     "23": { name: "Held Off-hand", slotMod:  (9/16), itemClass: 4, armor: 0, subClass: [0] },
     "25": { name: "Thrown", slotMod:  (5/16), itemClass: 2, armor: 0, subClass: [16] },
     "26": { name: "Ranged", slotMod:  (5/16), itemClass: 2, armor: 0, subClass: [3, 18, 19] },
-    "28": { name: "Relic", slotMod:  (4/16), itemClass: 4, armor: 0, subClass: [7, 8, 9, 10] },
+    "28": { name: "Relic", slotMod:  (4/16), itemClass: 4, armor: 0, subClass: [7, 8, 9, 10] }
   };
   
   const itemStats = {
@@ -53,12 +53,13 @@ $(document).ready(function() {
     "47": { name: "Spell Penetration", statMod: (12/16), type: 1 },
     "48": { name: "Block Value", statMod: (11/16), type: 1 },
     "armor": { name: "Bonus Armor", statMod: (1/16), type: 2 },
+    "all_res": { name: "Resist All", statMod: (5/2), type: 0 },
     "arcane_res": { name: "Resist Arcane", statMod: (16/16), type: 0 },
     "fire_res": { name: "Resist Fire", statMod: (16/16), type: 0 },
     "holy_res": { name: "Resist Holy", statMod: (16/16), type: 0 },
     "nature_res": { name: "Resist Nature", statMod: (16/16), type: 0 },
     "frost_res": { name: "Resist Frost", statMod: (16/16), type: 0 },
-    "shadow_res": { name: "Resist Shadow", statMod: (16/16), type: 0 },
+    "shadow_res": { name: "Resist Shadow", statMod: (16/16), type: 0 }
   };
 
   const armorTypes = {
@@ -71,7 +72,7 @@ $(document).ready(function() {
     "7": { name: "Libram",        tooltip: 1 },
     "8": { name: "Idol",          tooltip: 1 },
     "9": { name: "Totem",         tooltip: 1 },
-    "10": { name: "Sigil",         tooltip: 1 },
+    "10": { name: "Sigil",         tooltip: 1 }
   };
 
   const weaponTypes = {
@@ -89,7 +90,7 @@ $(document).ready(function() {
     "2": { name: "Bow", tooltip: 0 },
     "3": { name: "Gun", tooltip: 1 },
     "18": { name: "Crossbow", tooltip: 1 },
-    "19": { name: "Wand", tooltip: 1 },
+    "19": { name: "Wand", tooltip: 1 }
   };
 
   const weaponDamageTypes = {
@@ -99,7 +100,7 @@ $(document).ready(function() {
     "3": { name: "Nature" },
     "4": { name: "Frost" },
     "5": { name: "Shadow" },
-    "6": { name: "Arcane" },
+    "6": { name: "Arcane" }
   };
 
   const armorData = {
