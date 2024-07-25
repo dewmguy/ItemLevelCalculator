@@ -19,7 +19,7 @@ $(document).ready(function() {
     "16": { name: "Back", slotMod: (8/16), itemClass: 4, armor: 1, subClass: [1] },
     "17": { name: "Two-Hand", slotMod: (16/16), itemClass: 2, armor: 0, subClass: [1, 5, 8, 6, 10] },
     "19": { name: "Tabard", slotMod: (3/16), itemClass: 4, armor: 0, subClass: [0] },
-    "20": { name: "Robe", slotMod: (16/16), itemClass: 4, armor: 1, subClass: [1, 2, 3, 4] },
+    "20": { name: "Chest (Robe)", slotMod: (16/16), itemClass: 4, armor: 1, subClass: [1, 2, 3, 4] },
     "21": { name: "Main-Hand", slotMod: (7/16), itemClass: 2, armor: 0, subClass: [0, 4, 7, 15, 13] },
     "22": { name: "Off-Hand", slotMod: (9/16), itemClass: 2, armor: 0, subClass: [0, 4, 7, 15, 13] },
     "23": { name: "Held Off-hand", slotMod: (9/16), itemClass: 4, armor: 0, subClass: [0] },
@@ -60,6 +60,33 @@ $(document).ready(function() {
     "nature_res": { name: "Resist Nature", statMod: (16/16), type: 0 },
     "frost_res": { name: "Resist Frost", statMod: (16/16), type: 0 },
     "shadow_res": { name: "Resist Shadow", statMod: (16/16), type: 0 }
+  };
+
+  const statPhrases = {
+    "12": statAmount => `Increases defense rating by ${statAmount}.`,
+    "13": statAmount => `Increases your dodge rating by ${statAmount}.`,
+    "14": statAmount => `Increases your parry rating by ${statAmount}.`,
+    "15": statAmount => `Increases your shield block rating by ${statAmount}.`,
+    "31": statAmount => `Improves hit rating by ${statAmount}.`,
+    "32": statAmount => `Improves critical strike rating by ${statAmount}.`,
+    "35": statAmount => `Improves your resilience rating by ${statAmount}.`,
+    "36": statAmount => `Improves haste rating by ${statAmount}.`,
+    "37": statAmount => `Improves expertise rating by ${statAmount}.`,
+    "38": statAmount => `Increases attack power by ${statAmount}.`,
+    "43": statAmount => `Restores +${statAmount} mana per 5 sec.`,
+    "44": statAmount => `Increases your armor penetration rating by ${statAmount}.`,
+    "45": statAmount => `Increases spell power by ${statAmount}.`,
+    "46": statAmount => `Restores +${statAmount} health per 5 sec.`,
+    "47": statAmount => `Increases spell penetration by ${statAmount}.`,
+    "48": statAmount => `Increases the block value of your shield by ${statAmount}.`
+  };
+
+  const qualityCoefficients = {
+    'uncommon': ilvl => ilvl * (8 / 16) - 4,
+    'rare': ilvl => ilvl * (10 / 16) - 7,
+    'epic': ilvl => ilvl * (12 / 16) - 6,
+    'legendary': ilvl => ilvl * (14 / 16),
+    'artifact': ilvl => ilvl * (16 / 16)
   };
 
   const armorTypes = {
@@ -139,6 +166,24 @@ $(document).ready(function() {
       Plate: ilvl => -9.1068691810 + 9.7517833041 * ilvl - 0.0037013807 * Math.pow(ilvl, 2),
       Shield: ilvl => -164.0465200000 + 33.9723200000 * ilvl - 0.0145401229 * Math.pow(ilvl, 2)
     }
+  };
+
+  const shieldBlockCoefficients = {
+    uncommon: level => {
+      if (level >= 1 && level <= 80) return -3.0432462933 + 0.8825715740 * level - 0.0312968732 * Math.pow(level, 2) + 0.0007254284 * Math.pow(level, 3) - 0.0000046519 * Math.pow(level, 4);
+      if (level >= 81 && level <= 137) return -16.3908655872 + 0.6897096083 * level + 0.0013506088 * Math.pow(level, 2);
+      if (level >= 138) return 958.2984725669 - 18.2166307096 * level + 0.1250629715 * Math.pow(level, 2) - 0.0002655468 * Math.pow(level, 3);
+    },
+    rare: level => {
+      if (level >= 1 && level <= 70) return -3.5159255097 + 1.1796186496 * level - 0.0464979829 * Math.pow(level, 2) + 0.0011133817 * Math.pow(level, 3) - 0.0000079076 * Math.pow(level, 4);
+      if (level >= 71 && level <= 153) return -29.0000000000 + 1.0000000000 * level;
+      if (level >= 154) return 18470.4850615834 - 421.5128438990 * level + 3.5991532696 * Math.pow(level, 2) - 0.0135272648 * Math.pow(level, 3) + 0.0000189300 * Math.pow(level, 4);
+    },
+    epic: level => {
+      if (level >= 0 && level <= 189) return -36.7178644064 + 2.3738336805 * level - 0.0257785254 * Math.pow(level, 2) + 0.0002156921 * Math.pow(level, 3) - 0.0000005816 * Math.pow(level, 4);
+      if (level >= 190 && level <= 300) return 364.0853740290 - 1.7727768015 * level + 0.0050409241 * Math.pow(level, 2);
+    },
+    default: level => 54.5284833805 - 1.7511894287 * level + 0.0378136180 * Math.pow(level, 2) - 0.0001827142 * Math.pow(level, 3) + 0.0000002842 * Math.pow(level, 4)
   };
 
   function populateItemSlots(itemClass) {
@@ -227,106 +272,71 @@ $(document).ready(function() {
     else { $("#add-stat").show(); }
   }
 
-  function getQualityCoefficient(quality) {
-    switch (quality) {
-      case 'uncommon':  return ilvl => ilvl *  (8/16) - 4;
-      case 'rare':      return ilvl => ilvl * (10/16) - 7;
-      case 'epic':      return ilvl => ilvl * (12/16) - 6;
-      case 'legendary': return ilvl => ilvl * (14/16);
-      case 'artifact':  return ilvl => ilvl * (16/16);
-      default: return () => 0;
-    }
-  }
-
   function calculateStats(level, slot, quality) {
     console.error(`calculating stats from level`);
-    let statCount = 1;
-    const itemBudget = Math.pow(quality(level) * itemSlots[slot].slotMod, 1.5);
+    const itemSlotData = itemSlots[slot];
+    const qualityValue = quality(level);
+    const slotMod = itemSlotData.slotMod;
+    const itemBudget = Math.pow(qualityValue * slotMod, 1.5);
     console.log(`itemBudget: ${itemBudget}`);
+
     const statValues = {};
     $('#stats .group').each(function() {
-      const statName = $(this).find('.stat-type option:selected').text();
       const statType = $(this).find('.stat-type').val();
       const percent = parseFloat($(this).find('.stat-amount').val()) / 100 || 0;
-      const statCoefficient = itemStats[statType] ? itemStats[statType].statMod : 1;
-      console.log(`statCoefficient: ${statCoefficient}`);
-      const statBudget = itemBudget * percent; // the math
-      console.log(`statBudget: ${statBudget}`);
-      const statAmount = Math.pow(statBudget / statCoefficient, 2/3);
-      console.log(`statAmount: ${statAmount}`);
+      const statMod = itemStats[statType]?.statMod || 1;
+      const statBudget = itemBudget * percent;
+      const statAmount = Math.pow(statBudget / statMod, 2/3);
       statValues[statType] = Math.floor(statAmount);
-      console.log(`[${statCount}] ${statName}: ${itemBudget} * ${percent}`);
-      statCount++;
+      console.log(`[${statType}] statBudget: ${statBudget}, statAmount: ${statAmount}`);
     });
     console.log(`returned statValues: ${JSON.stringify(statValues)}`);
     return statValues;
   }
-  
+
   function calculateLevel(slot, quality) {
     console.error("calculating level from stats");
     let itemBudget = 0;
-    let statCount = 1;
+
     $('#stats .group').each(function() {
-      const statName = $(this).find('.stat-type option:selected').text();
       const statType = $(this).find('.stat-type').val();
-      const statCoefficient = itemStats[statType] ? itemStats[statType].statMod : 1;
+      const statMod = itemStats[statType]?.statMod || 1;
       const statAmount = parseFloat($(this).find('.stat-amount').val());
-      const statValue = Math.pow(statAmount * statCoefficient, 1.5); // the math
-      console.log(`[${statCount}] ${statName}: (${statAmount} * ${statCoefficient})^1.5 = ${statValue}`);
+      const statValue = Math.pow(statAmount * statMod, 1.5);
       itemBudget += statValue;
-      statCount++;
     });
     console.log(`itemBudget: ${itemBudget}`);
-    let i = 0;
-    while (i < 9999) {
-      const statBudgetIncrement = Math.pow(quality(i) * itemSlots[slot].slotMod, 1.5);
+
+    for (let i = 0; i < 9999; i++) {
+      const qualityValue = quality(i);
+      const slotMod = itemSlots[slot].slotMod;
+      const statBudgetIncrement = Math.pow(qualityValue * slotMod, 1.5);
       if (statBudgetIncrement >= itemBudget) {
-        itemLevel = i;
-        console.log(`itemLevel: ${itemLevel}`);
-        break;
+        console.log(`itemLevel: ${i}`);
+        return i;
       }
-      i++;
     }
-    return itemLevel;
+    return 0;  // Default return in case of unexpected input
   }
-  
+
   function calculateArmor(slot, type, level, quality) {
     console.error("generating armor");
     const slotData = itemSlots[slot];
-    if (slotData.armor == 0) { return ''; }
-    const slotCoefficient = slotData.slotMod;
-    console.log(`slotCoefficient: ${slotCoefficient}`);
-    const baseCoefficient = armorData[quality][type];
-    const baseValue = baseCoefficient(level);
+    if (!slotData.armor) return '';
+    const slotMod = slotData.slotMod;
+    console.log(`slotCoefficient: ${slotMod}`);
+    const baseValue = armorData[quality][type](level);
     console.log(`baseValue: ${baseValue}`);
-    const totalArmor = baseValue * slotCoefficient > 0 ? Math.ceil(baseValue * slotCoefficient) : 0;
+    const totalArmor = Math.max(Math.ceil(baseValue * slotMod), 0);
     console.log(`totalArmor: ${totalArmor}`);
     return `<div>${totalArmor} Armor</div>`;
   }
-
+  
   function calculateShieldBlock(level, quality) {
-      let baseBlock;
-      switch (quality) {
-        case 'uncommon':
-          if (level >= 1 && level <= 80) { baseBlock = -3.0432462933 + 0.8825715740 * level - 0.0312968732 * Math.pow(level, 2) + 0.0007254284 * Math.pow(level, 3) - 0.0000046519 * Math.pow(level, 4); }
-          else if (level >= 81 && level <= 137) { baseBlock = -16.3908655872 + 0.6897096083 * level + 0.0013506088 * Math.pow(level, 2); }
-          else if (level >= 138) { baseBlock = 958.2984725669 - 18.2166307096 * level + 0.1250629715 * Math.pow(level, 2) - 0.0002655468 * Math.pow(level, 3); }
-          break;
-        case 'rare':
-          if (level >= 1 && level <= 70) { baseBlock = -3.5159255097 + 1.1796186496 * level - 0.0464979829 * Math.pow(level, 2) + 0.0011133817 * Math.pow(level, 3) - 0.0000079076 * Math.pow(level, 4); }
-          else if (level >= 71 && level <= 153) { baseBlock = -29.0000000000 + 1.0000000000 * level; }
-          else if (level >= 154) { baseBlock = 18470.4850615834 - 421.5128438990 * level + 3.5991532696 * Math.pow(level, 2) - 0.0135272648 * Math.pow(level, 3) + 0.0000189300 * Math.pow(level, 4); }
-          break;
-        case 'epic':
-          if (level >= 0 && level <= 189) { baseBlock = -36.7178644064 + 2.3738336805 * level - 0.0257785254 * Math.pow(level, 2) + 0.0002156921 * Math.pow(level, 3) - 0.0000005816 * Math.pow(level, 4); }
-          else if (level >= 190 && level <= 300) { baseBlock = 364.0853740290 - 1.7727768015 * level + 0.0050409241 * Math.pow(level, 2); }
-          break;
-        default:
-          baseBlock = 54.5284833805 - 1.7511894287 * level + 0.0378136180 * Math.pow(level, 2) - 0.0001827142 * Math.pow(level, 3) + 0.0000002842 * Math.pow(level, 4);
-          break;
-      }
-      const totalBlock = baseBlock > 0 ? Math.ceil(baseBlock) : 0;
-      return `<div>${totalBlock} Block</div>`;
+    const calculateBlock = shieldBlockCoefficients[quality] || shieldBlockCoefficients.default;
+    const baseBlock = calculateBlock(level);
+    const totalBlock = baseBlock > 0 ? Math.ceil(baseBlock) : 0;
+    return `<div>${totalBlock} Block</div>`;
   }
 
   function subClassVisible(subClass, classList) {
@@ -342,25 +352,6 @@ $(document).ready(function() {
   }
   
   function statPhrasing(itemStat, statAmount) {
-    switch(itemStat) {
-      case "12": return `Increases defense rating by ${statAmount}.`;
-      case "13": return `Increases your dodge rating by ${statAmount}.`;
-      case "14": return `Increases your parry rating by ${statAmount}.`;
-      case "15": return `Increases your shield block rating by ${statAmount}.`;
-      case "31": return `Improves hit rating by ${statAmount}.`;
-      case "32": return `Improves critical strike rating by ${statAmount}.`;
-      case "35": return `Improves your resilience rating by ${statAmount}.`;
-      case "36": return `Improves haste rating by ${statAmount}.`;
-      case "37": return `Improves expertise rating by ${statAmount}.`;
-      case "38": return `Increases attack power by ${statAmount}.`;
-      case "43": return `Restores +${statAmount} mana per 5 sec.`;
-      case "44": return `Increases your armor penetration rating by ${statAmount}.`;
-      case "45": return `Increases spell power by ${statAmount}.`;
-      case "46": return `Restores +${statAmount} health per 5 sec.`;
-      case "47": return `Increases spell penetration by ${statAmount}.`;
-      case "48": return `Increases the block value of your shield by ${statAmount}.`;
-      default: return `broken`;
-    }
   }
   
   function createTooltipHTML(itemQuality, itemName, itemLevel, itemReqLevel, bindHTML, uniqueHTML, slotHTML, typeHTML, weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, greenStatsHTML, itemFlavorHTML) {
@@ -440,6 +431,11 @@ $(document).ready(function() {
     return sum;
   }
   
+  function statPhrasing(itemStat, statAmount) {
+    const phraseFunction = statPhrases[itemStat];
+    return phraseFunction ? phraseFunction(statAmount) : 'broken';
+  }
+
   // ui/ux
 
   $(document).on('click', '#stats .group .delete', function() {
@@ -608,7 +604,7 @@ $(document).ready(function() {
     const itemQuality = $('input[name="itemQuality"]:checked').val() || null;
     const itemQualityPretty = itemQuality.charAt(0).toUpperCase() + itemQuality.slice(1);
     const itemSlot = parseFloat($('#item-slot').val()) || null;
-    const qualityCoefficient = getQualityCoefficient(itemQuality);
+    const qualityCoefficient = qualityCoefficients[itemQuality] || (() => 0);
 
     if (calcMethod === 'level') { // level calc
       itemLevel = calculateLevel(itemSlot, qualityCoefficient);
