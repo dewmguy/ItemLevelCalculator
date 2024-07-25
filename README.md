@@ -23,13 +23,17 @@ The fundamentals of how an item level is calculated involves the following param
 
 ### StatBudget Formula
 
-```math
+$$
 \text{StatBudget}^{1.5} = \left[(\text{StatValue}[1] \times \text{StatMod}[1])^{1.5} + (\text{StatValue}[2] \times \text{StatMod}[2])^{1.5} + \ldots\right]
+$$
 
+$$
 \text{ItemBudget} = \frac{\text{StatBudget}}{\text{SlotMod}}
+$$
 
+$$
 \text{ilvl} = \text{ItemBudget} \times \text{QualityMod}
-```
+$$
 
 ## QualityMod
 
@@ -40,9 +44,9 @@ The fundamentals of how an item level is calculated involves the following param
 | 4 (epic)     | 3/2 (1.5)   | 26/1 (26.0) |
 
 If the ItemBudget is `100` and the item quality is:
-- Uncommon: The ilvl would be $208 = (100 \* 2/1 + 8/1)$
-- Rare: The ilvl would be $180.75 = (100 \* 9/5 + 3/4)$
-- Epic: The ilvl would be $176 = (100 \* 3/2 + 26/1)$
+- Uncommon: $208 = (100 \* 2/1 + 8/1)$
+- Rare: $180.75 = (100 \* 9/5 + 3/4)$
+- Epic: $176 = (100 \* 3/2 + 26/1)$
 
 ## StatMod
 
