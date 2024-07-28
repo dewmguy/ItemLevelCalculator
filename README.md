@@ -12,18 +12,18 @@ While many of the values and coefficients provided by the community are generall
 |------------|------------|
 | Stat       | Properties of an item, e.g., Stamina, Strength. |
 | StatMod    | Weight coefficient of a Stat. |
-| StatValue  | Imaginary value of the Stat on an item, calculated as `Stat * StatMod` raised to the power of 1.5. |
-| StatBudget | Sum of all StatValues, raised to the power of 1.5. |
+| StatValue  | Imaginary value of the Stat on an item, calculated as `Stat * StatMod` raised to the power of 1.7095 [log(2)/log(1/5)]. |
+| StatBudget | Sum of all StatValues, raised to the power of 1.7095. |
 | SlotMod    | Weight coefficient of an equipment slot. |
 | ItemValue  | StatBudget divided by SlotMod. |
 | ItemBudget | Imaginary limit of an item's StatBudget based on its item level. |
 | QualityMod | Weight coefficient of item quality. |
-| Item Level | Effective level of an item, calculated as ItemBudget multiplied by QualityMod. |
+| ItemLevel  | Effective level of an item, calculated as ItemBudget multiplied by QualityMod. |
 
 #### StatBudget Formula
 
 $$
-\text{StatBudget}^{1.5} = \left( (\text{StatValue}[1] \times \text{StatMod}[1])^{1.5} + (\text{StatValue}[2] \times \text{StatMod}[2])^{1.5} + \ldots \right)
+\text{StatBudget}^{1.7095} = \left( (\text{StatValue}[1] \times \text{StatMod}[1])^{1.7095} + (\text{StatValue}[2] \times \text{StatMod}[2])^{1.7095} + \ldots \right)
 $$
 
 #### ItemValue Calculation
@@ -49,7 +49,7 @@ $$
 #### Item Level Formula
 
 $$
-\text{item\_level} = \text{ItemValue} \times \text{QualityMod}
+\text{ItemLevel} = \text{ItemValue} \times \text{QualityMod}
 $$
 
 ## Stat & Slot Coefficients for Item Level 1 - 69
