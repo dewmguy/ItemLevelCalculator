@@ -223,7 +223,7 @@ $(document).ready(function() {
     const itemSlotData = itemSlots[slot];
     const qualityValue = quality(level);
     const slotMod = itemSlotData.slotMod;
-    const itemBudget = Math.pow(qualityValue * slotMod, exponent);
+    const itemBudget = Math.pow(qualityValue * slotMod, exponent) / slotMod;
     console.log(`itemBudget: ${itemBudget}`);
 
     const statValues = {};
