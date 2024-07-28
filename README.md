@@ -6,74 +6,67 @@ While many of the values and coefficients provided by the community are generall
 
 ![Screenshot](screenshot.png?raw=true "Screenshot of Item Calculator Interface")
 
-### Key Terms
+### Fundamentals of Item Level Calculation
 
-The fundamentals of how an item level is calculated involves the following parameters:
+| Term       | Definition |
+|------------|------------|
+| Stat       | Properties of an item, e.g., Stamina, Strength. |
+| StatMod    | Weight coefficient of a Stat. |
+| StatValue  | Imaginary value of the Stat on an item, calculated as `Stat * StatMod` raised to the power of 1.5. |
+| StatBudget | Sum of all StatValues, raised to the power of 1.5. |
+| SlotMod    | Weight coefficient of an equipment slot. |
+| ItemValue  | StatBudget divided by SlotMod. |
+| ItemBudget | Imaginary limit of an item's StatBudget based on its item level. |
+| QualityMod | Weight coefficient of item quality. |
+| Item Level | Effective level of an item, calculated as ItemBudget multiplied by QualityMod. |
 
-| Term              | Definition |
-|-------------------|------------|
-| Stat              | The properties of an item, i.e. Stamina, Strength, etc. |
-| StatMod           | The weight coefficient of a Stat. |
-| StatValue         | The imaginary value of the Stat on an item, found by multiplying the Stat by the StatMod and raising to the power of 1.5. |
-| StatBudget        | The limit of the imaginary sum of all StatValues of an item, found by the sum of all StatValues. |
-| SlotMod           | The weight coefficient of an equipment slot. |
-| ItemBudget        | The limit of the imaginary sum of the StatBudget, found by dividing the StatBudget by the SlotMod. |
-| QualityMod        | The weight coefficient of item quality. |
-| Item Level (ilvl) | The effective level of an item, found by multiplying the ItemBudget by the sum of the QualityMod. |
-
-### StatBudget Formula
-
-$$
-\text{StatBudget}^{1.5} = \left[(\text{StatValue}[1] \times \text{StatMod}[1])^{1.5} + (\text{StatValue}[2] \times \text{StatMod}[2])^{1.5} + \ldots\right]
-$$
+#### StatBudget Formula
 
 $$
-\text{ItemBudget} = \frac{\text{StatBudget}}{\text{SlotMod}}
+\text{StatBudget}^{1.5} = \left( (\text{StatValue}[1] \times \text{StatMod}[1])^{1.5} + (\text{StatValue}[2] \times \text{StatMod}[2])^{1.5} + \ldots \right)
 $$
 
+#### ItemValue Calculation
+
 $$
-\text{ilvl} = \text{ItemBudget} \times \text{QualityMod}
+\text{ItemValue} = \text{StatBudget} \times \text{SlotMod}
 $$
 
-## QualityMod
+The item level calculation involves an iterative loop that calculates the ItemBudget based on an assumed item level. The loop increments the item level until ItemBudget is equal to or greater than StatBudget.
 
-| quality      | qualityMult | qualityBase |
-|--------------|-------------|-------------|
-| 2 (uncommon) | 2/1 (2.0)   |  8/1 ( 8.0) |
-| 3 (rare)     | 9/5 (1.8)   |  3/4 (0.75) |
-| 4 (epic)     | 3/2 (1.5)   | 26/1 (26.0) |
+#### QualityMod Formula
 
-If the ItemBudget is `100` and the item quality is:
-- Uncommon: `208 = (100 \* 2/1 + 8/1)`
-- Rare: `180.75 = (100 \* 9/5 + 3/4)`
-- Epic: `176 = (100 \* 3/2 + 26/1)`
+$$
+\text{QualityMod} = \text{qualityMult} \times \text{ilvl} - \text{qualityBase}
+$$
 
-### alternate versions
+#### ItemBudget Formula
 
-uncommon: ilvl * 0.5   - 2
-rare    : ilvl * 0.625 - 1.15
-epic    : ilvl * 0.77  -1
+$$
+\text{ItemBudget} = \text{QualityMod} \times \text{SlotMod}
+$$
 
----
+#### Item Level Formula
 
-uncommon: slotValue * 2 + 8
-rare    : slotvalue * 1.8 + 0.75
-epic    : slotvalue * 1.2 + 26
+$$
+\text{item\_level} = \text{ItemValue} \times \text{QualityMod}
+$$
 
----
+## Stat & Slot Coefficients for Item Level 1 - 69
 
-uncommon: (slotvalue +  9.8) / 1.21
-rare    : (slotvalue +  4.2) / 1.42
-epic    : (slotvalue - 11.2) / 1.64
+### Item Quality Modifiers
 
----
+This coefficient controls the ceiling for stats on an item based on its quality.
 
-uncommon: (ilvl * 1.21 - 9.8) * SlotMod
-rare    : (ilvl * 1.42 - 4.2) * SlotMod
-epic    : (ilvl * 1.64 + 11.2) * SlotMod
+| quality      | qualityMult   | qualityBase | verified |
+|--------------|---------------|-------------|----------|
+| 2 (uncommon) |  8/16 (0.500) | 4           | yes      |
+| 3 (rare)     | 10/16 (0.625) | 3           | no       |
+| 4 (epic)     | 14/16 (0.875) | 2           | no       |
 
+### Item Stat Modifiers
 
-## StatMod
+This coefficient controls the ceiling for stats on an item based on the stat type.
 
 | General Stats      |  stat_type | StatMod |
 |--------------------|------------|---------|
@@ -83,33 +76,75 @@ epic    : (ilvl * 1.64 + 11.2) * SlotMod
 | Strength           |          4 |   16/16 |
 | Intellect          |          5 |   16/16 |
 | Spirit             |          6 |   16/16 |
-| Stamina            |          7 |   11/16 |
+| Stamina            |          7 |   16/16 |
 | Defense Rating     |         12 |   16/16 |
 | Dodge Rating       |         13 |   16/16 |
 | Parry Rating       |         14 |   16/16 |
 | Block Rating       |         15 |   16/16 |
+| Spell Crit         |         21 |   16/16 |
 | Hit Rating         |         31 |   16/16 |
 | Crit Rating        |         32 |   16/16 |
 | Resiliance         |         35 |   16/16 |
 | Haste Rating       |         36 |   16/16 |
 | Expertise Rating   |         37 |   16/16 |
 | Attack Power       |         38 |    8/16 |
-| Mana Regen Per 5   |         43 | 273/200 |
-| Armor Penetration  |         44 |    3/16 |
+| Mana Regen Per 5   |         43 |   32/16 |
+| Armor Penetration  |         44 |   16/16 |
 | Spell Power        |         45 |   14/16 |
-| Health Regen Per 5 |         46 |  91/400 |
+| Health Regen Per 5 |         46 |   11/16 |
 | Spell Penetration  |         47 |   12/16 |
 | Block Value        |         48 |   11/16 |
-| Bonus Armor        |      armor |    1/16 |
-| Resistance to All  |    all_res |     5/2 |
-| Arcane Resistance  | arcane_res |   16/16 |
-| Fire Resistance    |   fire_res |   16/16 |
-| Holy Resistance    |   holy_res |   16/16 |
-| Nature Resistance  | nature_res |   16/16 |
-| Frost Resistance   |  frost_res |   16/16 |
-| Shadow Resistance  | shadow_res |   16/16 |
+| Bonus Armor        |      armor |    3/32 |
+| Resistance to All  |    all_res |    4/16 |
+| Arcane Resistance  | arcane_res |   12/16 |
+| Fire Resistance    |   fire_res |   12/16 |
+| Holy Resistance    |   holy_res |   12/16 |
+| Nature Resistance  | nature_res |   12/16 |
+| Frost Resistance   |  frost_res |   12/16 |
+| Shadow Resistance  | shadow_res |   12/16 |
+
+### Item Slot Modifiers (Armor)
+
+This coefficient controls the ceiling for stats on an item based on what slot the armor piece belongs to.
+
+| Item Name       | InventoryType | SlotMod |
+|-----------------|---------------|---------|
+| Head            |             1 |   16/16 |
+| Neck            |             2 |    9/16 |
+| Shoulder        |             3 |    8/16 |
+| Shirt           |             4 |    3/16 |
+| Chest           |             5 |   16/16 |
+| Waist           |             6 |    9/16 |
+| Legs            |             7 |   16/16 |
+| Feet            |             8 |    7/16 |
+| Wrists          |             9 |    4/16 |
+| Hands           |            10 |    9/16 |
+| Finger          |            11 |    9/16 |
+| Trinket         |            12 |   11/16 |
+| Shield          |            14 |    4/16 |
+| Back            |            16 |    4/16 |
+| Tabard          |            19 |    3/16 |
+| Chest (Robe)    |            20 |   16/16 |
+| Held Off-hand   |            23 |    4/16 |
+| Relic           |            28 |    4/16 |
+
+### Item Slot Modifiers (Weapon)
+
+This coefficient controls the ceiling for stats on an item based on what slot the weapon belongs to.
+
+| Item Name       | InventoryType | SlotMod |
+|-----------------|---------------|---------|
+| One Hand Weapon |            13 |    7/16 |
+| Bow             |            15 |   16/16 |
+| Two Hand Weapon |            17 |   16/16 |
+| Main-Hand       |            21 |    7/16 |
+| Off-Hand        |            22 |    7/16 |
+| Thrown          |            25 |    5/16 |
+| Ranged          |            26 |    5/16 |
 
 ### Untested StatMods
+
+These are probably junk but keeping them here for further testing.
 
 | Ring Only Stats   | StatMod |
 |-------------------|---------|
@@ -126,41 +161,27 @@ epic    : (ilvl * 1.64 + 11.2) * SlotMod
 | Block Value       |   (3/5) |
 | Defense           |   (6/5) |
 
-## Slot Modifiers
-
-These values were derived by dividing the armor value of one of each type of armor of equivalent item level by the chest piece. The chest piece is assumed to have 100% of the armor assigned by its item level. Cloak was derived by dividing against a cloth chestpiece of equivalent item level. Non-armor types are assumed or borrowed from other documentation.
-
-| Item Name       | InventoryType | SlotMod |
-|-----------------|---------------|---------|
-| Head            |             1 |   13/16 |
-| Neck            |             2 |    9/16 |
-| Shoulder        |             3 |   12/16 |
-| Shirt           |             4 |    3/16 |
-| Chest           |             5 |   16/16 |
-| Waist           |             6 |    9/16 |
-| Legs            |             7 |   14/16 |
-| Feet            |             8 |   11/16 |
-| Wrists          |             9 |    7/16 |
-| Hands           |            10 |   10/16 |
-| Finger          |            11 |    9/16 |
-| Trinket         |            12 |   11/16 |
-| One Hand Weapon |            13 |    7/16 |
-| Shield          |            14 |   16/16 |
-| Bow             |            15 |   16/16 |
-| Back            |            16 |    8/16 |
-| Two Hand Weapon |            17 |   16/16 |
-| Tabard          |            19 |    3/16 |
-| Chest (Robe)    |            20 |   16/16 |
-| Main-Hand       |            21 |    7/16 |
-| Off-Hand        |            22 |    7/16 |
-| Held Off-hand   |            23 |    9/16 |
-| Thrown          |            25 |    5/16 |
-| Ranged          |            26 |    5/16 |
-| Relic           |            28 |    5/16 |
-
 ## Base Armor Calculation
 
-Base Armor is not to be confused with Bonus Armor, which is applied to an item as an additional stat like stamina. Base Armor is calculated by item level.
+Base Armor is not to be confused with Bonus Armor, which is applied to an item as an additional stat like stamina. Base Armor is calculated by item level. I expect that the base armor of an item actually consumes an amount of the item's overall stat budget. I believe this is true due to how bonus armor affects an items level. This can be a thought experiment for another time (or person).
+
+### Base Armor Modifiers
+
+These values are derived by dividing the armor value each type of armor of equivalent item level by that of the chest piece. The chest piece is assumed to have 100% of the armor assigned by its item level. The cloak armor value is derived by dividing against a cloth chestpiece of equivalent item level. Non-armor types are assumed or borrowed from other documentation.
+
+| Item Name    | InventoryType | armorMod |
+|--------------|---------------|----------|
+| Chest        |             5 |    16/16 |
+| Chest (Robe) |            20 |    16/16 |
+| Legs         |             7 |    14/16 |
+| Head         |             1 |    13/16 |
+| Shoulder     |             3 |    12/16 |
+| Feet         |             8 |    11/16 |
+| Hands        |            10 |    10/16 |
+| Waist        |             6 |     9/16 |
+| Shield       |            14 |     9/16 |
+| Back         |            16 |     8/16 |
+| Wrists       |             9 |     7/16 |
 
 ### Cloth
 

@@ -277,7 +277,7 @@ button:hover { background-color: #e6c200 }
 
 .tooltip .item-level, .flavor { color: #FFD100 }
 .tooltip .stat { color: #FFF }
-.tooltip .stat.green { color: #1EFF00 }
+.tooltip .stat.green, .green { color: #1EFF00 }
 .tooltip .specialstat { color: #1eff00 }
 
 .uncommon {
