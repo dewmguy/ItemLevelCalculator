@@ -8,48 +8,41 @@ While many of the values and coefficients provided by the community are generall
 
 ### Fundamentals of Item Level Calculation
 
-| Term       | Definition |
-|------------|------------|
-| Stat       | Properties of an item, e.g., Stamina, Strength. |
-| StatMod    | Weight coefficient of a Stat. |
-| StatValue  | Imaginary value of the Stat on an item, calculated as `Stat * StatMod` raised to the power of 1.7095 [log(2)/log(1/5)]. |
-| StatBudget | Sum of all StatValues, raised to the power of 1.7095. |
-| SlotMod    | Weight coefficient of an equipment slot. |
-| ItemValue  | StatBudget divided by SlotMod. |
-| ItemBudget | Imaginary limit of an item's StatBudget based on its item level. |
-| QualityMod | Weight coefficient of item quality. |
-| ItemLevel  | Effective level of an item, calculated as ItemBudget multiplied by QualityMod. |
+#### Terms and Definitions
+
+- **Stat**: Properties of an item, e.g., Stamina, Strength.
+- **StatMod**: Weight coefficient of a Stat.
+- **StatValue**: Imaginary value of the Stat on an item, calculated as $Stat \times StatMod$ raised to the power of 1.7095.
+- **StatBudget**: Sum of all StatValues, raised to the power of 1.7095.
+- **SlotMod**: Weight coefficient of an equipment slot.
+- **ItemBudget**: Total StatBudget multiplied by SlotMod.
+- **QualityMod**: Weight coefficient of item quality.
+- **ItemLevel**: Effective level of an item, calculated through an iterative process based on ItemBudget and QualityMod.
 
 #### StatBudget Formula
 
 $$
-\text{StatBudget}^{1.7095} = \left( (\text{StatValue}[1] \times \text{StatMod}[1])^{1.7095} + (\text{StatValue}[2] \times \text{StatMod}[2])^{1.7095} + \ldots \right)
+StatBudget = \left( (StatValue[1] \times StatMod[1])^{1.7095} + (StatValue[2] \times StatMod[2])^{1.7095} + \ldots \right)
 $$
 
-#### ItemValue Calculation
+#### ItemBudget Calculation
 
 $$
-\text{ItemValue} = \text{StatBudget} \times \text{SlotMod}
+ItemBudget = StatBudget \times SlotMod
 $$
 
-The item level calculation involves an iterative loop that calculates the ItemBudget based on an assumed item level. The loop increments the item level until ItemBudget is equal to or greater than StatBudget.
-
-#### QualityMod Formula
+#### QualityMod Calculation
 
 $$
-\text{QualityMod} = \text{qualityMult} \times \text{ilvl} - \text{qualityBase}
+QualityMod = qualityMult \times ItemLevel - qualityBase
 $$
 
-#### ItemBudget Formula
+#### ItemLevel Calculation
+
+The item level is the value of the number of iterations in a loop that calculates the QualityMod then multiplies it by the SlotMod raised to the power of 1.7095.
 
 $$
-\text{ItemBudget} = \text{QualityMod} \times \text{SlotMod}
-$$
-
-#### Item Level Formula
-
-$$
-\text{ItemLevel} = \text{ItemValue} \times \text{QualityMod}
+(\text{QualityMod}(i) \times \text{SlotMod})^{1.7095} \geq \text{ItemBudget} \implies \text{ItemLevel} = i
 $$
 
 ## Stat & Slot Coefficients for Item Level 1 - 69
