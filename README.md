@@ -4,6 +4,8 @@ This WIP web application functions as an item level calculator, aiding in the cr
 
 While many of the values and coefficients provided by the community are generally considered "good enough." I seek to bump up the reliability and accuracy of item level calculation by introducing polynomial regression. I believe the enhanced equations will provide significantly more reliable blizzlike output, intended to match the in-game values as closely as possible. The calculator is most effective for validating or creating items within the intended item level range of blizzlike items. Using the calculator to create items with item levels that extend beyond the existing in-game item level ranges may have undesireable output.
 
+The one point of contention that has frustrated me most from the anti-calculator argument is that it isn't worth doing because it could never be accurate enough due to account for Blizzard's many customizations and variations in how they assign stats to items. These are known as outliers, and in statistical analysis, one of the most important tasks is to identify and account for them. While it has required significant effort to locate these outliers, they become fairly easy to spot when you have a clear understanding of the baseline. Approaching this with the mindset of "the item doesn't exactly match the stats on Wowhead, so it's wrong" misses the point. That's not how this works, nor is it the intention. Blizzard created many formulas and occasionally deviated from them when necessary. It will never be a perfect 1:1 match because even Blizzard didn't adhere strictly to that standard. However, the calculator excels at providing an educated guess.
+
 ![Screenshot](screenshot.png?raw=true "Screenshot of Item Calculator Interface")
 
 ### Fundamentals of Item Level Calculation
@@ -12,8 +14,8 @@ While many of the values and coefficients provided by the community are generall
 
 - **Stat**: Properties of an item, e.g., Stamina, Strength.
 - **StatMod**: Weight coefficient of a Stat.
-- **StatValue**: Imaginary value of the Stat on an item, calculated as $Stat \times StatMod$ raised to the power of 1.7095.
-- **StatBudget**: Sum of all StatValues, raised to the power of 1.7095.
+- **StatValue**: Imaginary value of the Stat on an item, calculated as $Stat \times StatMod$ raised to the power of 1.5.
+- **StatBudget**: Sum of all StatValues, raised to the power of 1.5.
 - **SlotMod**: Weight coefficient of an equipment slot.
 - **ItemBudget**: Total StatBudget multiplied by SlotMod.
 - **QualityMod**: Weight coefficient of item quality.
@@ -22,7 +24,7 @@ While many of the values and coefficients provided by the community are generall
 #### StatBudget Formula
 
 $$
-StatBudget = \left( (StatValue[1] \times StatMod[1])^{1.7095} + (StatValue[2] \times StatMod[2])^{1.7095} + \ldots \right)
+StatBudget = \left( (StatValue[1] \times StatMod[1])^{1.5} + (StatValue[2] \times StatMod[2])^{1.5} + \ldots \right)
 $$
 
 #### ItemBudget Calculation
@@ -39,124 +41,113 @@ $$
 
 #### ItemLevel Calculation
 
-The item level is the value of the number of iterations in a loop that calculates the QualityMod then multiplies it by the SlotMod raised to the power of 1.7095.
+The item level is the value of the number of iterations in a loop that calculates the QualityMod then multiplies it by the SlotMod raised to the power of 1.5.
 
 $$
-(\text{QualityMod}(i) \times \text{SlotMod})^{1.7095} \geq \text{ItemBudget} \implies \text{ItemLevel} = i
+(\text{QualityMod}(i) \times \text{SlotMod})^{1.5} \geq \text{ItemBudget} \implies \text{ItemLevel} = i
 $$
 
-## Stat & Slot Coefficients for Item Level 1 - 69
+## Stat & Slot Coefficients
+
+Rare items in TBC were blanketed with item level values that blizz thought would make itemization easier for players moving out of the item level scheme of vanilla, probably to reinforce players to believe lower number worse. The reality is that this itemization scheme in no way reflects the actual item level of an item in this group. For instance, items at item level 115 of any given InventoryType/subclass pair will range from 115 to approximately 85 -- potentially overlapping with the higher item level items of vanilla. The item calculation validates that the ceiling for these items are indeed capped at 115, and seldom go over. A couple of them are over-tuned but the majority are under-tuned. For the purposes of the calculator, this item level scheme will not be honored. If you're validating an item that says it's 115 on wowhead/wotlkdb you will have drastically varied results, it is not the calculator who is wrong. Generating a 115 item will have the stats expected. Lower level rares are even more sporadic as they conform even less to bounds of the item level group, often including over-tuned items. For example, the most powerful item level 85 rare has a true item level of approximately 106 (24021).
+
+Rare items in WotLK are similarly designed, blanket coated with item levels like 200 and 187, while the actual stats and actual item values vary greatly. As for item level 200 items, the item level is a floor rather than a ceiling, masking item levels that go up to around 
 
 ### Item Quality Modifiers
 
 This coefficient controls the ceiling for stats on an item based on its quality.
 
-| quality      | qualityMult   | qualityBase | verified |
-|--------------|---------------|-------------|----------|
-| 2 (uncommon) |  8/16 (0.500) | 4           | yes      |
-| 3 (rare)     | 10/16 (0.625) | 3           | no       |
-| 4 (epic)     | 14/16 (0.875) | 2           | no       |
+| quality | ilvl range | qualityMult | qualityBase |
+|---------|------------|-------------|-------------|
+|       2 |       1-69 |       0.500 |         4.0 |
+|       2 |     70-135 |       0.510 |         4.5 |
+|       2 |    136-200 |       0.590 |        17.0 |
+|       3 |       1-79 |       0.635 |         3.6 |
+|       3 |     80-135 |       0.625 |        1.15 |
+|       3 |    136-300 |       0.830 |        41.0 |
+|       4 |       1-99 |       0.689 |           1 |
+|       4 |    100-199 |       0.689 |          -4 |
+|       4 |    200-300 |       1.800 |         240 |
 
 ### Item Stat Modifiers
 
-This coefficient controls the ceiling for stats on an item based on the stat type.
+This coefficient (StatMod) controls the ceiling for stats on an item based on the stat type. (Headers: 2=Uncommon, 3=Rare, 4=Epic)
 
-| General Stats      |  stat_type | StatMod |
-|--------------------|------------|---------|
-| Mana               |          0 |   32/16 |
-| Health             |          1 |   32/16 |
-| Agility            |          3 |   16/16 |
-| Strength           |          4 |   16/16 |
-| Intellect          |          5 |   16/16 |
-| Spirit             |          6 |   16/16 |
-| Stamina            |          7 |   16/16 |
-| Defense Rating     |         12 |   16/16 |
-| Dodge Rating       |         13 |   16/16 |
-| Parry Rating       |         14 |   16/16 |
-| Block Rating       |         15 |   16/16 |
-| Spell Crit         |         21 |   16/16 |
-| Hit Rating         |         31 |   16/16 |
-| Crit Rating        |         32 |   16/16 |
-| Resiliance         |         35 |   16/16 |
-| Haste Rating       |         36 |   16/16 |
-| Expertise Rating   |         37 |   16/16 |
-| Attack Power       |         38 |    8/16 |
-| Mana Regen Per 5   |         43 |   32/16 |
-| Armor Penetration  |         44 |   16/16 |
-| Spell Power        |         45 |   14/16 |
-| Health Regen Per 5 |         46 |   11/16 |
-| Spell Penetration  |         47 |   12/16 |
-| Block Value        |         48 |   11/16 |
-| Bonus Armor        |      armor |    3/32 |
-| Resistance to All  |    all_res |    4/16 |
-| Arcane Resistance  | arcane_res |   12/16 |
-| Fire Resistance    |   fire_res |   12/16 |
-| Holy Resistance    |   holy_res |   12/16 |
-| Nature Resistance  | nature_res |   12/16 |
-| Frost Resistance   |  frost_res |   12/16 |
-| Shadow Resistance  | shadow_res |   12/16 |
+| stat_type | Stat Name          | InventoryType | 2 - 1-69 | 2 - 70-135 | 2 - 136-200 | 3 - 1-79 | 3 - 80-135 | 3 - 136-200 | 4 - 1-89 | 4 - 90-199 | 4 - 200-300 |
+|-----------|--------------------|---------------|----------|------------|-------------|----------|------------|-------------|----------|------------|-------------|
+|         0 | Mana               |           any |    32/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|         1 | Health             |           any |    32/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|         3 | Agility            |           any |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|         4 | Strength           |           any |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|         5 | Intellect          |           any |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|         6 | Spirit             |           any |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|         7 | Stamina            |           any |    16/16 |      10/16 |       10/16 |    16/16 |      10/16 |         2/3 |    10/16 |      10/16 |       10/16 |
+|        12 | Defense Rating     |            14 |    10/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        12 | Defense Rating     |          else |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        13 | Dodge Rating       |           any |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        14 | Parry Rating       |           any |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        15 | Block Rating       |            14 |     6/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        15 | Block Rating       |          else |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        21 | Spell Crit Rating  |           any |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        21 | Hit Rating         |           any |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        32 | Crit Rating        |           any |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        35 | Resiliance Rating  |           any |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        36 | Haste Rating       |           any |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        37 | Expertise          |           any |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        38 | Attack Power       |           any |     8/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        43 | Mana Regen Per 5   |           any |    32/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        44 | Armor Penetration  |           any |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        45 | Spell Power        |           any |    14/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        46 | Health Regen Per 5 |           any |    11/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |        4/16 |
+|        47 | Spell Penetration  |           any |    12/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        48 | Block Value        |     2, 11, 14 |     4/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|        48 | Block Value        |          else |    11/16 |        ... |         ... |      ... |        ... |         ... |     8/16 |       4/16 |        4/16 |
+|     armor | Bonus Armor        |           any |     3/32 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|     X_res | Resistances        |           any |    14/16 |        ... |         ... |      ... |        ... |         ... |      ... |      16/16 |       12/16 |
+|  X_socket | Sockets            |           any |     10/1 |       10/1 |        25/1 |     10/1 |       10/1 |        25/1 |     10/1 |       10/1 |        25/1 |
 
 ### Item Slot Modifiers (Armor)
 
-This coefficient controls the ceiling for stats on an item based on what slot the armor piece belongs to.
+This coefficient (SlotMod) controls the ceiling for stats on an item based on the slot. (Headers: 2=Uncommon, 3=Rare, 4=Epic)
 
-| Item Name       | InventoryType | SlotMod |
-|-----------------|---------------|---------|
-| Head            |             1 |   16/16 |
-| Neck            |             2 |    9/16 |
-| Shoulder        |             3 |    8/16 |
-| Shirt           |             4 |    3/16 |
-| Chest           |             5 |   16/16 |
-| Waist           |             6 |    9/16 |
-| Legs            |             7 |   16/16 |
-| Feet            |             8 |    7/16 |
-| Wrists          |             9 |    4/16 |
-| Hands           |            10 |    9/16 |
-| Finger          |            11 |    9/16 |
-| Trinket         |            12 |   11/16 |
-| Shield          |            14 |    4/16 |
-| Back            |            16 |    4/16 |
-| Tabard          |            19 |    3/16 |
-| Chest (Robe)    |            20 |   16/16 |
-| Held Off-hand   |            23 |    4/16 |
-| Relic           |            28 |    4/16 |
+| InventoryType | Item Name     | 2 - 1-69 | 2 - 70-135 | 2 - 136-200 | 3 - 1-79 | 3 - 80-135 | 3 - 136-200 | 4 - 1-89 | 4 - 90-199 | 4 - 200-300 |
+|---------------|---------------|----------|------------|-------------|----------|------------|-------------|----------|------------|-------------|
+|             1 | Head          |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|             2 | Neck          |     4/16 |       4/16 |        4/16 |     4/16 |       3/16 |        4/16 |     4/16 |       3/16 |        3/16 |
+|             3 | Shoulder      |     8/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|             4 | Shirt         |     1/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|             5 | Chest         |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|             6 | Waist         |    10/16 |       8/16 |        8/16 |    10/16 |       9/16 |        9/16 |    10/16 |       9/16 |        9/16 |
+|             7 | Legs          |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|             8 | Feet          |     8/16 |       8/16 |        8/16 |     8/16 |       7/16 |        7/16 |     8/16 |       7/16 |        7/16 |
+|             9 | Wrists        |     4/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|            10 | Hands         |     9/16 |       8/16 |        8/16 |     9/16 |       9/16 |        6/16 |     9/16 |       8/16 |        4/16 |
+|            11 | Finger        |     3/16 |       4/16 |        4/16 |     3/16 |       3/16 |        3/16 |     3/16 |       3/16 |        8/16 |
+|            12 | Trinket       |     8/16 |       7/16 |        7/16 |     8/16 |      11/16 |       11/16 |     8/16 |       5/16 |        3/16 |
+|            14 | Shield        |     4/16 |       4/16 |        4/16 |     4/16 |       4/16 |        4/16 |     4/16 |       4/16 |        8/16 |
+|            16 | Back          |     3/16 |       4/16 |        4/16 |     3/16 |       3/16 |        3/16 |     3/16 |       3/16 |        4/16 |
+|            19 | Tabard        |     1/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|            20 | Chest (Robe)  |    16/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
+|            23 | Held Off-hand |     3/16 |       4/16 |        4/16 |     3/16 |       3/16 |        3/16 |     3/16 |       3/16 |        3/16 |
+|            28 | Relic         |     1/16 |        ... |         ... |      ... |        ... |         ... |      ... |        ... |         ... |
 
 ### Item Slot Modifiers (Weapon)
 
-This coefficient controls the ceiling for stats on an item based on what slot the weapon belongs to.
+This coefficient (SlotMod) controls the ceiling for stats on an item based on the slot.
 
-| Item Name       | InventoryType | SlotMod |
-|-----------------|---------------|---------|
-| One Hand Weapon |            13 |    7/16 |
-| Bow             |            15 |   16/16 |
-| Two Hand Weapon |            17 |   16/16 |
-| Main-Hand       |            21 |    7/16 |
-| Off-Hand        |            22 |    7/16 |
-| Thrown          |            25 |    5/16 |
-| Ranged          |            26 |    5/16 |
-
-### Untested StatMods
-
-These are probably junk but keeping them here for further testing.
-
-| Ring Only Stats   | StatMod |
-|-------------------|---------|
-| Resistance (All)  |   (9/5) |
-| Resistance (One)  | (18/25) |
-| Life Regen Per 5  |   (7/2) |
-
-| Neck Only Stats   | StatMod |
-|-------------------|---------|
-| Life Regen Per 5  |   (7/2) |
-
-| Shield Only Stats | StatMod |
-|-------------------|---------|
-| Block Value       |   (3/5) |
-| Defense           |   (6/5) |
+| Item Name       | InventoryType | uncommon |
+|-----------------|---------------|----------|
+| One Hand Weapon |            13 |     7/16 |
+| Bow             |            15 |    16/16 |
+| Two Hand Weapon |            17 |    16/16 |
+| Main-Hand       |            21 |     7/16 |
+| Off-Hand        |            22 |     7/16 |
+| Thrown          |            25 |     5/16 |
+| Ranged          |            26 |     5/16 |
 
 ## Base Armor Calculation
 
-Base Armor is not to be confused with Bonus Armor, which is applied to an item as an additional stat like stamina. Base Armor is calculated by item level. I expect that the base armor of an item actually consumes an amount of the item's overall stat budget. I believe this is true due to how bonus armor affects an items level. This can be a thought experiment for another time (or person).
+Base Armor is calculated by item level and Bonus Armor is applied to an item as an additional stat like stamina. I expect that the base armor of an item actually consumes an amount of the item's overall stat budget in whatever formula blizzard invented. I believe this is true due to how bonus armor affects an items level. This can be a thought experiment for another time (or person).
 
 ### Base Armor Modifiers
 

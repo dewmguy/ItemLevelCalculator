@@ -27,19 +27,19 @@
                         <div class="text note textStats">The calculator will determine the stat values based on the ilvl.</div>
                     </div>
                     <div class="group select">
-                        <div class="item"><input type="radio" id="uncommon" name="itemQuality" value="uncommon" checked required /> <label class="uncommon" for="uncommon">Uncommon</label></div>
-                        <div class="item"><input type="radio" id="rare" name="itemQuality" value="rare" required /> <label class="rare" for="rare">Rare</label></div>
-                        <div class="item"><input type="radio" id="epic" name="itemQuality" value="epic" required /> <label class="epic" for="epic">Epic</label></div>
-                        <div class="item"><input type="radio" id="legendary" name="itemQuality" value="legendary" required /> <label class="legendary" for="legendary">Legendary</label></div>
-                        <div class="item"><input type="radio" id="artifact" name="itemQuality" value="artifact" required /> <label class="artifact" for="artifact">Artifact</label></div>
-                    </div>
-                    <div class="group select">
                         <div class="item borderfix"><input type="radio" id="armor" name="itemClass" value="4" checked required /> <label for="armor">Armor</label></div>
                         <div class="item"><input type="radio" id="weapon" name="itemClass" value="2" required /> <label for="weapon">Weapon</label></div>
                     </div>
                     <div class="group">
                         <select class="itemSlot" id="item-slot" name="itemSlot" required></select>
                         <select class="itemType" id="item-subclass" name="itemType" required></select>
+                    </div>
+                    <div class="group select">
+                        <div class="item"><input type="radio" data-quality="2" id="uncommon" name="itemQuality" value="uncommon" checked required /> <label class="uncommon" for="uncommon">Uncommon</label></div>
+                        <div class="item"><input type="radio" data-quality="3" id="rare" name="itemQuality" value="rare" required /> <label class="rare" for="rare">Rare</label></div>
+                        <div class="item"><input type="radio" data-quality="4" id="epic" name="itemQuality" value="epic" required /> <label class="epic" for="epic">Epic</label></div>
+                        <div class="item"><input type="radio" data-quality="5" id="legendary" name="itemQuality" value="legendary" required disabled /> <label class="legendary" for="legendary">Legendary</label></div>
+                        <div class="item"><input type="radio" data-quality="6" id="artifact" name="itemQuality" value="artifact" required disabled /> <label class="artifact" for="artifact">Artifact</label></div>
                     </div>
                     <div class="group select weaponMethod">
                         <div class="item"><input class="full" type="radio" id="weaponCaster" name="weaponMethod" value="caster" required checked /> <label for="weaponCaster">Caster</label></div>
