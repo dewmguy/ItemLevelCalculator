@@ -13,106 +13,106 @@ $(document).ready(function() {
   const armorType = {
     "2": { name: "Neck", armorMod: 0, itemClass: 4, subClass: [0],
       slotMod: modData([
-        [2, 130, 4/16], // final
-        [2, 80, 4/16], // final
-        [2, 1, 4/16], // final
-        [3, 136, 4/16],
-        [3, 80, 3/16],
-        [3, 1, 4/16],
         [4, 200, 3/16],
         [4, 90, 3/16],
         [4, 1, 4/16],
+        [3, 136, 4/16],
+        [3, 80, 3/16],
+        [3, 1, 4/16],
+        [2, 130, 4/16], // final
+        [2, 80, 4/16], // final
+        [2, 1, 4/16], // final
       ])
     },
     "6": { name: "Waist", armorMod: 9/16, itemClass: 4, subClass: [1, 2, 3, 4],
       slotMod: modData([
-        [2, 130, 8/16], // final
-        [2, 80, 8/16], // final
-        [2, 1, 8/16], // final
-        [3, 136, 9/16],
-        [3, 80, 9/16],
-        [3, 1, 10/16],
         [4, 200, 9/16],
         [4, 90, 9/16],
         [4, 1, 10/16],
+        [3, 136, 9/16],
+        [3, 80, 9/16],
+        [3, 1, 10/16],
+        [2, 130, 8/16], // final
+        [2, 80, 8/16], // final
+        [2, 1, 8/16], // final
       ])
     },
     "8": { name: "Feet", armorMod: 11/16, itemClass: 4, subClass: [1, 2, 3, 4],
       slotMod: modData([
-        [2, 130, 8/16], // final
-        [2, 80, 8/16], // final
-        [2, 1, 8/16], // final
-        [3, 136, 7/16],
-        [3, 80, 7/16],
-        [3, 1, 8/16],
         [4, 200, 7/16],
         [4, 90, 7/16],
         [4, 1, 8/16],
+        [3, 136, 7/16],
+        [3, 80, 7/16],
+        [3, 1, 8/16],
+        [2, 130, 8/16], // final
+        [2, 80, 8/16], // final
+        [2, 1, 8/16], // final
       ])
     },
     "10": { name: "Hands", armorMod: 10/16, itemClass: 4, subClass: [1, 2, 3, 4],
       slotMod: modData([
-        [2, 130, 8/16], // final
-        [2, 80, 8/16], // final
-        [2, 1, 8/16], // final
-        [3, 136, 6/16],
-        [3, 80, 9/16],
-        [3, 1, 9/16],
         [4, 200, 4/16],
         [4, 90, 8/16],
         [4, 1, 9/16],
+        [3, 136, 6/16],
+        [3, 80, 9/16],
+        [3, 1, 9/16],
+        [2, 130, 8/16], // final
+        [2, 80, 8/16], // final
+        [2, 1, 8/16], // final
       ])
     },
     "11": { name: "Finger", armorMod: 0, itemClass: 4, subClass: [0],
       slotMod: modData([
-        [2, 130, 4/16], // final
-        [2, 80, 4/16], // final
-        [2, 1, 4/16], // final
-        [3, 136, 3/16],
-        [3, 80, 3/16],
-        [3, 1, 3/16],
         [4, 200, 8/16],
         [4, 90, 3/16],
         [4, 1, 3/16],
+        [3, 136, 3/16],
+        [3, 80, 3/16],
+        [3, 1, 3/16],
+        [2, 130, 4/16], // final
+        [2, 80, 4/16], // final
+        [2, 1, 4/16], // final
       ])
     },
     "12": { name: "Trinket", armorMod: 0, itemClass: 4, subClass: [0],
       slotMod: modData([
-        [2, 130, 8/16], // final
-        [2, 80, 8/16], // final
-        [2, 1, 8/16], // final
-        [3, 136, 11/16],
-        [3, 80, 11/16],
-        [3, 1, 8/16],
         [4, 200, 3/16],
         [4, 90, 5/16],
         [4, 1, 8/16],
+        [3, 136, 11/16],
+        [3, 80, 11/16],
+        [3, 1, 8/16],
+        [2, 130, 8/16], // final
+        [2, 80, 8/16], // final
+        [2, 1, 8/16], // final
       ])
     },
     "14": { name: "Shield", armorMod: 16/16, itemClass: 4, subClass: [6],
       slotMod: modData([
-        [2, 130, 4/16], // final
-        [2, 80, 4/16], // final
-        [2, 1, 4/16], // final
-        [3, 136, 4/16],
-        [3, 80, 4/16],
-        [3, 1, 4/16],
         [4, 200, 8/16],
         [4, 90, 4/16],
         [4, 1, 4/16],
+        [3, 136, 4/16],
+        [3, 80, 4/16],
+        [3, 1, 4/16],
+        [2, 130, 4/16], // final
+        [2, 80, 4/16], // final
+        [2, 1, 4/16], // final
       ])
     },
     "16": { name: "Back", armorMod: 8/16, itemClass: 4, subClass: [1],
       slotMod: modData([
-        [2, 130, 4/16], // final
-        [2, 80, 4/16], // final
-        [2, 1, 3/16], // final
-        [3, 136, 3/16],
-        [3, 80, 3/16],
-        [3, 1, 3/16],
         [4, 200, 4/16],
         [4, 90, 3/16],
         [4, 1, 3/16],
+        [3, 136, 3/16],
+        [3, 80, 3/16],
+        [3, 1, 3/16],
+        [2, 130, 4/16], // final
+        [2, 80, 4/16], // final
+        [2, 1, 3/16], // final
       ])
     },
     "1": { name: "Head", armorMod: 13/16, itemClass: 4, subClass: [1, 2, 3, 4], slotMod: 16/16 },
@@ -134,13 +134,15 @@ $(document).ready(function() {
     "17": { name: "Two-Hand", slotMod: 16/16, armorMod: 0, itemClass: 2, subClass: [1, 5, 8, 6, 10] },
     "15": { name: "Bow", slotMod: 16/16, armorMod: 0, itemClass: 2, subClass: [2] },
     "25": { name: "Thrown", slotMod: 5/16, armorMod: 0, itemClass: 2, subClass: [16] },
-    "26": { name: "Ranged", slotMod: 5/16, armorMod: 0, itemClass: 2, subClass: [3, 18, 19] }
+    "26": { name: "Ranged", slotMod: 5/16, armorMod: 0, itemClass: 2, subClass: [3, 18, 19] },
   };
 
   const resistMods = (slot, quality, lvl) => dataFilter(quality, lvl, modFilter([
     [4, 200, 12/16],
     [4, 1, 16/16],
     [3, 1, 16/16],
+    [2, 130, 16/16], // final
+    [2, 80, 16/16], // final
     [2, 1, 16/16], // final
   ]));
 
@@ -151,16 +153,16 @@ $(document).ready(function() {
     [3, 130, 25/1],
     [3, 80, 10/1],
     [3, 1, 10/1],
-    [2, 130, 32/1],
-    [2, 80, 10/1],
+    [2, 130, 30/1], // final
+    [2, 80, 10/1], // final
     [2, 1, 10/1], // final
   ]));
 
   const itemStats = {
     "7": { name: "Stamina", type: 0,
       statMod: (slot, quality, lvl) => dataFilter(quality, lvl, modFilter([
-        [3, 80, 10/16],
         [4, 1, 10/16],
+        [3, 80, 10/16],
         [3, 1, 16/16],
         [2, 130, 2/3], // final
         [2, 80, 2/3], // final
@@ -172,7 +174,7 @@ $(document).ready(function() {
         [4, 200, 4/16],
         [4, 1, 68/16],
         [3, 1, 68/64],
-        [2, 130, 55/64],
+        [2, 130, 55/64], // final
         [2, 80, 55/64], // final
         [2, 1, 45/64], // final
       ])
@@ -182,7 +184,7 @@ $(document).ready(function() {
         [4, 200, 4/16],
         [4, 1, 68/16],
         [3, 1, 68/64],
-        [2, 130, 88/32],
+        [2, 130, 81/32], // final
         [2, 80, 88/32], // final
         [2, 1, 77/32], // final
       ])
@@ -202,7 +204,7 @@ $(document).ready(function() {
           [4, 90, 4/16],
           [4, 1, 8/16],
           [3, 1, 16/16],
-          [2, 130, 21/64]
+          [2, 130, 21/64], // final
           [2, 80, 21/64], // final
           [2, 1, 16/16], // final
         ]
@@ -210,7 +212,7 @@ $(document).ready(function() {
           [4, 90, 4/16],
           [4, 1, 8/16],
           [3, 1, 21/64],
-          [2, 130, 21/64],
+          [2, 130, 21/64], // final
           [2, 80, 21/64], // final
           [2, 1, 16/16], // final
         ]
@@ -369,7 +371,7 @@ $(document).ready(function() {
     2: {
       name: 'uncommon',
       calculate: function(ilvl) {
-        if (ilvl >= 136) return qC(ilvl,0.801,-38.3); // final
+        if (ilvl >= 136) return qC(ilvl,0.801,-38.3);
         if (ilvl >= 80) return qC(ilvl,0.505,-4.5); // final
         if (ilvl >= 1) return qC(ilvl,0.495,-2.85); // final
       }
@@ -435,7 +437,10 @@ $(document).ready(function() {
 
   function calculateStats(itemClass, level, slot, quality, qualityMod) {
     console.error(`calculating stats from level`);
-    
+
+    // remove sockets from stat value percentage requirements
+    // fix sockets tooltip output on calculate    
+
     const array = itemClass == '4' ? armorType : weaponType;
     const invType = array[slot];
     const slotMod = invType.slotMod;
