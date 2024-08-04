@@ -3,240 +3,243 @@ $(document).ready(function() {
   const exponent = Math.log(2) / Math.log(1.5);
   const exponentInverse = 1 / exponent;
 
-  const dataFilter = (quality, ilvl, data) => {
-    for (const set of data) { if (quality === set.quality && ilvl >= set.min) return set.mod; }
+  const dataFilter = (quality, lvl, data) => {
+    for (const set of data) {
+      if (quality === set.quality && set.min <= lvl) {
+        console.log(`dataFilter(${quality} === ${set.quality} && ${set.min} <= ${lvl}) => {${set.mod}}`);
+        return set.mod;
+      }
+    }
     return null;
   };
-  const modFilter = (entries) => entries.map(([quality, min, mod]) => ({ quality, min, mod }));
-  const modData = (data) => (quality, ilvl) => dataFilter(quality, ilvl, modFilter(data));
 
   const armorType = {
     "2": { name: "Neck", armorMod: 0, itemClass: 4, subClass: [0],
-      slotMod: modData([
-        [4, 200, 3/16],
-        [4, 90, 3/16],
-        [4, 1, 4/16],
-        [3, 136, 4/16],
-        [3, 80, 3/16],
-        [3, 1, 4/16],
-        [2, 130, 4/16], // final
-        [2, 80, 4/16], // final
-        [2, 1, 4/16], // final
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [
+        { quality: 4, min: 200, mod: (3/16) },
+        { quality: 4, min: 90, mod: (3/16) },
+        { quality: 4, min: 1, mod: (4/16) },
+        { quality: 3, min: 136, mod: (4/16) },
+        { quality: 3, min: 80, mod: (3/16) },
+        { quality: 3, min: 1, mod: (4/16) },
+        { quality: 2, min: 130, mod: (4/16) }, // final
+        { quality: 2, min: 80, mod: (4/16) }, // final
+        { quality: 2, min: 1, mod: (4/16) }, // final
       ])
     },
-    "6": { name: "Waist", armorMod: 9/16, itemClass: 4, subClass: [1, 2, 3, 4],
-      slotMod: modData([
-        [4, 200, 9/16],
-        [4, 90, 9/16],
-        [4, 1, 10/16],
-        [3, 136, 9/16],
-        [3, 80, 9/16],
-        [3, 1, 10/16],
-        [2, 130, 8/16], // final
-        [2, 80, 8/16], // final
-        [2, 1, 8/16], // final
+    "6": { name: "Waist", armorMod: (9/16), itemClass: 4, subClass: [1, 2, 3, 4],
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [
+        { quality: 4, min: 200, mod: (9/16) },
+        { quality: 4, min: 90, mod: (9/16) },
+        { quality: 4, min: 1, mod: (10/16) },
+        { quality: 3, min: 136, mod: (9/16) },
+        { quality: 3, min: 80, mod: (9/16) },
+        { quality: 3, min: 1, mod: (10/16) },
+        { quality: 2, min: 130, mod: (8/16) }, // final
+        { quality: 2, min: 80, mod: (8/16) }, // final
+        { quality: 2, min: 1, mod: (8/16) }, // final
       ])
     },
-    "8": { name: "Feet", armorMod: 11/16, itemClass: 4, subClass: [1, 2, 3, 4],
-      slotMod: modData([
-        [4, 200, 7/16],
-        [4, 90, 7/16],
-        [4, 1, 8/16],
-        [3, 136, 7/16],
-        [3, 80, 7/16],
-        [3, 1, 8/16],
-        [2, 130, 8/16], // final
-        [2, 80, 8/16], // final
-        [2, 1, 8/16], // final
+    "8": { name: "Feet", armorMod: (11/16), itemClass: 4, subClass: [1, 2, 3, 4],
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [
+        { quality: 4, min: 200, mod: (7/16) },
+        { quality: 4, min: 90, mod: (7/16) },
+        { quality: 4, min: 1, mod: (8/16) },
+        { quality: 3, min: 136, mod: (7/16) },
+        { quality: 3, min: 80, mod: (7/16) },
+        { quality: 3, min: 1, mod: (8/16) },
+        { quality: 2, min: 130, mod: (8/16) }, // final
+        { quality: 2, min: 80, mod: (8/16) }, // final
+        { quality: 2, min: 1, mod: (8/16) }, // final
       ])
     },
-    "10": { name: "Hands", armorMod: 10/16, itemClass: 4, subClass: [1, 2, 3, 4],
-      slotMod: modData([
-        [4, 200, 4/16],
-        [4, 90, 8/16],
-        [4, 1, 9/16],
-        [3, 136, 6/16],
-        [3, 80, 9/16],
-        [3, 1, 9/16],
-        [2, 130, 8/16], // final
-        [2, 80, 8/16], // final
-        [2, 1, 8/16], // final
+    "10": { name: "Hands", armorMod: (10/16), itemClass: 4, subClass: [1, 2, 3, 4],
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [
+        { quality: 4, min: 200, mod: (4/16) },
+        { quality: 4, min: 90, mod: (8/16) },
+        { quality: 4, min: 1, mod: (9/16) },
+        { quality: 3, min: 136, mod: (6/16) },
+        { quality: 3, min: 80, mod: (9/16) },
+        { quality: 3, min: 1, mod: (9/16) },
+        { quality: 2, min: 130, mod: (8/16) }, // final
+        { quality: 2, min: 80, mod: (8/16) }, // final
+        { quality: 2, min: 1, mod: (8/16) }, // final
       ])
     },
     "11": { name: "Finger", armorMod: 0, itemClass: 4, subClass: [0],
-      slotMod: modData([
-        [4, 200, 8/16],
-        [4, 90, 3/16],
-        [4, 1, 3/16],
-        [3, 136, 3/16],
-        [3, 80, 3/16],
-        [3, 1, 3/16],
-        [2, 130, 4/16], // final
-        [2, 80, 4/16], // final
-        [2, 1, 4/16], // final
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [
+        { quality: 4, min: 200, mod: (8/16) },
+        { quality: 4, min: 90, mod: (3/16) },
+        { quality: 4, min: 1, mod: (3/16) },
+        { quality: 3, min: 136, mod: (3/16) },
+        { quality: 3, min: 80, mod: (3/16) },
+        { quality: 3, min: 1, mod: (3/16) },
+        { quality: 2, min: 130, mod: (4/16) }, // final
+        { quality: 2, min: 80, mod: (4/16) }, // final
+        { quality: 2, min: 1, mod: (4/16) }, // final
       ])
     },
     "12": { name: "Trinket", armorMod: 0, itemClass: 4, subClass: [0],
-      slotMod: modData([
-        [4, 200, 3/16],
-        [4, 90, 5/16],
-        [4, 1, 8/16],
-        [3, 136, 11/16],
-        [3, 80, 11/16],
-        [3, 1, 8/16],
-        [2, 130, 8/16], // final
-        [2, 80, 8/16], // final
-        [2, 1, 8/16], // final
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [
+        { quality: 4, min: 200, mod: (3/16) },
+        { quality: 4, min: 90, mod: (5/16) },
+        { quality: 4, min: 1, mod: (8/16) },
+        { quality: 3, min: 136, mod: (11/16) },
+        { quality: 3, min: 80, mod: (11/16) },
+        { quality: 3, min: 1, mod: (8/16) },
+        { quality: 2, min: 130, mod: (8/16) }, // final
+        { quality: 2, min: 80, mod: (8/16) }, // final
+        { quality: 2, min: 1, mod: (8/16) }, // final
       ])
     },
-    "14": { name: "Shield", armorMod: 16/16, itemClass: 4, subClass: [6],
-      slotMod: modData([
-        [4, 200, 8/16],
-        [4, 90, 4/16],
-        [4, 1, 4/16],
-        [3, 136, 4/16],
-        [3, 80, 4/16],
-        [3, 1, 4/16],
-        [2, 130, 4/16], // final
-        [2, 80, 4/16], // final
-        [2, 1, 4/16], // final
+    "14": { name: "Shield", armorMod: (16/16), itemClass: 4, subClass: [6],
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [
+        { quality: 4, min: 200, mod: (8/16) },
+        { quality: 4, min: 90, mod: (4/16) },
+        { quality: 4, min: 1, mod: (4/16) },
+        { quality: 3, min: 136, mod: (4/16) },
+        { quality: 3, min: 80, mod: (4/16) },
+        { quality: 3, min: 1, mod: (4/16) },
+        { quality: 2, min: 130, mod: (4/16) }, // final
+        { quality: 2, min: 80, mod: (4/16) }, // final
+        { quality: 2, min: 1, mod: (4/16) }, // final
       ])
     },
-    "16": { name: "Back", armorMod: 8/16, itemClass: 4, subClass: [1],
-      slotMod: modData([
-        [4, 200, 4/16],
-        [4, 90, 3/16],
-        [4, 1, 3/16],
-        [3, 136, 3/16],
-        [3, 80, 3/16],
-        [3, 1, 3/16],
-        [2, 130, 4/16], // final
-        [2, 80, 4/16], // final
-        [2, 1, 3/16], // final
+    "16": { name: "Back", armorMod: (8/16), itemClass: 4, subClass: [1],
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [
+        { quality: 4, min: 200, mod: (4/16) },
+        { quality: 4, min: 90, mod: (3/16) },
+        { quality: 4, min: 1, mod: (3/16) },
+        { quality: 3, min: 136, mod: (3/16) },
+        { quality: 3, min: 80, mod: (3/16) },
+        { quality: 3, min: 1, mod: (3/16) },
+        { quality: 2, min: 130, mod: (4/16) }, // final
+        { quality: 2, min: 80, mod: (4/16) }, // final
+        { quality: 2, min: 1, mod: (3/16) }, // final
       ])
     },
-    "1": { name: "Head", armorMod: 13/16, itemClass: 4, subClass: [1, 2, 3, 4], slotMod: 16/16 },
-    "3": { name: "Shoulder", armorMod: 12/16, itemClass: 4, subClass: [1, 2, 3, 4], slotMod: 8/16 },
-    "4": { name: "Shirt", armorMod: 0, itemClass: 4, subClass: [1], slotMod: 1/16 },
-    "5": { name: "Chest", armorMod: 16/16, itemClass: 4, subClass: [1, 2, 3, 4], slotMod: 16/16 },
-    "7": { name: "Legs", armorMod: 14/16, itemClass: 4, subClass: [1, 2, 3, 4], slotMod: 16/16 },
-    "9": { name: "Wrists", armorMod: 7/16, itemClass: 4, subClass: [1, 2, 3, 4], slotMod: 4/16 },
-    "19": { name: "Tabard", armorMod: 0, itemClass: 4, subClass: [0], slotMod: 1/16 },
-    "20": { name: "Chest (Robe)", armorMod: 16/16, itemClass: 4, subClass: [1, 2, 3, 4], slotMod: 16/16 },
-    "23": { name: "Held Off-hand", armorMod: 0, itemClass: 4, subClass: [0], slotMod: 3/16 },
-    "28": { name: "Relic", armorMod: 0, itemClass: 4, subClass: [7, 8, 9, 10], slotMod: 1/16 },
+    "1": { name: "Head", armorMod: (13/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
+    "3": { name: "Shoulder", armorMod: (12/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (8/16) },
+    "4": { name: "Shirt", armorMod: 0, itemClass: 4, subClass: [1], slotMod: (1/16) },
+    "5": { name: "Chest", armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
+    "7": { name: "Legs", armorMod: (14/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
+    "9": { name: "Wrists", armorMod: (7/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (4/16) },
+    "19": { name: "Tabard", armorMod: 0, itemClass: 4, subClass: [0], slotMod: (1/16) },
+    "20": { name: "Chest (Robe)", armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
+    "23": { name: "Held Off-hand", armorMod: 0, itemClass: 4, subClass: [0], slotMod: (3/16) },
+    "28": { name: "Relic", armorMod: 0, itemClass: 4, subClass: [7, 8, 9, 10], slotMod: (1/16) },
   };
-
+  
   const weaponType = {
-    "13": { name: "One-Hand", slotMod: 7/16, armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
-    "21": { name: "Main-Hand", slotMod: 7/16, armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
-    "22": { name: "Off-Hand", slotMod: 7/16, armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
-    "17": { name: "Two-Hand", slotMod: 16/16, armorMod: 0, itemClass: 2, subClass: [1, 5, 8, 6, 10] },
-    "15": { name: "Bow", slotMod: 16/16, armorMod: 0, itemClass: 2, subClass: [2] },
-    "25": { name: "Thrown", slotMod: 5/16, armorMod: 0, itemClass: 2, subClass: [16] },
-    "26": { name: "Ranged", slotMod: 5/16, armorMod: 0, itemClass: 2, subClass: [3, 18, 19] },
+    "13": { name: "One-Hand", slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
+    "21": { name: "Main-Hand", slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
+    "22": { name: "Off-Hand", slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
+    "17": { name: "Two-Hand", slotMod: (16/16), armorMod: 0, itemClass: 2, subClass: [1, 5, 8, 6, 10] },
+    "15": { name: "Bow", slotMod: (16/16), armorMod: 0, itemClass: 2, subClass: [2] },
+    "25": { name: "Thrown", slotMod: (5/16), armorMod: 0, itemClass: 2, subClass: [16] },
+    "26": { name: "Ranged", slotMod: (5/16), armorMod: 0, itemClass: 2, subClass: [3, 18, 19] }
   };
 
-  const resistMods = (slot, quality, lvl) => dataFilter(quality, lvl, modFilter([
-    [4, 200, 12/16],
-    [4, 1, 16/16],
-    [3, 1, 16/16],
-    [2, 130, 16/16], // final
-    [2, 80, 16/16], // final
-    [2, 1, 16/16], // final
-  ]));
+  const resistMods = (slot, quality, lvl) => dataFilter(quality, lvl, [
+    { quality: 4, min: 200, mod: (12/16) },
+    { quality: 4, min: 1, mod: (16/16) },
+    { quality: 3, min: 1, mod: (16/16) },
+    { quality: 2, min: 130, mod: (16/16) }, // final
+    { quality: 2, min: 80, mod: (16/16) }, // final
+    { quality: 2, min: 1, mod: (16/16) }, // final
+  ]);
 
-  const socketMods = (slot, quality, lvl) => dataFilter(quality, lvl, modFilter([
-    [4, 200, 25/1],
-    [4, 90, 10/1],
-    [4, 1, 10/1],
-    [3, 130, 25/1],
-    [3, 80, 10/1],
-    [3, 1, 10/1],
-    [2, 130, 30/1], // final
-    [2, 80, 10/1], // final
-    [2, 1, 10/1], // final
-  ]));
+  const socketMods = (slot, quality, lvl) => dataFilter(quality, lvl, [
+    { quality: 4, min: 200, mod: (25/1) },
+    { quality: 4, min: 90, mod: (10/1) },
+    { quality: 4, min: 1, mod: (10/1) },
+    { quality: 3, min: 130, mod: (25/1) },
+    { quality: 3, min: 80, mod: (10/1) },
+    { quality: 3, min: 1, mod: (10/1) },
+    { quality: 2, min: 130, mod: (30/1) }, // final
+    { quality: 2, min: 80, mod: (10/1) }, // final
+    { quality: 2, min: 1, mod: (10/1) }, // final
+  ]);
 
   const itemStats = {
     "7": { name: "Stamina", type: 0,
-      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, modFilter([
-        [4, 1, 10/16],
-        [3, 80, 10/16],
-        [3, 1, 16/16],
-        [2, 130, 2/3], // final
-        [2, 80, 2/3], // final
-        [2, 1, 16/16], // final
-      ]))
-    },
-    "45": { name: "Spell Power", type: 1,
-      statMod: (slot, quality, lvl) => modData([
-        [4, 200, 4/16],
-        [4, 1, 68/16],
-        [3, 1, 68/64],
-        [2, 130, 55/64], // final
-        [2, 80, 55/64], // final
-        [2, 1, 45/64], // final
+      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, [
+        { quality: 4, min: 1, mod: (10/16) },
+        { quality: 3, min: 80, mod: (10/16) },
+        { quality: 3, min: 1, mod: (16/16) },
+        { quality: 2, min: 130, mod: (2/3) }, // final
+        { quality: 2, min: 80, mod: (2/3) }, // final
+        { quality: 2, min: 1, mod: (16/16) }, // final
       ])
     },
-    "43": { name: "Mana Regen HP5", type: 1,
-      statMod: (slot, quality, lvl) => modData([
-        [4, 200, 4/16],
-        [4, 1, 68/16],
-        [3, 1, 68/64],
-        [2, 130, 81/32], // final
-        [2, 80, 88/32], // final
-        [2, 1, 77/32], // final
+    "45": { name: "Spell Power", type: 1,
+      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, [
+        { quality: 4, min: 200, mod: (4/16) },
+        { quality: 4, min: 1, mod: (68/64) },
+        { quality: 3, min: 1, mod: (68/64) },
+        { quality: 2, min: 130, mod: (55/64) }, // final
+        { quality: 2, min: 80, mod: (55/64) }, // final
+        { quality: 2, min: 1, mod: (45/64) }, // final
+      ])
+    },
+    "43": { name: "Mana Regen MP5", type: 1,
+      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, [
+        { quality: 4, min: 200, mod: (4/16) },
+        { quality: 4, min: 1, mod: (68/16) },
+        { quality: 3, min: 1, mod: (68/64) },
+        { quality: 2, min: 130, mod: (81/32) }, // final
+        { quality: 2, min: 80, mod: (88/32) }, // final
+        { quality: 2, min: 1, mod: (77/32) }, // final
       ])
     },
     "46": { name: "Health Regen HP5", type: 1,
-      statMod: (slot, quality, lvl) => modData([
-        [4, 200, 4/16],
-        [4, 1, 68/16],
-        [3, 1, 68/16],
-        [2, 1, 68/16], // final
+      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, [
+        { quality: 4, min: 200, mod: (4/16) },
+        { quality: 4, min: 1, mod: (68/16) },
+        { quality: 3, min: 1, mod: (68/16) },
+        { quality: 2, min: 1, mod: (68/64) }, // final
       ])
     },
     "48": { name: "Block Value", type: 1,
-      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, modFilter(
+      statMod: (slot, quality, lvl) => dataFilter(quality, lvl,
         [2, 11, 14].includes(slot)
         ? [ // ammys, rings, shields
-          [4, 90, 4/16],
-          [4, 1, 8/16],
-          [3, 1, 16/16],
-          [2, 130, 21/64], // final
-          [2, 80, 21/64], // final
-          [2, 1, 16/16], // final
+          { quality: 4, min: 90, mod: (4/16) },
+          { quality: 4, min: 1, mod: (16/16) },
+          { quality: 3, min: 1, mod: (16/16) },
+          { quality: 2, min: 130, mod: (21/64) }, // final
+          { quality: 2, min: 80, mod: (21/64) }, // final
+          { quality: 2, min: 1, mod: (16/16) }, // final
         ]
         : [ // everything else
-          [4, 90, 4/16],
-          [4, 1, 8/16],
-          [3, 1, 21/64],
-          [2, 130, 21/64], // final
-          [2, 80, 21/64], // final
-          [2, 1, 16/16], // final
+          { quality: 4, min: 90, mod: (4/16) },
+          { quality: 4, min: 1, mod: (8/16) },
+          { quality: 3, min: 1, mod: (21/64) },
+          { quality: 2, min: 130, mod: (21/64) }, // final
+          { quality: 2, min: 80, mod: (21/64) }, // final
+          { quality: 2, min: 1, mod: (16/16) }, // final
         ]
-      ))
+      )
     },
-    "0": { name: "Mana", type: 0, statMod: 32/16 }, // cannot test
-    "1": { name: "Health", type: 0, statMod: 32/16 }, // cannot test
-    "3": { name: "Agility", type: 0, statMod: 16/16 },
-    "4": { name: "Strength", type: 0, statMod: 16/16 },
-    "5": { name: "Intellect", type: 0, statMod: 16/16 },
-    "6": { name: "Spirit", type: 0, statMod: 16/16 },
-    "12": { name: "Defense Rating", type: 1, statMod: 16/16 },
-    "13": { name: "Dodge Rating", type: 1, statMod: 16/16 },
-    "14": { name: "Parry Rating", type: 1, statMod: 16/16 },
-    "15": { name: "Block Rating", type: 1, statMod: 16/16},
-    "21": { name: "Spell Crit Rating", type: 1, statMod: 16/16 },
-    "31": { name: "Hit Rating", type: 1, statMod: 16/16 },
-    "32": { name: "Crit Rating", type: 1, statMod: 16/16 },
-    "35": { name: "Resilience Rating", type: 1, statMod: 16/16 },
-    "36": { name: "Haste Rating", type: 1, statMod: 16/16 },
-    "37": { name: "Expertise Rating", type: 1, statMod: 16/16 },
-    "38": { name: "Attack Power", type: 1, statMod: 8/16 },
-    "44": { name: "Armor Penetration Rating", type: 1, statMod: 16/16 }, // unconfirmed
-    "47": { name: "Spell Penetration", type: 1, statMod: 12/16 }, // unconfirmed
+    "0": { name: "Mana", type: 0, statMod: (32/16) }, // cannot test
+    "1": { name: "Health", type: 0, statMod: (32/16) }, // cannot test
+    "3": { name: "Agility", type: 0, statMod: (16/16) },
+    "4": { name: "Strength", type: 0, statMod: (16/16) },
+    "5": { name: "Intellect", type: 0, statMod: (16/16) },
+    "6": { name: "Spirit", type: 0, statMod: (16/16) },
+    "12": { name: "Defense Rating", type: 1, statMod: (16/16) },
+    "13": { name: "Dodge Rating", type: 1, statMod: (16/16) },
+    "14": { name: "Parry Rating", type: 1, statMod: (16/16) },
+    "15": { name: "Block Rating", type: 1, statMod: (16/16) },
+    "21": { name: "Spell Crit Rating", type: 1, statMod: (16/16) },
+    "31": { name: "Hit Rating", type: 1, statMod: (16/16) },
+    "32": { name: "Crit Rating", type: 1, statMod: (16/16) },
+    "35": { name: "Resilience Rating", type: 1, statMod: (16/16) },
+    "36": { name: "Haste Rating", type: 1, statMod: (16/16) },
+    "37": { name: "Expertise Rating", type: 1, statMod: (16/16) },
+    "38": { name: "Attack Power", type: 1, statMod: (8/16) },
+    "44": { name: "Armor Penetration Rating", type: 1, statMod: (16/16) },
+    "47": { name: "Spell Penetration", type: 1, statMod: (12/16) },
     "armor": { name: "Bonus Armor", type: 3, statMod: 3/32 },
     "arcane_res": { name: "Resist Arcane", type: 0, statMod: resistMods },
     "fire_res": { name: "Resist Fire", type: 0, statMod: resistMods },
@@ -313,121 +316,131 @@ $(document).ready(function() {
   
   const armorData = {
     "6": {
-      Cloth: ilvl => 2.5281010518232847 + 1.331747228269099 * ilvl + 0.00944593034412355 * Math.pow(ilvl, 2) - 0.00006849549050619422 * Math.pow(ilvl, 3) + 1.2354987243172888e-7 * Math.pow(ilvl, 4),
-      Leather: ilvl => 1.5555029361141006 + 3.0358551084632817 * ilvl + 0.010441421831956765 * Math.pow(ilvl, 2) - 0.00009593877599476476 * Math.pow(ilvl, 3) + 1.8476622137336274e-7 * Math.pow(ilvl, 4),
-      Mail: ilvl => -7.5320987581173 + 9.77641667353662 * ilvl - 0.07509546031114869 * Math.pow(ilvl, 2) + 0.0008277573203410827 * Math.pow(ilvl, 3) - 0.000003968983245793348 * Math.pow(ilvl, 4) + 6.374377745994348e-9 * Math.pow(ilvl, 5),
-      Plate: ilvl => 5.102460977820272 + 9.509093276356396 * ilvl + 0.07993511436723227 * Math.pow(ilvl, 2) - 0.0005654807309686971 * Math.pow(ilvl, 3) + 0.0000010185213184327804 * Math.pow(ilvl, 4),
-      Shield: ilvl => -68.32056773225723 + 52.05238254766441 * ilvl - 0.2633818416382036 * Math.pow(ilvl, 2) + 0.0032416668345449868 * Math.pow(ilvl, 3) - 0.000017286124455117578 * Math.pow(ilvl, 4) + 2.9484202941863735e-8 * Math.pow(ilvl, 5)
+      Cloth: lvl => 2.5281010518232847 + 1.331747228269099 * lvl + 0.00944593034412355 * Math.pow(lvl, 2) - 0.00006849549050619422 * Math.pow(lvl, 3) + 1.2354987243172888e-7 * Math.pow(lvl, 4),
+      Leather: lvl => 1.5555029361141006 + 3.0358551084632817 * lvl + 0.010441421831956765 * Math.pow(lvl, 2) - 0.00009593877599476476 * Math.pow(lvl, 3) + 1.8476622137336274e-7 * Math.pow(lvl, 4),
+      Mail: lvl => -7.5320987581173 + 9.77641667353662 * lvl - 0.07509546031114869 * Math.pow(lvl, 2) + 0.0008277573203410827 * Math.pow(lvl, 3) - 0.000003968983245793348 * Math.pow(lvl, 4) + 6.374377745994348e-9 * Math.pow(lvl, 5),
+      Plate: lvl => 5.102460977820272 + 9.509093276356396 * lvl + 0.07993511436723227 * Math.pow(lvl, 2) - 0.0005654807309686971 * Math.pow(lvl, 3) + 0.0000010185213184327804 * Math.pow(lvl, 4),
+      Shield: lvl => -68.32056773225723 + 52.05238254766441 * lvl - 0.2633818416382036 * Math.pow(lvl, 2) + 0.0032416668345449868 * Math.pow(lvl, 3) - 0.000017286124455117578 * Math.pow(lvl, 4) + 2.9484202941863735e-8 * Math.pow(lvl, 5)
     },
     "5": {
-      Cloth: ilvl => 2.5281010518232847 + 1.331747228269099 * ilvl + 0.00944593034412355 * Math.pow(ilvl, 2) - 0.00006849549050619422 * Math.pow(ilvl, 3) + 1.2354987243172888e-7 * Math.pow(ilvl, 4),
-      Leather: ilvl => 1.5555029361141006 + 3.0358551084632817 * ilvl + 0.010441421831956765 * Math.pow(ilvl, 2) - 0.00009593877599476476 * Math.pow(ilvl, 3) + 1.8476622137336274e-7 * Math.pow(ilvl, 4),
-      Mail: ilvl => -7.5320987581173 + 9.77641667353662 * ilvl - 0.07509546031114869 * Math.pow(ilvl, 2) + 0.0008277573203410827 * Math.pow(ilvl, 3) - 0.000003968983245793348 * Math.pow(ilvl, 4) + 6.374377745994348e-9 * Math.pow(ilvl, 5),
-      Plate: ilvl => 5.102460977820272 + 9.509093276356396 * ilvl + 0.07993511436723227 * Math.pow(ilvl, 2) - 0.0005654807309686971 * Math.pow(ilvl, 3) + 0.0000010185213184327804 * Math.pow(ilvl, 4),
-      Shield: ilvl => -68.32056773225723 + 52.05238254766441 * ilvl - 0.2633818416382036 * Math.pow(ilvl, 2) + 0.0032416668345449868 * Math.pow(ilvl, 3) - 0.000017286124455117578 * Math.pow(ilvl, 4) + 2.9484202941863735e-8 * Math.pow(ilvl, 5)
+      Cloth: lvl => 2.5281010518232847 + 1.331747228269099 * lvl + 0.00944593034412355 * Math.pow(lvl, 2) - 0.00006849549050619422 * Math.pow(lvl, 3) + 1.2354987243172888e-7 * Math.pow(lvl, 4),
+      Leather: lvl => 1.5555029361141006 + 3.0358551084632817 * lvl + 0.010441421831956765 * Math.pow(lvl, 2) - 0.00009593877599476476 * Math.pow(lvl, 3) + 1.8476622137336274e-7 * Math.pow(lvl, 4),
+      Mail: lvl => -7.5320987581173 + 9.77641667353662 * lvl - 0.07509546031114869 * Math.pow(lvl, 2) + 0.0008277573203410827 * Math.pow(lvl, 3) - 0.000003968983245793348 * Math.pow(lvl, 4) + 6.374377745994348e-9 * Math.pow(lvl, 5),
+      Plate: lvl => 5.102460977820272 + 9.509093276356396 * lvl + 0.07993511436723227 * Math.pow(lvl, 2) - 0.0005654807309686971 * Math.pow(lvl, 3) + 0.0000010185213184327804 * Math.pow(lvl, 4),
+      Shield: lvl => -68.32056773225723 + 52.05238254766441 * lvl - 0.2633818416382036 * Math.pow(lvl, 2) + 0.0032416668345449868 * Math.pow(lvl, 3) - 0.000017286124455117578 * Math.pow(lvl, 4) + 2.9484202941863735e-8 * Math.pow(lvl, 5)
     },
     "4": {
-      Cloth: ilvl => 2.5281010518232847 + 1.331747228269099 * ilvl + 0.00944593034412355 * Math.pow(ilvl, 2) - 0.00006849549050619422 * Math.pow(ilvl, 3) + 1.2354987243172888e-7 * Math.pow(ilvl, 4),
-      Leather: ilvl => 1.5555029361141006 + 3.0358551084632817 * ilvl + 0.010441421831956765 * Math.pow(ilvl, 2) - 0.00009593877599476476 * Math.pow(ilvl, 3) + 1.8476622137336274e-7 * Math.pow(ilvl, 4),
-      Mail: ilvl => -7.5320987581173 + 9.77641667353662 * ilvl - 0.07509546031114869 * Math.pow(ilvl, 2) + 0.0008277573203410827 * Math.pow(ilvl, 3) - 0.000003968983245793348 * Math.pow(ilvl, 4) + 6.374377745994348e-9 * Math.pow(ilvl, 5),
-      Plate: ilvl => 5.102460977820272 + 9.509093276356396 * ilvl + 0.07993511436723227 * Math.pow(ilvl, 2) - 0.0005654807309686971 * Math.pow(ilvl, 3) + 0.0000010185213184327804 * Math.pow(ilvl, 4),
-      Shield: ilvl => -68.32056773225723 + 52.05238254766441 * ilvl - 0.2633818416382036 * Math.pow(ilvl, 2) + 0.0032416668345449868 * Math.pow(ilvl, 3) - 0.000017286124455117578 * Math.pow(ilvl, 4) + 2.9484202941863735e-8 * Math.pow(ilvl, 5)
+      Cloth: lvl => 2.5281010518232847 + 1.331747228269099 * lvl + 0.00944593034412355 * Math.pow(lvl, 2) - 0.00006849549050619422 * Math.pow(lvl, 3) + 1.2354987243172888e-7 * Math.pow(lvl, 4),
+      Leather: lvl => 1.5555029361141006 + 3.0358551084632817 * lvl + 0.010441421831956765 * Math.pow(lvl, 2) - 0.00009593877599476476 * Math.pow(lvl, 3) + 1.8476622137336274e-7 * Math.pow(lvl, 4),
+      Mail: lvl => -7.5320987581173 + 9.77641667353662 * lvl - 0.07509546031114869 * Math.pow(lvl, 2) + 0.0008277573203410827 * Math.pow(lvl, 3) - 0.000003968983245793348 * Math.pow(lvl, 4) + 6.374377745994348e-9 * Math.pow(lvl, 5),
+      Plate: lvl => 5.102460977820272 + 9.509093276356396 * lvl + 0.07993511436723227 * Math.pow(lvl, 2) - 0.0005654807309686971 * Math.pow(lvl, 3) + 0.0000010185213184327804 * Math.pow(lvl, 4),
+      Shield: lvl => -68.32056773225723 + 52.05238254766441 * lvl - 0.2633818416382036 * Math.pow(lvl, 2) + 0.0032416668345449868 * Math.pow(lvl, 3) - 0.000017286124455117578 * Math.pow(lvl, 4) + 2.9484202941863735e-8 * Math.pow(lvl, 5)
     },
     "3": {
-      Cloth: ilvl => -1.3423883493277042 + 2.200587627369824 * ilvl - 0.023452920240817212 * Math.pow(ilvl, 2) + 0.0002057092987396633 * Math.pow(ilvl, 3) - 5.346376377648381e-7 * Math.pow(ilvl, 4),
-      Leather: ilvl => -4.3185941880426775 + 5.22367821032947 * ilvl - 0.06638307153372526 * Math.pow(ilvl, 2) + 0.0005313187225831865 * Math.pow(ilvl, 3) - 0.0000013052892289727186 * Math.pow(ilvl, 4),
-      Mail: ilvl => 31.445856660984333 + 8.055343208054605 * ilvl - 0.08529020006193702 * Math.pow(ilvl, 2) + 0.0007948792659050846 * Math.pow(ilvl, 3) - 0.0000021078789263816906 * Math.pow(ilvl, 4),
-      Plate: ilvl => -28.396604349521805 + 16.329061088393786 * ilvl - 0.16567265946139803 * Math.pow(ilvl, 2) + 0.0014420657876884682 * Math.pow(ilvl, 3) - 0.000003730547431550686 * Math.pow(ilvl, 4),
-      Shield: ilvl => -44.06927830732479 + 60.18645188729204 * ilvl - 4.54601783641102 * Math.pow(ilvl, 2) + 0.19213407170465685 * Math.pow(ilvl, 3) - 0.003571960126176484 * Math.pow(ilvl, 4) + 0.00003452904159703563 * Math.pow(ilvl, 5) - 1.8099081604737638e-7 * Math.pow(ilvl, 6) + 4.887914417526831e-10 * Math.pow(ilvl, 7) - 5.340719565656609e-13 * Math.pow(ilvl, 8)
+      Cloth: lvl => -1.3423883493277042 + 2.200587627369824 * lvl - 0.023452920240817212 * Math.pow(lvl, 2) + 0.0002057092987396633 * Math.pow(lvl, 3) - 5.346376377648381e-7 * Math.pow(lvl, 4),
+      Leather: lvl => -4.3185941880426775 + 5.22367821032947 * lvl - 0.06638307153372526 * Math.pow(lvl, 2) + 0.0005313187225831865 * Math.pow(lvl, 3) - 0.0000013052892289727186 * Math.pow(lvl, 4),
+      Mail: lvl => 31.445856660984333 + 8.055343208054605 * lvl - 0.08529020006193702 * Math.pow(lvl, 2) + 0.0007948792659050846 * Math.pow(lvl, 3) - 0.0000021078789263816906 * Math.pow(lvl, 4),
+      Plate: lvl => -28.396604349521805 + 16.329061088393786 * lvl - 0.16567265946139803 * Math.pow(lvl, 2) + 0.0014420657876884682 * Math.pow(lvl, 3) - 0.000003730547431550686 * Math.pow(lvl, 4),
+      Shield: lvl => -44.06927830732479 + 60.18645188729204 * lvl - 4.54601783641102 * Math.pow(lvl, 2) + 0.19213407170465685 * Math.pow(lvl, 3) - 0.003571960126176484 * Math.pow(lvl, 4) + 0.00003452904159703563 * Math.pow(lvl, 5) - 1.8099081604737638e-7 * Math.pow(lvl, 6) + 4.887914417526831e-10 * Math.pow(lvl, 7) - 5.340719565656609e-13 * Math.pow(lvl, 8)
     },
     "2": {
-      Cloth: ilvl => 8.528248246851293 + 1.13588900743772 * ilvl + 0.00018480865552209587 * Math.pow(ilvl, 2),
-      Leather: ilvl => 39.0574346793 + 1.8042785077 * ilvl + 0.0014831968 * Math.pow(ilvl, 2),
-      Mail: ilvl => 74.58060541262037 + 3.93396431596397 * ilvl + 0.004366253997171184 * Math.pow(ilvl, 2),
-      Plate: ilvl => -8.953978248173765 + 9.748506027592633 * ilvl - 0.003686683605302056 * Math.pow(ilvl, 2),
-      Shield: ilvl => 82.22823 + 29.92042 * ilvl - 0.01284 * Math.pow(ilvl, 2) + 0.00007097724866192495 * Math.pow(ilvl, 3)
+      Cloth: lvl => 8.528248246851293 + 1.13588900743772 * lvl + 0.00018480865552209587 * Math.pow(lvl, 2),
+      Leather: lvl => 39.0574346793 + 1.8042785077 * lvl + 0.0014831968 * Math.pow(lvl, 2),
+      Mail: lvl => 74.58060541262037 + 3.93396431596397 * lvl + 0.004366253997171184 * Math.pow(lvl, 2),
+      Plate: lvl => -8.953978248173765 + 9.748506027592633 * lvl - 0.003686683605302056 * Math.pow(lvl, 2),
+      Shield: lvl => 82.22823 + 29.92042 * lvl - 0.01284 * Math.pow(lvl, 2) + 0.00007097724866192495 * Math.pow(lvl, 3)
     }
   };
 
   const shieldBlockCoefficients = {
-    uncommon: level => {
-      if (level >= 1 && level <= 80) return -3.0432462933 + 0.8825715740 * level - 0.0312968732 * Math.pow(level, 2) + 0.0007254284 * Math.pow(level, 3) - 0.0000046519 * Math.pow(level, 4);
-      if (level >= 81 && level <= 137) return -16.3908655872 + 0.6897096083 * level + 0.0013506088 * Math.pow(level, 2);
-      if (level >= 138) return 958.2984725669 - 18.2166307096 * level + 0.1250629715 * Math.pow(level, 2) - 0.0002655468 * Math.pow(level, 3);
+    uncommon: lvl => {
+      if (lvl >= 1 && lvl <= 80) return -3.0432462933 + 0.8825715740 * lvl - 0.0312968732 * Math.pow(lvl, 2) + 0.0007254284 * Math.pow(lvl, 3) - 0.0000046519 * Math.pow(lvl, 4);
+      if (lvl >= 80 && lvl <= 130) return -16.3908655872 + 0.6897096083 * lvl + 0.0013506088 * Math.pow(lvl, 2);
+      if (lvl >= 130) return 958.2984725669 - 18.2166307096 * lvl + 0.1250629715 * Math.pow(lvl, 2) - 0.0002655468 * Math.pow(lvl, 3);
     },
-    rare: level => {
-      if (level >= 1 && level <= 70) return -3.5159255097 + 1.1796186496 * level - 0.0464979829 * Math.pow(level, 2) + 0.0011133817 * Math.pow(level, 3) - 0.0000079076 * Math.pow(level, 4);
-      if (level >= 71 && level <= 153) return -29.0000000000 + 1.0000000000 * level;
-      if (level >= 154) return 18470.4850615834 - 421.5128438990 * level + 3.5991532696 * Math.pow(level, 2) - 0.0135272648 * Math.pow(level, 3) + 0.0000189300 * Math.pow(level, 4);
+    rare: lvl => {
+      if (lvl >= 1 && lvl <= 70) return -3.5159255097 + 1.1796186496 * lvl - 0.0464979829 * Math.pow(lvl, 2) + 0.0011133817 * Math.pow(lvl, 3) - 0.0000079076 * Math.pow(lvl, 4);
+      if (lvl >= 71 && lvl <= 153) return -29.0000000000 + 1.0000000000 * lvl;
+      if (lvl >= 154) return 18470.4850615834 - 421.5128438990 * lvl + 3.5991532696 * Math.pow(lvl, 2) - 0.0135272648 * Math.pow(lvl, 3) + 0.0000189300 * Math.pow(lvl, 4);
     },
-    epic: level => {
-      if (level >= 0 && level <= 189) return -36.7178644064 + 2.3738336805 * level - 0.0257785254 * Math.pow(level, 2) + 0.0002156921 * Math.pow(level, 3) - 0.0000005816 * Math.pow(level, 4);
-      if (level >= 190 && level <= 300) return 364.0853740290 - 1.7727768015 * level + 0.0050409241 * Math.pow(level, 2);
+    epic: lvl => {
+      if (lvl >= 0 && lvl <= 189) return -36.7178644064 + 2.3738336805 * lvl - 0.0257785254 * Math.pow(lvl, 2) + 0.0002156921 * Math.pow(lvl, 3) - 0.0000005816 * Math.pow(lvl, 4);
+      if (lvl >= 190 && lvl <= 300) return 364.0853740290 - 1.7727768015 * lvl + 0.0050409241 * Math.pow(lvl, 2);
     },
-    default: level => 54.5284833805 - 1.7511894287 * level + 0.0378136180 * Math.pow(level, 2) - 0.0001827142 * Math.pow(level, 3) + 0.0000002842 * Math.pow(level, 4)
+    default: lvl => 54.5284833805 - 1.7511894287 * lvl + 0.0378136180 * Math.pow(lvl, 2) - 0.0001827142 * Math.pow(lvl, 3) + 0.0000002842 * Math.pow(lvl, 4)
   };
 
   const qualityCoefficients = {
     2: {
       name: 'uncommon',
-      calculate: function(ilvl) {
-        if (ilvl >= 136) return qC(ilvl,0.801,-38.3);
-        if (ilvl >= 80) return qC(ilvl,0.505,-4.5); // final
-        if (ilvl >= 1) return qC(ilvl,0.495,-2.85); // final
+      calc: function(lvl) {
+        if (lvl >= 130) return qC(lvl,0.801,-38.3); // final
+        if (lvl >= 80) return qC(lvl,0.505,-4.5); // final
+        if (lvl >= 1) return qC(lvl,0.495,-2.85); // final
       }
     },
     3: {
       name: 'rare',
-      calculate: function(ilvl) {
-        if (ilvl >= 136) return qC(ilvl,0.86,-41);
-        if (ilvl >= 80) return qC(ilvl,0.625,-1.15);
-        if (ilvl >= 1) return qC(ilvl,0.635,-3.6);
+      calc: function(lvl) {
+        if (lvl >= 136) return qC(lvl,0.86,-41);
+        if (lvl >= 80) return qC(lvl,0.625,-1.15);
+        if (lvl >= 1) return qC(ivl,0.635,-3.6);
       }
     },
     4: {
       name: 'epic',
-      calculate: function(ilvl) {
-        if (ilvl >= 200) return qC(ilvl,1.8,-240);
-        if (ilvl >= 100) return qC(ilvl,0.689,4);
-        if (ilvl >= 1) return qC(ilvl,0.689,-1);
+      calc: function(lvl) {
+        if (lvl >= 200) return qC(lvl,1.8,-240);
+        if (lvl >= 100) return qC(lvl,0.689,4);
+        if (lvl >= 1) return qC(lvl,0.689,-1);
       }
     }
   };
   
-  function qC(ilvl,mult,base) {
-    return ilvl * mult + base;
+  function qC(lvl,mult,base) {
+    //console.log(`lvl: ${lvl}, mult: ${mult}, base: ${base} => ${(lvl * mult)} + ${base} => ${(lvl * mult) + base}`);
+    return (lvl * mult) + base;
   }
 
   function calculateLevel(itemClass, slot, quality, qualityMod) {
     console.error("calculating level from stats");
+
+    let itemLevel = 0;
 
     const array = itemClass == '4' ? armorType : weaponType;
     const invType = array[slot];
     const slotMod = invType.slotMod;
     const slotModFunction = typeof slotMod === 'function';
     
-    let totalStatBudget = 0;
+    for (let i = 1; i < 999; i++) {
 
-    $('#stats .group').each(function() {
-      const statType = $(this).find('.stat-type').val();
-      const statName = itemStats[statType]?.name || undefined;
-      const statMod = itemStats[statType]?.statMod || undefined;
-      const statValue = parseFloat($(this).find('.stat-amount').val());
-      const statModFunction = typeof statMod === 'function';
-      const effectiveStatMod = statModFunction ? statMod(slot, quality, statValue) : statMod;
+      let totalStatBudget = 0;
+      let statName = '';
+      let statType = '';
+      let statValue = '';
+      let effectiveStatMod = '';
+      let statBudget = '';
 
-      const statBudget = Math.pow(statValue * effectiveStatMod, exponent);
-      totalStatBudget += statBudget;
-      console.log(`statType: ${statName}(${statType}), statValue: ${statValue}, statMod: ${effectiveStatMod}, statBudget: ${statBudget}`);
-    });
-    
-    let itemLevel = 0;
-    for (let i = 0; i < 9999; i++) {
-      const itemBudget = totalStatBudget * (slotModFunction ? slotMod(quality, i+1) : slotMod);
+      $('#stats .group').each(function() {
+        statType = $(this).find('.stat-type').val();
+        statName = itemStats[statType]?.name || undefined;
+        const statMod = itemStats[statType]?.statMod || undefined;
+        statValue = parseFloat($(this).find('.stat-amount').val());
+        const statModFunction = typeof statMod === 'function';
+        effectiveStatMod = statModFunction ? statMod(slot, quality, i) : statMod;
+        // statmod function is broken
+        //console.warn(`statMod ${statModFunction ? 'is function' : 'is variable'} => ${statMod}`);
+
+        statBudget = Math.pow(statValue * effectiveStatMod, exponent);
+        totalStatBudget += statBudget;
+      });
+
+      const itemBudget = totalStatBudget * (slotModFunction ? slotMod(quality, i) : slotMod);
       const effectiveSlotMod = slotModFunction ? slotMod(quality, i) : slotMod;
-      const statBudgetIncrement = Math.pow(qualityMod(i) * effectiveSlotMod, exponent);
+      const statBudgetIncrement = Math.pow(qualityMod(i+1) * effectiveSlotMod, exponent);
       if (statBudgetIncrement > itemBudget) {
-        console.log(`qualityMod: ${qualityMod(i)}, statBudget: ${totalStatBudget}, slotMod: ${effectiveSlotMod}, itemBudget: ${itemBudget}, itemLevel: ${i}`);
+        console.log(`statType: ${statName}(${statType}), statValue: ${statValue}, statMod: ${effectiveStatMod}, statBudget: ${statBudget}`);
+        console.log(`qualityMod: ${qualityMod(i+1)}, statBudget: ${totalStatBudget}, slotMod: ${effectiveSlotMod}, itemBudget: ${itemBudget}, itemLevel: ${i}`);
         itemLevel = Math.max(i, 1);
         break;
       }
@@ -780,7 +793,7 @@ $(document).ready(function() {
     const itemQuality = $('input[name="itemQuality"]:checked').data('quality') || null;
     let qualityName = qualityCoefficients[itemQuality].name || null;
     const itemSlot = parseFloat($('#item-slot').val()) || null;
-    const qualityCoefficient = qualityCoefficients[itemQuality]?.calculate || (() => 0);
+    const qualityCoefficient = qualityCoefficients[itemQuality].calc;
 
     if (calcMethod === 'level') { // level calc
       itemLevel = calculateLevel(itemClass, itemSlot, itemQuality, qualityCoefficient);
@@ -878,6 +891,7 @@ $(document).ready(function() {
       }
     }
     
+    // durability is not on misc
     const durabilityCalc = 145;
     durabilityHTML = `<div>Durability ${durabilityCalc} / ${durabilityCalc}</div>`;
     
