@@ -35,7 +35,50 @@
   border-left: 1px solid #505050;
   padding-left: 20px;
 }
-#stats { height: 100% }
+#stats {
+  height: 100%;
+  border-top: 1px solid #505050;
+  border-bottom: 1px solid #505050;
+  padding: 10px 0;
+}
+
+#sockets {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin: 1em 0;
+}
+
+#sockets .socket {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  color: #9D9D9D;
+  text-transform: capitalize;
+  align-items: center;
+}
+#sockets img { height: 1em }
+
+#sellprice {
+  display: flex;
+  flex-direction: row;
+  text-transform: capitalize;
+  gap: .5ch;
+}
+
+#sellprice .gold::after, #sellprice .silver::after, #sellprice .copper::after {
+  content: '';
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  margin-left: 1px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  vertical-align: middle;
+}
+#sellprice .gold::after { background-image: url('item-display/money/gold.png') }
+#sellprice .silver::after { background-image: url('item-display/money/silver.png') }
+#sellprice .copper::after { background-image: url('item-display/money/copper.png') }
 
 #output {
   display: flex;
@@ -249,11 +292,14 @@ button:hover { background-color: #e6c200 }
 }
 
 .note {
+  width: 100%;
+  padding: 5px;
   background: #303030;
   color: #FFC;
-  padding: 3px;
   font-family: Consolas, Serif;
-  font-size: 10px;
+  font-size: 12px;
+  text-align: center;
+  white-space: wrap;
 }
 
 .error {
@@ -269,14 +315,17 @@ button:hover { background-color: #e6c200 }
   border: 1px solid #555;
   border-radius: 5px;
   color: #fff;
+  font-size: 12px;
 }
 
 .tooltip * {
+  font-family: Verdana, "Open Sans", Sans-Serif;
   line-height: 1.25em;
+  cursor: default;
 }
 
 .tooltip .item-name {
-  font-size: 13px;
+  font-size: 14px;
   text-transform: capitalize;
 }
 

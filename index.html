@@ -18,13 +18,13 @@
                 <div class="configure">
                     <h3>Customize Your Item</h3>
                     <div class="group select">
-                        <div class="item"><input class="full" type="radio" id="selectLevel" name="calcMethod" value="level" required checked /> <label for="selectLevel">Calc ilvl</label></div>
-                        <div class="item"><input class="full" type="radio" id="selectStats" name="calcMethod" value="stats" required /> <label for="selectStats">Calc Stats</label></div>
+                        <div class="item"><input class="full" type="radio" id="selectLevel" name="calcMethod" value="level" required checked /> <label for="selectLevel">Calculate Level</label></div>
+                        <div class="item"><input class="full" type="radio" id="selectStats" name="calcMethod" value="stats" required /> <label for="selectStats">Calculate Stats</label></div>
                         <input class="full" type="number" id="item-level" name="itemLevel" placeholder="Item Level" />
                     </div>
                     <div class="group">
-                        <div class="text note textLevel">The calculator will determine the ilvl based on the stat values.</div>
-                        <div class="text note textStats">The calculator will determine the stat values based on the ilvl.</div>
+                        <div class="text note textLevel">Determine the item level based on the stat values.</div>
+                        <div class="text note textStats">Determine the stat values based on the item level.</div>
                     </div>
                     <div class="group select">
                         <div class="item borderfix"><input type="radio" id="armor" name="itemClass" value="4" checked required /> <label for="armor">Armor</label></div>
@@ -66,7 +66,7 @@
                         <div class="item"><input type="radio" id="equipped" name="itemUnique" value="equipped" /> <label for="equipped">Unique-Equipped</label></div>
                     </div>
                     <div class="group">
-                        <input type="text" id="item-name" value="" placeholder="Item Name (Optional)" />
+                        <input type="text" id="item-name" value="" class="uncommon" placeholder="Item Name (Optional)" />
                         <input class="quarter" type="number" id="item-reqlvl" name="itemReqLevel" placeholder="Level" />
                     </div>
                     <div class="group">
@@ -74,10 +74,10 @@
                     </div>
                 </div>
                 <div id="statPanel">
-                    <h3>Select Item Stats</h3>
+                    <h3>Select Item Properties</h3>
                     <p class="text note">Calculation interprets a stat value as a <span id="statMethod">integer</span>.</p>
+                    <div class="group"><button type="button" id="add-stat">Add a Stat</button><button type="button" id="add-socket">Add a Socket</button></div>
                     <div id="stats"></div>
-                    <button type="button" id="add-stat">Add a Stat</button>
                     <button class="calculate" type="submit">Calculate</button>
                 </div>
             </form>

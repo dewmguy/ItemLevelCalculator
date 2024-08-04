@@ -1,225 +1,251 @@
 $(document).ready(function() {
   
-  const exponent = 1.5;
-  //const exponent = Math.log(2)/Math.log(1.5);
+  const exponent = Math.log(2) / Math.log(1.5);
   const exponentInverse = 1 / exponent;
-  
-  const applyResistances = (quality, ilvl) => {
-    return (quality === 2 && ilvl >= 1 && ilvl <= 69) ? (14/16) :
-    (quality === 4 && ilvl >= 200 && ilvl <= 300) ? (12/16) :
-    (14/16);
-  };
 
-  const applySockets = (quality, ilvl) => {
-    return (quality === 2 && ilvl >= 1 && ilvl <= 69) ? (10/1) :
-    (quality === 2 && ilvl >= 70 && ilvl <= 135) ? (10/1) :
-    (quality === 2 && ilvl >= 136 && ilvl <= 200) ? (25/1) :
-    (quality === 3 && ilvl >= 1 && ilvl <= 79) ? (10/1) :
-    (quality === 3 && ilvl >= 80 && ilvl <= 135) ? (10/1) :
-    (quality === 3 && ilvl >= 136 && ilvl <= 200) ? (25/1) :
-    (quality === 4 && ilvl >= 1 && ilvl <= 89) ? (10/1) :
-    (quality === 4 && ilvl >= 90 && ilvl <= 199) ? (10/1) :
-    (quality === 4 && ilvl >= 200 && ilvl <= 300) ? (25/1) :
-    null;
-  };
-  
   const dataFilter = (quality, ilvl, data) => {
-    for (const set of data) {
-      if (quality === set.quality && ilvl >= set.min && ilvl <= set.max) { return set.mod; }
-    }
+    for (const set of data) { if (quality === set.quality && ilvl >= set.min) return set.mod; }
     return null;
   };
+  const modFilter = (entries) => entries.map(([quality, min, mod]) => ({ quality, min, mod }));
+  const modData = (data) => (quality, ilvl) => dataFilter(quality, ilvl, modFilter(data));
 
-  const inventoryType = {
-    "1": { name: "Head", armorMod: (13/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
-    "3": { name: "Shoulder", armorMod: (12/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (8/16) },
-    "5": { name: "Chest", armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
-    "7": { name: "Legs", armorMod: (14/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
-    "9": { name: "Wrists", armorMod: (7/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (4/16) },
-    "20": { name: "Chest (Robe)", slotMod: (16/16), armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4] },
-    "4": { name: "Shirt", armorMod: 0, itemClass: 4, subClass: [1], slotMod: (1/16) },
-    "19": { name: "Tabard", armorMod: 0, itemClass: 4, subClass: [0], slotMod: (1/16) },
-    "28": { name: "Relic", armorMod: 0, itemClass: 4, subClass: [7, 8, 9, 10], slotMod: (1/16) },
-    "6": { name: "Waist", armorMod: (9/16), itemClass: 4, subClass: [1, 2, 3, 4],
-      slotMod: (quality, ilvl) => dataFilter(quality, ilvl, [
-        { quality: 2, min: 1, max: 69, mod: (10/16) },
-        { quality: 2, min: 70, max: 135, mod: (8/16) },
-        { quality: 2, min: 136, max: 200, mod: (8/16) },
-        { quality: 3, min: 1, max: 79, mod: (10/16) },
-        { quality: 3, min: 80, max: 135, mod: (9/16) },
-        { quality: 3, min: 136, max: 200, mod: (9/16) },
-        { quality: 4, min: 1, max: 89, mod: (10/16) },
-        { quality: 4, min: 90, max: 199, mod: (9/16) },
-        { quality: 4, min: 200, max: 300, mod: (9/16) },
-      ])
-    },
-    "8": { name: "Feet", armorMod: (11/16), itemClass: 4, subClass: [1, 2, 3, 4],
-      slotMod: (quality, ilvl) => dataFilter(quality, ilvl, [
-        { quality: 2, min: 1, max: 69, mod: (8/16) },
-        { quality: 2, min: 70, max: 135, mod: (8/16) },
-        { quality: 2, min: 136, max: 200, mod: (8/16) },
-        { quality: 3, min: 1, max: 79, mod: (8/16) },
-        { quality: 3, min: 80, max: 135, mod: (7/16) },
-        { quality: 3, min: 136, max: 200, mod: (7/16) },
-        { quality: 4, min: 1, max: 89, mod: (8/16) },
-        { quality: 4, min: 90, max: 199, mod: (7/16) },
-        { quality: 4, min: 200, max: 300, mod: (7/16) },
-      ])
-    },
-    "10": { name: "Hands", armorMod: (10/16), itemClass: 4, subClass: [1, 2, 3, 4],
-      slotMod: (quality, ilvl) => dataFilter(quality, ilvl, [
-        { quality: 2, min: 1, max: 69, mod: (9/16) },
-        { quality: 2, min: 70, max: 135, mod: (8/16) },
-        { quality: 2, min: 136, max: 200, mod: (8/16) },
-        { quality: 3, min: 1, max: 79, mod: (9/16) },
-        { quality: 3, min: 80, max: 135, mod: (9/16) },
-        { quality: 3, min: 136, max: 200, mod: (6/16) },
-        { quality: 4, min: 1, max: 89, mod: (9/16) },
-        { quality: 4, min: 90, max: 199, mod: (8/16) },
-        { quality: 4, min: 200, max: 300, mod: (4/16) },
-      ])
-    },
-    "14": { name: "Shield", armorMod: (16/16), itemClass: 4, subClass: [6],
-      slotMod: (quality, ilvl) => dataFilter(quality, ilvl, [
-        { quality: 2, min: 1, max: 69, mod: (4/16) },
-        { quality: 2, min: 70, max: 135, mod: (4/16) },
-        { quality: 2, min: 136, max: 200, mod: (4/16) },
-        { quality: 3, min: 1, max: 79, mod: (4/16) },
-        { quality: 3, min: 80, max: 135, mod: (4/16) },
-        { quality: 3, min: 136, max: 200, mod: (4/16) },
-        { quality: 4, min: 1, max: 89, mod: (4/16) },
-        { quality: 4, min: 90, max: 199, mod: (4/16) },
-        { quality: 4, min: 200, max: 300, mod: (8/16) },
-      ])
-    },
-    "16": { name: "Back", armorMod: (8/16), itemClass: 4, subClass: [1],
-      slotMod: (quality, ilvl) => dataFilter(quality, ilvl, [
-        { quality: 2, min: 1, max: 69, mod: (3/16) },
-        { quality: 2, min: 70, max: 135, mod: (4/16) },
-        { quality: 2, min: 136, max: 200, mod: (4/16) },
-        { quality: 3, min: 1, max: 79, mod: (3/16) },
-        { quality: 3, min: 80, max: 135, mod: (3/16) },
-        { quality: 3, min: 136, max: 200, mod: (3/16) },
-        { quality: 4, min: 1, max: 89, mod: (3/16) },
-        { quality: 4, min: 90, max: 199, mod: (3/16) },
-        { quality: 4, min: 200, max: 300, mod: (4/16) },
-      ])
-    },
+  const armorType = {
     "2": { name: "Neck", armorMod: 0, itemClass: 4, subClass: [0],
-      slotMod: (quality, ilvl) => dataFilter(quality, ilvl, [
-        { quality: 2, min: 1, max: 69, mod: (4/16) },
-        { quality: 2, min: 70, max: 135, mod: (4/16) },
-        { quality: 2, min: 136, max: 200, mod: (4/16) },
-        { quality: 3, min: 1, max: 79, mod: (4/16) },
-        { quality: 3, min: 80, max: 135, mod: (3/16) },
-        { quality: 3, min: 136, max: 200, mod: (4/16) },
-        { quality: 4, min: 1, max: 89, mod: (4/16) },
-        { quality: 4, min: 90, max: 199, mod: (3/16) },
-        { quality: 4, min: 200, max: 300, mod: (3/16) },
+      slotMod: modData([
+        [2, 130, 4/16], // final
+        [2, 80, 4/16], // final
+        [2, 1, 4/16], // final
+        [3, 136, 4/16],
+        [3, 80, 3/16],
+        [3, 1, 4/16],
+        [4, 200, 3/16],
+        [4, 90, 3/16],
+        [4, 1, 4/16],
+      ])
+    },
+    "6": { name: "Waist", armorMod: 9/16, itemClass: 4, subClass: [1, 2, 3, 4],
+      slotMod: modData([
+        [2, 130, 8/16], // final
+        [2, 80, 8/16], // final
+        [2, 1, 8/16], // final
+        [3, 136, 9/16],
+        [3, 80, 9/16],
+        [3, 1, 10/16],
+        [4, 200, 9/16],
+        [4, 90, 9/16],
+        [4, 1, 10/16],
+      ])
+    },
+    "8": { name: "Feet", armorMod: 11/16, itemClass: 4, subClass: [1, 2, 3, 4],
+      slotMod: modData([
+        [2, 130, 8/16], // final
+        [2, 80, 8/16], // final
+        [2, 1, 8/16], // final
+        [3, 136, 7/16],
+        [3, 80, 7/16],
+        [3, 1, 8/16],
+        [4, 200, 7/16],
+        [4, 90, 7/16],
+        [4, 1, 8/16],
+      ])
+    },
+    "10": { name: "Hands", armorMod: 10/16, itemClass: 4, subClass: [1, 2, 3, 4],
+      slotMod: modData([
+        [2, 130, 8/16], // final
+        [2, 80, 8/16], // final
+        [2, 1, 8/16], // final
+        [3, 136, 6/16],
+        [3, 80, 9/16],
+        [3, 1, 9/16],
+        [4, 200, 4/16],
+        [4, 90, 8/16],
+        [4, 1, 9/16],
       ])
     },
     "11": { name: "Finger", armorMod: 0, itemClass: 4, subClass: [0],
-      slotMod: (quality, ilvl) => dataFilter(quality, ilvl, [
-        { quality: 2, min: 1, max: 69, mod: (3/16) },
-        { quality: 2, min: 70, max: 135, mod: (4/16) },
-        { quality: 2, min: 136, max: 200, mod: (4/16) },
-        { quality: 3, min: 1, max: 79, mod: (3/16) },
-        { quality: 3, min: 80, max: 135, mod: (3/16) },
-        { quality: 3, min: 136, max: 200, mod: (3/16) },
-        { quality: 4, min: 1, max: 89, mod: (3/16) },
-        { quality: 4, min: 90, max: 199, mod: (3/16) },
-        { quality: 4, min: 200, max: 300, mod: (8/16) },
+      slotMod: modData([
+        [2, 130, 4/16], // final
+        [2, 80, 4/16], // final
+        [2, 1, 4/16], // final
+        [3, 136, 3/16],
+        [3, 80, 3/16],
+        [3, 1, 3/16],
+        [4, 200, 8/16],
+        [4, 90, 3/16],
+        [4, 1, 3/16],
       ])
     },
     "12": { name: "Trinket", armorMod: 0, itemClass: 4, subClass: [0],
-      slotMod: (quality, ilvl) => dataFilter(quality, ilvl, [
-        { quality: 2, min: 1, max: 69, mod: (8/16) },
-        { quality: 2, min: 70, max: 135, mod: (7/16) },
-        { quality: 2, min: 136, max: 200, mod: (7/16) },
-        { quality: 3, min: 1, max: 79, mod: (8/16) },
-        { quality: 3, min: 80, max: 135, mod: (11/16) },
-        { quality: 3, min: 136, max: 200, mod: (11/16) },
-        { quality: 4, min: 1, max: 89, mod: (8/16) },
-        { quality: 4, min: 90, max: 199, mod: (5/16) },
-        { quality: 4, min: 200, max: 300, mod: (3/16) },
+      slotMod: modData([
+        [2, 130, 8/16], // final
+        [2, 80, 8/16], // final
+        [2, 1, 8/16], // final
+        [3, 136, 11/16],
+        [3, 80, 11/16],
+        [3, 1, 8/16],
+        [4, 200, 3/16],
+        [4, 90, 5/16],
+        [4, 1, 8/16],
       ])
     },
-    "23": { name: "Held Off-hand", armorMod: 0, itemClass: 4, subClass: [0],
-      slotMod: (quality, ilvl) => dataFilter(quality, ilvl, [
-        { quality: 2, min: 1, max: 69, mod: (3/16) },
-        { quality: 2, min: 70, max: 135, mod: (4/16) },
-        { quality: 2, min: 136, max: 200, mod: (4/16) },
-        { quality: 3, min: 1, max: 79, mod: (3/16) },
-        { quality: 3, min: 80, max: 135, mod: (3/16) },
-        { quality: 3, min: 136, max: 200, mod: (3/16) },
-        { quality: 4, min: 1, max: 89, mod: (3/16) },
-        { quality: 4, min: 90, max: 199, mod: (3/16) },
-        { quality: 4, min: 200, max: 300, mod: (3/16) },
+    "14": { name: "Shield", armorMod: 16/16, itemClass: 4, subClass: [6],
+      slotMod: modData([
+        [2, 130, 4/16], // final
+        [2, 80, 4/16], // final
+        [2, 1, 4/16], // final
+        [3, 136, 4/16],
+        [3, 80, 4/16],
+        [3, 1, 4/16],
+        [4, 200, 8/16],
+        [4, 90, 4/16],
+        [4, 1, 4/16],
       ])
     },
-    "13": { name: "One-Hand", slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
-    "21": { name: "Main-Hand", slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
-    "22": { name: "Off-Hand", slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
-    "17": { name: "Two-Hand", slotMod: (16/16), armorMod: 0, itemClass: 2, subClass: [1, 5, 8, 6, 10] },
-    "15": { name: "Bow", slotMod: (16/16), armorMod: 0, itemClass: 2, subClass: [2] },
-    "25": { name: "Thrown", slotMod: (5/16), armorMod: 0, itemClass: 2, subClass: [16] },
-    "26": { name: "Ranged", slotMod: (5/16), armorMod: 0, itemClass: 2, subClass: [3, 18, 19] }
+    "16": { name: "Back", armorMod: 8/16, itemClass: 4, subClass: [1],
+      slotMod: modData([
+        [2, 130, 4/16], // final
+        [2, 80, 4/16], // final
+        [2, 1, 3/16], // final
+        [3, 136, 3/16],
+        [3, 80, 3/16],
+        [3, 1, 3/16],
+        [4, 200, 4/16],
+        [4, 90, 3/16],
+        [4, 1, 3/16],
+      ])
+    },
+    "1": { name: "Head", armorMod: 13/16, itemClass: 4, subClass: [1, 2, 3, 4], slotMod: 16/16 },
+    "3": { name: "Shoulder", armorMod: 12/16, itemClass: 4, subClass: [1, 2, 3, 4], slotMod: 8/16 },
+    "4": { name: "Shirt", armorMod: 0, itemClass: 4, subClass: [1], slotMod: 1/16 },
+    "5": { name: "Chest", armorMod: 16/16, itemClass: 4, subClass: [1, 2, 3, 4], slotMod: 16/16 },
+    "7": { name: "Legs", armorMod: 14/16, itemClass: 4, subClass: [1, 2, 3, 4], slotMod: 16/16 },
+    "9": { name: "Wrists", armorMod: 7/16, itemClass: 4, subClass: [1, 2, 3, 4], slotMod: 4/16 },
+    "19": { name: "Tabard", armorMod: 0, itemClass: 4, subClass: [0], slotMod: 1/16 },
+    "20": { name: "Chest (Robe)", armorMod: 16/16, itemClass: 4, subClass: [1, 2, 3, 4], slotMod: 16/16 },
+    "23": { name: "Held Off-hand", armorMod: 0, itemClass: 4, subClass: [0], slotMod: 3/16 },
+    "28": { name: "Relic", armorMod: 0, itemClass: 4, subClass: [7, 8, 9, 10], slotMod: 1/16 },
   };
 
+  const weaponType = {
+    "13": { name: "One-Hand", slotMod: 7/16, armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
+    "21": { name: "Main-Hand", slotMod: 7/16, armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
+    "22": { name: "Off-Hand", slotMod: 7/16, armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
+    "17": { name: "Two-Hand", slotMod: 16/16, armorMod: 0, itemClass: 2, subClass: [1, 5, 8, 6, 10] },
+    "15": { name: "Bow", slotMod: 16/16, armorMod: 0, itemClass: 2, subClass: [2] },
+    "25": { name: "Thrown", slotMod: 5/16, armorMod: 0, itemClass: 2, subClass: [16] },
+    "26": { name: "Ranged", slotMod: 5/16, armorMod: 0, itemClass: 2, subClass: [3, 18, 19] }
+  };
+
+  const resistMods = (slot, quality, lvl) => dataFilter(quality, lvl, modFilter([
+    [4, 200, 12/16],
+    [4, 1, 16/16],
+    [3, 1, 16/16],
+    [2, 1, 16/16], // final
+  ]));
+
+  const socketMods = (slot, quality, lvl) => dataFilter(quality, lvl, modFilter([
+    [4, 200, 25/1],
+    [4, 90, 10/1],
+    [4, 1, 10/1],
+    [3, 130, 25/1],
+    [3, 80, 10/1],
+    [3, 1, 10/1],
+    [2, 130, 32/1],
+    [2, 80, 10/1],
+    [2, 1, 10/1], // final
+  ]));
+
   const itemStats = {
-    "0": { name: "Mana", type: 0, statMod: (32/16) },
-    "1": { name: "Health", type: 0, statMod: (32/16) },
-    "3": { name: "Agility", type: 0, statMod: (16/16) },
-    "4": { name: "Strength", type: 0, statMod: (16/16) },
-    "5": { name: "Intellect", type: 0, statMod: (16/16) },
-    "6": { name: "Spirit", type: 0, statMod: (16/16) },
     "7": { name: "Stamina", type: 0,
-      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, [
-        { quality: 2, min: 1, max: 69, mod: (16/16) },
-        { quality: 2, min: 70, max: 200, mod: (10/16) },
-        { quality: 3, min: 1, max: 79, mod: (16/16) },
-        { quality: 3, min: 80, max: 200, mod: (10/16) },
-        { quality: 4, min: 1, max: 300, mod: (10/16) },
+      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, modFilter([
+        [3, 80, 10/16],
+        [4, 1, 10/16],
+        [3, 1, 16/16],
+        [2, 130, 2/3], // final
+        [2, 80, 2/3], // final
+        [2, 1, 16/16], // final
+      ]))
+    },
+    "45": { name: "Spell Power", type: 1,
+      statMod: (slot, quality, lvl) => modData([
+        [4, 200, 4/16],
+        [4, 1, 68/16],
+        [3, 1, 68/64],
+        [2, 130, 55/64],
+        [2, 80, 55/64], // final
+        [2, 1, 45/64], // final
       ])
     },
-    "12": { name: "Defense Rating", type: 1, statMod: (slot, quality, lvl) => (slot === 14) ? (10/16) : (16/16) },
-    "13": { name: "Dodge Rating", type: 1, statMod: (16/16) },
-    "14": { name: "Parry Rating", type: 1, statMod: (16/16) },
-    "15": { name: "Block Rating", type: 1, statMod: (slot, quality, lvl) => (slot === 14) ? (6/16) : (16/16) },
-    "21": { name: "Spell Crit Rating", type: 1, statMod: (16/16) },
-    "31": { name: "Hit Rating", type: 1, statMod: (16/16) },
-    "32": { name: "Crit Rating", type: 1, statMod: (16/16) },
-    "35": { name: "Resilience Rating", type: 1, statMod: (16/16) },
-    "36": { name: "Haste Rating", type: 1, statMod: (16/16) },
-    "37": { name: "Expertise Rating", type: 1, statMod: (16/16) },
-    "38": { name: "Attack Power", type: 1, statMod: (8/16) },
-    "43": { name: "Mana Regen MP5", type: 1, statMod: (32/16) },
-    "44": { name: "Armor Penetration Rating", type: 1, statMod: (16/16) },
-    "45": { name: "Spell Power", type: 1, statMod: (14/16) },
-    "46": { name: "Health Regen HP5", type: 1, 
-      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, [
-        { quality: 4, min: 200, max: 300, mod: (4/16) },
-        { quality: 1, min: 1, max: 300, mod: (11/16) },
+    "43": { name: "Mana Regen HP5", type: 1,
+      statMod: (slot, quality, lvl) => modData([
+        [4, 200, 4/16],
+        [4, 1, 68/16],
+        [3, 1, 68/64],
+        [2, 130, 88/32],
+        [2, 80, 88/32], // final
+        [2, 1, 77/32], // final
       ])
     },
-    "47": { name: "Spell Penetration", type: 1, statMod: (12/16) },
-    "48": { name: "Block Value", type: 1, 
-      statMod: (slot, quality, lvl) => {
-        if ([2, 11, 14].includes(type) || (quality === 4 && lvl > 90)) { return (4/16); }
-        else { return (11/16); }
-      }
+    "46": { name: "Health Regen HP5", type: 1,
+      statMod: (slot, quality, lvl) => modData([
+        [4, 200, 4/16],
+        [4, 1, 68/16],
+        [3, 1, 68/16],
+        [2, 1, 68/16], // final
+      ])
     },
-    "armor": { name: "Bonus Armor", type: 3, statMod: (3/32) },
-    "arcane_res": { name: "Resist Arcane", type: 0, statMod: applyResistances },
-    "fire_res": { name: "Resist Fire", type: 0, statMod: applyResistances },
-    "holy_res": { name: "Resist Holy", type: 0, statMod: applyResistances },
-    "nature_res": { name: "Resist Nature", type: 0, statMod: applyResistances },
-    "frost_res": { name: "Resist Frost", type: 0, statMod: applyResistances },
-    "shadow_res": { name: "Resist Shadow", type: 0, statMod: applyResistances },
-    "meta_socket": { name: "Meta Socket", type: 2, statMod: applySockets },
-    "red_socket": { name: "Red Socket", type: 2, statMod: applySockets },
-    "blue_socket": { name: "Blue Socket", type: 2, statMod: applySockets },
-    "yellow_socket": { name: "Yellow Socket", type: 2, statMod: applySockets },
+    "48": { name: "Block Value", type: 1,
+      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, modFilter(
+        [2, 11, 14].includes(slot)
+        ? [ // ammys, rings, shields
+          [4, 90, 4/16],
+          [4, 1, 8/16],
+          [3, 1, 16/16],
+          [2, 130, 21/64]
+          [2, 80, 21/64], // final
+          [2, 1, 16/16], // final
+        ]
+        : [ // everything else
+          [4, 90, 4/16],
+          [4, 1, 8/16],
+          [3, 1, 21/64],
+          [2, 130, 21/64],
+          [2, 80, 21/64], // final
+          [2, 1, 16/16], // final
+        ]
+      ))
+    },
+    "0": { name: "Mana", type: 0, statMod: 32/16 }, // cannot test
+    "1": { name: "Health", type: 0, statMod: 32/16 }, // cannot test
+    "3": { name: "Agility", type: 0, statMod: 16/16 },
+    "4": { name: "Strength", type: 0, statMod: 16/16 },
+    "5": { name: "Intellect", type: 0, statMod: 16/16 },
+    "6": { name: "Spirit", type: 0, statMod: 16/16 },
+    "12": { name: "Defense Rating", type: 1, statMod: 16/16 },
+    "13": { name: "Dodge Rating", type: 1, statMod: 16/16 },
+    "14": { name: "Parry Rating", type: 1, statMod: 16/16 },
+    "15": { name: "Block Rating", type: 1, statMod: 16/16},
+    "21": { name: "Spell Crit Rating", type: 1, statMod: 16/16 },
+    "31": { name: "Hit Rating", type: 1, statMod: 16/16 },
+    "32": { name: "Crit Rating", type: 1, statMod: 16/16 },
+    "35": { name: "Resilience Rating", type: 1, statMod: 16/16 },
+    "36": { name: "Haste Rating", type: 1, statMod: 16/16 },
+    "37": { name: "Expertise Rating", type: 1, statMod: 16/16 },
+    "38": { name: "Attack Power", type: 1, statMod: 8/16 },
+    "44": { name: "Armor Penetration Rating", type: 1, statMod: 16/16 }, // unconfirmed
+    "47": { name: "Spell Penetration", type: 1, statMod: 12/16 }, // unconfirmed
+    "armor": { name: "Bonus Armor", type: 3, statMod: 3/32 },
+    "arcane_res": { name: "Resist Arcane", type: 0, statMod: resistMods },
+    "fire_res": { name: "Resist Fire", type: 0, statMod: resistMods },
+    "holy_res": { name: "Resist Holy", type: 0, statMod: resistMods },
+    "nature_res": { name: "Resist Nature", type: 0, statMod: resistMods },
+    "frost_res": { name: "Resist Frost", type: 0, statMod: resistMods },
+    "shadow_res": { name: "Resist Shadow", type: 0, statMod: resistMods },
+    "meta_socket": { name: "Meta Socket", color: "meta", type: 2, statMod: socketMods },
+    "red_socket": { name: "Red Socket", color: "red", type: 2, statMod: socketMods },
+    "blue_socket": { name: "Blue Socket", color: "blue", type: 2, statMod: socketMods },
+    "yellow_socket": { name: "Yellow Socket", color: "yellow", type: 2, statMod: socketMods },
   };
 
   const statPhrases = {
@@ -343,45 +369,50 @@ $(document).ready(function() {
     2: {
       name: 'uncommon',
       calculate: function(ilvl) {
-        if (ilvl >= 1 && ilvl <= 69) return ilvl * 0.5 - 4;
-        if (ilvl >= 70 && ilvl <= 135) return ilvl * 0.51 - 4.5;
-        if (ilvl >= 136 && ilvl <= 200) return ilvl * 0.59 - 17;
+        if (ilvl >= 136) return qC(ilvl,0.801,-38.3); // final
+        if (ilvl >= 80) return qC(ilvl,0.505,-4.5); // final
+        if (ilvl >= 1) return qC(ilvl,0.495,-2.85); // final
       }
     },
     3: {
       name: 'rare',
       calculate: function(ilvl) {
-        if (ilvl >= 1 && ilvl <= 79) return ilvl * 0.635 - 3.6;
-        if (ilvl >= 80 && ilvl <= 135) return ilvl * 0.625 - 1.15;
-        if (ilvl >= 136 && ilvl <= 300) return ilvl * 0.83 - 41;
+        if (ilvl >= 136) return qC(ilvl,0.86,-41);
+        if (ilvl >= 80) return qC(ilvl,0.625,-1.15);
+        if (ilvl >= 1) return qC(ilvl,0.635,-3.6);
       }
     },
     4: {
       name: 'epic',
       calculate: function(ilvl) {
-        if (ilvl >= 1 && ilvl <= 99) return ilvl * 0.689 - 1;
-        if (ilvl >= 100 && ilvl <= 199) return ilvl * 0.689 + 4;
-        if (ilvl >= 200 && ilvl <= 300) return ilvl * 1.8 - 240;
+        if (ilvl >= 200) return qC(ilvl,1.8,-240);
+        if (ilvl >= 100) return qC(ilvl,0.689,4);
+        if (ilvl >= 1) return qC(ilvl,0.689,-1);
       }
     }
   };
+  
+  function qC(ilvl,mult,base) {
+    return ilvl * mult + base;
+  }
 
-  function calculateLevel(slot, quality, qualityMod) {
+  function calculateLevel(itemClass, slot, quality, qualityMod) {
     console.error("calculating level from stats");
-    console.log(`slot: ${slot}, quality: ${quality}, qualityMod: ${qualityMod}`);
 
-    const inventory = inventoryType[slot];
-    const slotMod = inventory.slotMod;
+    const array = itemClass == '4' ? armorType : weaponType;
+    const invType = array[slot];
+    const slotMod = invType.slotMod;
     const slotModFunction = typeof slotMod === 'function';
     
     let totalStatBudget = 0;
 
     $('#stats .group').each(function() {
       const statType = $(this).find('.stat-type').val();
-      const statName = itemStats[statType]?.name || '';
-      const statMod = itemStats[statType]?.statMod || 1;
+      const statName = itemStats[statType]?.name || undefined;
+      const statMod = itemStats[statType]?.statMod || undefined;
       const statValue = parseFloat($(this).find('.stat-amount').val());
-      const effectiveStatMod = typeof statMod === 'function' ? statMod(slot, quality, statValue) : statMod;
+      const statModFunction = typeof statMod === 'function';
+      const effectiveStatMod = statModFunction ? statMod(slot, quality, statValue) : statMod;
 
       const statBudget = Math.pow(statValue * effectiveStatMod, exponent);
       totalStatBudget += statBudget;
@@ -393,7 +424,6 @@ $(document).ready(function() {
       const itemBudget = totalStatBudget * (slotModFunction ? slotMod(quality, i+1) : slotMod);
       const effectiveSlotMod = slotModFunction ? slotMod(quality, i) : slotMod;
       const statBudgetIncrement = Math.pow(qualityMod(i) * effectiveSlotMod, exponent);
-      //console.log(`statBudgetIncrement [${i+1}] = ${statBudgetIncrement}`);
       if (statBudgetIncrement > itemBudget) {
         console.log(`qualityMod: ${qualityMod(i)}, statBudget: ${totalStatBudget}, slotMod: ${effectiveSlotMod}, itemBudget: ${itemBudget}, itemLevel: ${i}`);
         itemLevel = Math.max(i, 1);
@@ -403,15 +433,16 @@ $(document).ready(function() {
     return itemLevel;
   }
 
-  function calculateStats(level, slot, quality, qualityMod) {
+  function calculateStats(itemClass, level, slot, quality, qualityMod) {
     console.error(`calculating stats from level`);
     
-    const inventory = inventoryType[slot];
-    const slotMod = inventory.slotMod;
+    const array = itemClass == '4' ? armorType : weaponType;
+    const invType = array[slot];
+    const slotMod = invType.slotMod;
     const slotModFunction = typeof slotMod === 'function';
     const effectiveSlotMod = slotModFunction ? slotMod(quality, level) : slotMod;
 
-    const itemBudget = Math.pow(qualityMod(level) * effectiveSlotMod, exponent) / effectiveSlotMod;
+    const itemBudget = Math.pow(qualityMod(level) * effectiveSlotMod, exponent)/effectiveSlotMod;
     const statValues = {};
 
     $('#stats .group').each(function() {
@@ -434,7 +465,7 @@ $(document).ready(function() {
   }
 
   function calculateArmor(slot, type, level, quality, bonus) {
-    const slotData = inventoryType[slot];
+    const slotData = armorType[slot];
     if (slotData.armorMod > 0) {
       console.error("generating armor");
       const slotMod = slotData.armorMod;
@@ -459,22 +490,21 @@ $(document).ready(function() {
   function populateItemSlots(itemClass) {
     const itemSlotObj = $('#item-slot');
     let name = itemClass == '4' ? 'Armor' : 'Weapon';
+    let array = itemClass == '4' ? armorType : weaponType;
     itemSlotObj.empty().append(`<option value="">Choose ${name} Type</option>`);
-    $.each(inventoryType, function(key, data) {
-      if(data.itemClass == itemClass) {
-        itemSlotObj.append(`<option data-class="${data.itemClass}" value="${key}">${data.name}</option>`);
-      }
+    $.each(array, function(key, data) {
+      itemSlotObj.append(`<option data-class="${itemClass}" value="${key}">${data.name}</option>`);
     });
   }
 
   function populateSubClass(subClass, itemClass) {
     const subClassObj = $('#item-subclass');
     subClassObj.empty();
-    const classList = itemClass == 4 ? armorTypes : weaponTypes;
+    const array = itemClass == 4 ? armorTypes : weaponTypes;
 
     if (subClass.length === 1) {
       const classKey = subClass[0];
-      const classData = classList[classKey];
+      const classData = array[classKey];
       if (classData) {
         subClassObj.append(`<option value="${classKey}">${classData.name}</option>`);
         subClassObj.prop('disabled', true);
@@ -483,7 +513,7 @@ $(document).ready(function() {
     else {
       subClassObj.append(`<option value="">Choose ${$("#item-slot option:selected").data('class') == 2 ? 'Weapon' : 'Armor'} Type</option>`);
       $.each(subClass, function(_, classKey) {
-        let classData = classList[classKey];
+        let classData = array[classKey];
         if (classData) {
           subClassObj.append(`<option value="${classKey}">${classData.name}</option>`);
         }
@@ -502,30 +532,56 @@ $(document).ready(function() {
 
   function createStatDropdown(id) {
     let options = '<option value="">Select a Stat</option>';
-    $.each(itemStats, function(key, data) { options += `<option value="${key}">${data.name}</option>`; });
-    return `<select id="stat-type-${id}" class="stat-type" data-id="${id}">${options}</select>`;
+    $.each(itemStats, function(key, data) {
+      if (data.type !== 2) { options += `<option value="${key}">${data.name}</option>`; }
+    });
+    return `<select id="stat-type-${id}" class="stat-type stat" data-id="${id}">${options}</select>`;
+  }
+
+  function createSocketDropdown(id) {
+    let options = '<option value="">Select a Socket</option>';
+    $.each(itemStats, function(key, data) {
+      options += `<option data-color="${data.color}" value="${key}">${data.name} FUCK</option>`;
+    });
+    return `<select id="stat-type-${id}" class="stat-type socket" data-id="${id}">${options}</select>`;
   }
 
   function updateStatDropdowns() {
     const selectedStats = [];
-    $('.stat-type').each(function() {
+    $('.stat-type.stat').each(function() {
       const statValue = $(this).val();
       if (statValue) { selectedStats.push(statValue); }
       const selectObj = $(this);
       selectObj.empty();
       selectObj.append('<option value="">Select a Stat</option>');
       $.each(itemStats, function(key, data) {
-        if (selectedStats.indexOf(key) === -1 || key === statValue) { selectObj.append(`<option value="${key}">${data.name}</option>`); }
+        if (data.type !== 2 && (selectedStats.indexOf(key) === -1 || key === statValue)) { selectObj.append(`<option value="${key}">${data.name}</option>`); }
       });
       selectObj.val(statValue);
     });
   }
 
-  let statCount = 0;
+  function updateSocketDropdowns() {
+    const selectedSockets = [];
+    $('.stat-type.socket').each(function() {
+      const socketValue = $(this).val();
+      if (socketValue) { selectedSockets.push(socketValue); }
+      const selectObj = $(this);
+      selectObj.empty();
+      selectObj.append('<option value="">Select a Socket</option>');
+      $.each(itemStats, function(key, data) {
+        if (data.type === 2 && (selectedSockets.indexOf(key) === -1 || key === socketValue)) { selectObj.append(`<option data-color="${data.color}" value="${key}">${data.name}</option>`); }
+      });
+      selectObj.val(socketValue);
+    });
+  }
 
-  function updateStatGroup(action) {
+  let statCount = 0;
+  let socketCount = 0;
+
+  function updateStatGroup(type, action) {
     if (action == 'add') {
-      if (statCount < 11) {
+      if (type == 'stat' && statCount <= 10) {
         const statHtml = `
           <div class="group select" id="stat-group-${statCount}">
             <input type="number" class="stat-amount" data-calc="" id="stat-amount-${statCount}" value="0" />
@@ -536,10 +592,38 @@ $(document).ready(function() {
         updateStatDropdowns();
         statCount++;
       }
+      if (type == 'socket' && socketCount <= 3) {
+        const statHtml = `
+          <div class="group select socket" id="stat-group-${statCount}">
+            <input type="number" class="stat-amount" data-calc="" id="stat-amount-${statCount}" value="1" disabled />
+            ${createSocketDropdown(socketCount)}
+            <div class="delete"></div>
+          </div>`;
+        $('#stats').append(statHtml);
+        updateSocketDropdowns();
+        socketCount++;
+      }
     }
-    else if (action == 'delete') { statCount--; }
-    if (statCount == 10) { $("#add-stat").hide(); }
+    else if (type == 'stat' && action == 'delete') { statCount--; }
+    else if (type == 'socket' && action == 'delete') { socketCount--; }
+    if (statCount >= 10) { $("#add-stat").hide(); }
     else { $("#add-stat").show(); }
+    if (socketCount >= 3) { $("#add-socket").hide(); }
+    else { $("#add-socket").show(); }
+    sortStats();
+  }
+  
+  function sortStats() {
+    const statsObj = $('#stats');
+    const stats = statsObj.children().detach();
+    const sortedStats = stats.sort(function(a, b) {
+      const isSocketA = $(a).hasClass('socket');
+      const isSocketB = $(b).hasClass('socket');
+      if (isSocketA && !isSocketB) { return -1; }
+      else if (!isSocketA && isSocketB) { return 1; }
+      else { return 0; }
+    });
+    statsObj.append(sortedStats);
   }
 
   function subClassVisible(subClass, classList) {
@@ -554,7 +638,7 @@ $(document).ready(function() {
     return subClassName ? `<div class="item-subclass">${subClassName}</div>` : subClassName;
   }
   
-  function createTooltipHTML(itemQuality, itemName, itemLevel, itemReqLevel, bindHTML, uniqueHTML, slotHTML, typeHTML, weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, greenStatsHTML, itemFlavorHTML) {
+  function createTooltipHTML(itemQuality, itemName, itemLevel, durabilityHTML, itemReqLevel, sellPriceHTML, bindHTML, uniqueHTML, slotHTML, typeHTML, weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, socketsHTML, greenStatsHTML, itemFlavorHTML) {
     return `
       <div class="item-name ${itemQuality}">${itemName}</div>
       <div class="item-level">Item Level ${itemLevel}</div>
@@ -565,9 +649,12 @@ $(document).ready(function() {
       ${itemArmor}
       ${blockValue}
       <div class="white stats">${whiteStatsHTML}</div>
+      <div class="sockets">${socketsHTML}</div>
+      ${durabilityHTML}
       <div class="item-reqlvl">Requires Level ${itemReqLevel}</div>
       <div class="green stats">${greenStatsHTML}</div>
       ${itemFlavorHTML}
+      ${sellPriceHTML}
     `;
   }
 
@@ -682,6 +769,7 @@ $(document).ready(function() {
     let itemLevel = $('#item-level').val() || null;
     let itemDescription = $('#item-description').val() || null;
     let statValue = null;
+    const itemClass = $('#item-slot option:selected').data('class');
     const itemBind = $('input[name="itemBind"]:checked').val() || null;
     const itemUnique = $('input[name="itemUnique"]:checked').val() || null;
     const itemQuality = $('input[name="itemQuality"]:checked').data('quality') || null;
@@ -690,10 +778,10 @@ $(document).ready(function() {
     const qualityCoefficient = qualityCoefficients[itemQuality]?.calculate || (() => 0);
 
     if (calcMethod === 'level') { // level calc
-      itemLevel = calculateLevel(itemSlot, itemQuality, qualityCoefficient);
+      itemLevel = calculateLevel(itemClass, itemSlot, itemQuality, qualityCoefficient);
     }
     else if (calcMethod === 'stats') { // stat calc
-      const statValues = calculateStats(itemLevel, itemSlot, itemQuality, qualityCoefficient);
+      const statValues = calculateStats(itemClass, itemLevel, itemSlot, itemQuality, qualityCoefficient);
       $('#stats .group').each(function() {
         let statType = $(this).find('.stat-type').val();
         if (statValues[statType]) {
@@ -708,17 +796,22 @@ $(document).ready(function() {
     let bindHTML = '';
     let uniqueHTML = '';
     let whiteStatsHTML = '';
+    let socketsHTML = '';
     let greenStatsHTML = '';
     let itemArmor = '';
     let blockValue = '';
     let bonusArmor = 0;
     let weaponDamageHTML = '';
+    let durabilityHTML = '';
+    let sellPriceHTML = '';
     let itemFlavorHTML = itemDescription ? `<div class="flavor">"${itemDescription}"</div>` : '';
 
     $('#stats .group').each(function() {
-      let statTypeText = $(this).find('.stat-type option:selected').text();
-      let statTypeKey = $(this).find('.stat-type option:selected').val();
-      let statAmount = calcMethod == 'level' ? $(this).find('.stat-amount').val() : $(this).find('.stat-amount').data('calc');
+      const statTypeObj = $(this).find('.stat-type option:selected');
+      const statValueObj = $(this).find('.stat-amount');
+      let statTypeText = statTypeObj.text();
+      let statTypeKey = statTypeObj.val();
+      let statAmount = calcMethod == 'level' ? statValueObj.val() : statValueObj.data('calc');
       if (statTypeKey && statAmount > 0) {
         let stat = itemStats[statTypeKey];
         if (stat.type === 0) {
@@ -728,11 +821,12 @@ $(document).ready(function() {
           let customPhrase = statPhrasing(statTypeKey, statAmount);
           greenStatsHTML += `<div class="stat green">Equip: ${customPhrase}</div>`;
         }
+        else if (stat.type === 2) {
+          const socketColor = statTypeObj.data('color');
+          socketsHTML += `<div class="socket"><img src="item-display/socket/${socketColor}.png" />${socketColor} Socket</div>`;
+        }
         else if (stat.type === 3) {
           bonusArmor = $(this).find('.stat-amount').val();
-        }
-        else if (stat.type === 2) {
-           //gem logic
         }
       }
     });
@@ -748,9 +842,8 @@ $(document).ready(function() {
     let slotName = $('#item-slot option:selected').text();
     let itemName = $("#item-name").val() || `${qualityName} ${slotName}`;
     
-    let itemReqLevel = $("#item-reqlvl").val() || 0;
+    let itemReqLevel = $("#item-reqlvl").val() || 80;
 
-    let itemClass = $('#item-slot option:selected').data('class');
     let itemType = $('#item-subclass option:selected').text();
     let itemTypeKey = $('#item-subclass option:selected').val();
 
@@ -758,7 +851,8 @@ $(document).ready(function() {
       const damageMin = parseFloat($("#damageMin").val());
       const damageMax = parseFloat($("#damageMax").val());
       const attackSpeed = parseFloat($("#attackSpeed").val());
-      weaponDamageHTML = calculateDamage(damageMin, damageMax, attackSpeed, getBonusDamage());
+      let delay = attackSpeed >= 5 ? 5 : attackSpeed <= 1 ? 1 : attackSpeed;
+      weaponDamageHTML = calculateDamage(damageMin, damageMax, delay, getBonusDamage());
       // calculate dps reduction
       // add feral attack power or spell power
     }
@@ -768,18 +862,39 @@ $(document).ready(function() {
       if(itemSlot == 14) {
         blockValue = calculateShieldBlock(itemLevel, itemQuality);
       }
+      if(socketsHTML) {
+        const socketBonus = '+8 Strength';
+        socketsHTML = `
+          <div id="sockets">
+            ${socketsHTML}
+            <div class="socket">Socket Bonus: ${socketBonus}</div>
+          </div>
+        `;
+      }
     }
     
-    // durability
+    const durabilityCalc = 145;
+    durabilityHTML = `<div>Durability ${durabilityCalc} / ${durabilityCalc}</div>`;
+    
+    const [gold, silver, copper] = [19, 96, 36];
+    sellPriceHTML = `
+    <div id="sellprice">
+      <div>Sell Price:</div>
+      ${gold >= 0 ? '<div class="gold">'+gold+'</div>' : ''}
+      ${silver >= 0 ? '<div class="silver">'+silver+'</div> ' : ''}
+      ${copper >= 0 ? '<div class="copper">'+copper+'</div> ' : ''}
+    </div>
+    `;
 
-    let tooltipHtml = createTooltipHTML(qualityName, itemName, itemLevel, itemReqLevel, bindHTML, uniqueHTML, slotName, subClassHTML(), weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, greenStatsHTML, itemFlavorHTML);
+    let tooltipHtml = createTooltipHTML(qualityName, itemName, itemLevel, durabilityHTML, itemReqLevel, sellPriceHTML, bindHTML, uniqueHTML, slotName, subClassHTML(), weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, socketsHTML, greenStatsHTML, itemFlavorHTML);
     $('#output .tooltip').html(tooltipHtml);
   }
 
   // ui/ux
 
   $(document).on('click', '#stats .group .delete', function() {
-    updateStatGroup('delete');
+    if($(this).parent().hasClass('socket')) { updateStatGroup('socket','delete'); }
+    else { updateStatGroup('stat', 'delete'); }
     $(this).parent(".group").remove();
   });
 
@@ -823,7 +938,7 @@ $(document).ready(function() {
     let maxDamage = parseFloat(maxDamageObj.val());
     let minDamageObj = $("#damageMin");
     let minDamage = parseFloat(minDamageObj.val());
-    if(maxDamage < minDamage && maxDamage >= 0) { maxDamageObj.val(minDamage); }
+    //if(maxDamage < minDamage && maxDamage >= 0) { maxDamageObj.val(minDamage); }
   });
 
   $("#damageMax1, #damageMin1").on('change input', function() {
@@ -877,8 +992,10 @@ $(document).ready(function() {
     if(sum > 100) { $('.stat-amount').addClass('error'); }
   });
   $('#item-level').on('change input', function() { if ($(this).val() <= 0) { $(this).val(''); } });
-  $('#add-stat').click(function() { updateStatGroup('add'); });
-  $('#stats').on('change', '.stat-type', updateStatDropdowns);
+  $('#add-stat').click(function() { updateStatGroup('stat', 'add'); });
+  $('#add-socket').click(function() { updateStatGroup('socket', 'add'); });
+  $('#stats').on('change', '.stat-type.stat', updateStatDropdowns);
+  $('#stats').on('change', '.stat-type.socket', updateSocketDropdowns);
   $('input[name="itemQuality"]').click(function() {
     $("#item-name").removeClass("uncommon rare epic legendary artifact");
     $("#item-name").addClass($(this).val());
@@ -925,7 +1042,8 @@ $(document).ready(function() {
     }
     const itemSlot = $(this).find('option:selected').val();
     const itemClass = $(this).find('option:selected').data('class');
-    if (itemSlot) { populateSubClass(inventoryType[itemSlot].subClass, itemClass); }
+    const array = itemClass == '4' ? armorType : weaponType;
+    if (itemSlot) { populateSubClass(array[itemSlot].subClass, itemClass); }
     $(".itemType").show();
     $(".weaponMethod").hide();
     if(itemSlot == 26 || itemSlot == 25 || itemSlot == 15) {
