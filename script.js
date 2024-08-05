@@ -850,7 +850,7 @@ $(document).ready(function() {
     let itemName = $("#item-name").val() || `${qualityName} ${slotName}`;
     
     let requiredLevel = parseFloat($('#item-reqlvl').val());
-    requiredLevel = requiredLevel === 0 ? '' : requiredLevel > 0 ? requiredLevel : itemLevel >= 200 ? 80 : itemLevel - 5 > 0 ? itemLevel - 5 : 1;
+    requiredLevel = requiredLevel === 0 ? '' : requiredLevel > 80 ? 80 : requiredLevel < 1 ? 1 : itemLevel - 5 > 0 ? itemLevel - 5 : 1;
     let requiredLevelHTML = requiredLevel >= 1 ? `<div>Requires Level ${requiredLevel}</div>` : '';
 
     let itemType = $('#item-subclass option:selected').text();
