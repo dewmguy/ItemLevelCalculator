@@ -21,15 +21,14 @@ A prime example of these outliers is the [Shining Buckle Gauntlets](https://www.
 
 #### Terms and Definitions
 
-- **Stat**: A property of points on an item (e.g., Stamina, Strength, etc.)
-- **StatMod**: The weight coefficient or "cost" of a Stat. (e.g. Stamina is often less expensive as it has a lower weight coefficient in certain item level tiers.)
-- **Exponent**: $\frac{\log(2)}{\log(1.5)}$ Applied to inflate the total expense of a stat. This makes a lone stat of higher quantity more expensive than multiple lower quantity stats while maintaining a relatively similar overall expense. (e.g. at item level 172, 100 strength ≈ 53 strength + 53 agility + 53 crit)
-- **StatValue**: An inflated expense of the Stat on an item.
+- **StatMod**: The weight coefficient or "cost" of a given Stat. Stamina is often less expensive than strength.
+- **Exponent**: $log(2)/log(1.5) ≈ 1.7095$ is applied to inflate the expense of a stat into a StatValue. This makes a lone stat of higher quantity more expensive than multiple lower quantity stats while maintaining a relatively similar overall expense. (e.g. at item level 172, 100 strength ≈ 53 strength + 53 agility + 53 crit)
+- **StatValue**: The inflated expense of the Stat on an item.
 - **StatBudget**: The sum of all of the StatValues on an item.
 - **SlotMod**: The weight coefficient of an item based on its slot. A chest will have a lower item level than gloves with the same stats.
-- **ItemBudget**: The weighted total stat budget of an item of a specific slot.
-- **QualityMod**: A weight coefficient of an item based on its quality. An epic shield will have a lower item level than an uncommon shield with the same stats.
-- **ItemLevel**: Effective level of an item.
+- **ItemBudget**: The StatBudget of an item multiplied by the SlotMod coefficient of the item's slot type.
+- **QualityMod**: The weight coefficient of an item based on its quality. An epic shield will have a lower item level than an uncommon shield with the same stats.
+- **ItemLevel**: The effective level of an item.
 
 ### Calculation Process - If you don't know the item level
 
@@ -47,7 +46,7 @@ $$
 
 #### QualityMod Calculation
 
-The quality mod is calculated by multiplying a given item level by a coefficient, the product of which is added to a base integer.
+The QualityMod is calculated by multiplying a given item level by a predetermined coefficient, the product of which is added to a base integer.
 
 $$
 QualityMod(i) = qualityMult \times i_{ItemLevel} + qualityBase
@@ -55,7 +54,7 @@ $$
 
 #### ItemLevel Calculation
 
-The QualityMod is multiplied by the SlotMod and the product is raised to the power of the exponent. This is performed in a loop with $i$ increasing by the value of 1 each iteration until the product meets or exceeds the value of the ItemBudget. The item level is the number of iterations required to meet the criteria.
+The QualityMod is multiplied by the SlotMod and the product is raised to the exponent power. This is performed in a loop with $i$ increasing by the value of 1 each iteration until the product meets or exceeds the value of the ItemBudget. The item level is the number of iterations required to meet the criteria.
 
 $$
 (\text{QualityMod}(i) \times \text{SlotMod})^{\frac{\log(2)}{\log(1.5)}} \geq \text{ItemBudget}
