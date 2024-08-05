@@ -426,11 +426,10 @@ $(document).ready(function() {
 
       const effectiveSlotMod = slotModFunction ? slotMod(quality, i) : slotMod;
       const itemBudget = totalStatBudget * effectiveSlotMod;
-      const lookahead = i + 1;
-      const statBudgetIncrement = Math.pow(qualityMod(lookahead) * effectiveSlotMod, exponent);
+      const statBudgetIncrement = Math.pow(qualityMod(i+1) * effectiveSlotMod, exponent);
 
       if (statBudgetIncrement >= itemBudget) {
-        consoleLog.push(`qualityMod: ${qualityMod(i)}, statBudget: ${totalStatBudget}, slotMod: ${effectiveSlotMod}, itemBudget: ${itemBudget}, itemLevel: ${i}`);
+        consoleLog.push(`qualityMod: ${qualityMod(i+1)}, statBudget: ${totalStatBudget}, slotMod: ${effectiveSlotMod}, itemBudget: ${itemBudget}, itemLevel: ${i}`);
         itemLevel = i;
         break;
       }
@@ -463,6 +462,8 @@ $(document).ready(function() {
 
       statBudget = itemBudget * statPercent;
       const statValue = Math.pow(statBudget / effectiveStatMod, exponentInverse);
+      
+      // perform a loop starting from 1 that multiplies 
       
       statValues[statType] = Math.ceil(statValue);
       console.log(`statType: ${statName}(${statType}), statValue: ${statValue}, statMod: ${effectiveStatMod}, statBudget: ${statBudget}`);

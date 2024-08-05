@@ -1,5 +1,8 @@
 # ItemLevelCalculator [🔗](https://dewmguy.github.io/ItemLevelCalculator/)
 
+![Screenshot](screenshot.png?raw=true "Screenshot of Item Calculator Interface")
+[Item in the screenshot - Vest of Jotunheim](https://www.wowhead.com/wotlk/item=43912/vest-of-jotunheim)
+
 This web application is currently in development. The Item Level Calculator is designed to assist in the creation, modification, and validation of item-level balanced armor and weapons for World of Warcraft emulators, with support for Vanilla, The Burning Crusade, and Wrath of the Lich King. It is most effective for validating or creating items within the intended item level range of blizzlike items. Items with levels extending beyond the existing in-game ranges may yield undesirable or unpredictable results.
 
 In researching this concept, I discovered numerous values and coefficients scattered throughout the community, each employing different mathematical approaches. While many in the community describe these calculations as "good enough," I found them often constrained by linear functions, lacking the dynamic scaling needed to accommodate variations introduced by Blizzard throughout the expansions. Many stats vary based on Inventory Type, Quality, and Item Level. 
@@ -14,27 +17,24 @@ For instance, consider item level 277 gear dropped in Icecrown Citadel (ICC). Th
 
 A prime example of these outliers is the [Shining Buckle Gauntlets](https://www.wowhead.com/wotlk/item=39183/shining-buckle-gauntlets) and the [Discoverer's Mitts](https://www.wowhead.com/wotlk/item=39013/discoverers-mitts). Both are item level 154 leather items with identical stats despite differing qualities, an impossibility under standard calculations. I wonder which one of them is true to its item level.
 
-![Screenshot](screenshot.png?raw=true "Screenshot of Item Calculator Interface")
-[Item in the screenshot - Vest of Jotunheim](https://www.wowhead.com/wotlk/item=43912/vest-of-jotunheim)
-
-### Fundamentals of Item Level Calculation
+## Fundamentals of Item Level Calculation
 
 #### Terms and Definitions
 
-- **Stat**: Properties of an item, e.g., Stamina, Strength.
-- **StatMod**: Weight coefficient of a Stat.
-- **Exponent**: The component of the formula used to help give more weight to items with fewer stats. [log(2)/log(1.5)]
-- **StatValue**: Imaginary value of the Stat on an item, calculated as $Stat \times StatMod$ raised to the exponent.
-- **StatBudget**: Sum of all StatValues, raised to the exponent.
-- **SlotMod**: Weight coefficient of an equipment slot.
-- **ItemBudget**: Total StatBudget multiplied by SlotMod.
-- **QualityMod**: Weight coefficient of item quality.
-- **ItemLevel**: Effective level of an item, calculated through an iterative process based on ItemBudget and QualityMod.
+- **Stat**: A property of points on an item (e.g., Stamina, Strength, etc.)
+- **StatMod**: The weight coefficient or "cost" of a Stat. (e.g. Stamina is often less expensive as it has a lower weight coefficient in certain item level tiers.)
+- **Exponent**: $\frac{\log(2)}{\log(1.5)}$ Applied to inflate the total expense of a stat. This makes a lone stat of higher quantity more expensive than multiple lower quantity stats while maintaining a relatively similar overall expense. (e.g. at item level 172, 100 strength ≈ 53 strength + 53 agility + 53 crit)
+- **StatValue**: An inflated expense of the Stat on an item.
+- **StatBudget**: The sum of all of the StatValues on an item.
+- **SlotMod**: The weight coefficient of an item based on its slot. A chest will have a lower item level than gloves with the same stats.
+- **ItemBudget**: The weighted total stat budget of an item of a specific slot.
+- **QualityMod**: A weight coefficient of an item based on its quality. An epic shield will have a lower item level than an uncommon shield with the same stats.
+- **ItemLevel**: Effective level of an item.
 
 #### StatBudget Formula
 
 $$
-StatBudget = \left( (StatValue_{1} \times StatMod_{1})^{exp} + (StatValue_{2} \times StatMod_{2})^{exp} + \ldots \right)
+StatBudget = \left( (StatValue_{1} \times StatMod_{1})^{\frac{\log(2)}{\log(1.5)}} + (StatValue_{2} \times StatMod_{2})^{\frac{\log(2)}{\log(1.5)}} + \ldots \right)
 $$
 
 #### ItemBudget Calculation
@@ -45,23 +45,21 @@ $$
 
 #### QualityMod Calculation
 
+The quality mod is calculated by multiplying a given item level by a coefficient, the product of which is added to a base integer.
+
 $$
-QualityMod = qualityMult \times ItemLevel - qualityBase
+QualityMod = qualityMult \times ItemLevel(i) + qualityBase
 $$
 
 #### ItemLevel Calculation
 
-The item level is the value of the number of iterations in a loop that calculates the QualityMod then multiplies it by the SlotMod raised to the power of the exponent.
+QualityMod is multiplied by the SlotMod raised to the power of the exponent in a loop with i increasing by the value of 1 each iteration. This is performed until the product meets or exceeds the value of the ItemBudget. The item level is the number of iterations required to meet the criteria.
 
 $$
-(\text{QualityMod}(i) \times \text{SlotMod})^{exp} \geq \text{ItemBudget} \implies \text{ItemLevel} = itemLevel(i)
+(\text{QualityMod}(i) \times \text{SlotMod})^{\frac{\log(2)}{\log(1.5)}} \geq \text{ItemBudget}
 $$
 
 ## Stat & Slot Coefficients
-
-Rare items in TBC were blanketed with item level values that blizz thought would make itemization easier for players moving out of the item level scheme of vanilla, probably to reinforce players to believe lower number worse. The reality is that this itemization scheme in no way reflects the actual item level of an item in this group. For instance, items at item level 115 of any given InventoryType/subclass pair will range from 115 to approximately 85 -- potentially overlapping with the higher item level items of vanilla. The item calculation validates that the ceiling for these items are indeed capped at 115, and seldom go over. A couple of them are over-tuned but the majority are under-tuned. For the purposes of the calculator, this item level scheme will not be honored. If you're validating an item that says it's 115 on wowhead/wotlkdb you will have drastically varied results, it is not the calculator who is wrong. Generating a 115 item will have the stats expected. Lower level rares are even more sporadic as they conform even less to bounds of the item level group, often including over-tuned items. For example, the most powerful item level 85 rare has a true item level of approximately 106 (24021).
-
-Rare items in WotLK are similarly designed, blanket coated with item levels like 200 and 187, while the actual stats and actual item values vary greatly. As for item level 200 or 277 items, the item level represents a floor rather than a ceiling, masking item levels with significantly higher true levels.
 
 ### Item Quality Modifiers
 
