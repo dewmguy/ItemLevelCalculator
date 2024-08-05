@@ -78,7 +78,9 @@ This coefficient controls the ceiling for stats on an item based on its quality.
 
 ### Item Slot Modifiers (Armor)
 
-This coefficient (SlotMod) controls the ceiling for stats on an item based on the slot. (Headers: 2=Uncommon, 3=Rare, 4=Epic) (?=uncertain, f=finalized value)
+This coefficient (SlotMod) controls the ceiling for stats on an item based on the slot. (Note: 2=Uncommon, 3=Rare, 4=Epic, ?=uncertain value, f=finalized value)
+
+The values in this table are found to be static and do not change within any item level range.
 
 | InventoryType | Item Name     | defaults |
 |---------------|---------------|----------|
@@ -92,6 +94,8 @@ This coefficient (SlotMod) controls the ceiling for stats on an item based on th
 |            20 | Chest (Robe)  |    16/16 |
 |            23 | Held Off-hand |     3/16 |
 |            28 | Relic         |     1/16 |
+
+The values in this table are found to be dynamic and frequently very between item level ranges.
 
 | InventoryType | Item Name     | [2]   1+ | [2] 80+ | [2] 130+ | [3]   1+ | [3]    80+ | [3]    136+ | [4]   1+ | [4]    90+ | [4]    200+ |
 |---------------|---------------|----------|---------|----------|----------|------------|-------------|----------|------------|-------------|
@@ -120,7 +124,9 @@ This coefficient (SlotMod) controls the ceiling for stats on an item based on th
 
 ### Item Stat Modifiers
 
-This coefficient (StatMod) controls the ceiling for stats on an item based on the stat type. (Headers: 2=Uncommon, 3=Rare, 4=Epic) (?=uncertain, f=finalized value)
+This coefficient (StatMod) controls the ceiling for stats on an item based on the stat type. (Note: 2=Uncommon, 3=Rare, 4=Epic, ?=uncertain value, f=finalized value)
+
+The values in this table are found to be static and do not change within any item level range.
 
 | stat_type | Stat Name          | InventoryType | defaults |
 |-----------|--------------------|---------------|----------|
@@ -145,6 +151,7 @@ This coefficient (StatMod) controls the ceiling for stats on an item based on th
 |        44 | Armor Penetration  |           all |    16/16 |
 |        47 | Spell Penetration  |           all |    16/16 |
 
+The values in this table are found to be dynamic and frequently very between item level ranges.
 
 | stat_type | Stat Name          | InventoryType | [2]   1+ | [2]  80+ | [2] 130+ | [3]   1+ | [3]  80+ | [3] 136+ | [4]   1+ | [4]  90+ | [4] 200+ |
 |-----------|--------------------|---------------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
@@ -157,19 +164,23 @@ This coefficient (StatMod) controls the ceiling for stats on an item based on th
 |        48 | Block Value        |     2, 11, 14 |  16/16 f |  21/64 ? |  21/64 ? |      ... |      ... |      ... |      ... |      ... |      ... |
 |        48 | Block Value        |          else |  16/16 f |  21/64 f |  21/64 ? |      ... |      ... |      ... |     8/16 |     4/16 |     4/16 |
 
-| stat_type  | Unvalidated Stats  |
-|------------|--------------------|
-| Swim Speed |               9/16 |
-| +x Stealth |                8/1 |
-| +x Gather  |               8/16 |
+### Special Skill Modifiers
+
+The values in this table are not in use, and are not currently planned to be used, but these are somewhat accurate values based on minimal testing.
+
+| stat_type  | Unvalidated Stats |
+|------------|-------------------|
+| Swim Speed |              9/16 |
+| +x Stealth |               8/1 |
+| +x Gather  |              8/16 |
 
 ## Base Armor Calculation
 
-Base Armor is calculated by item level and Bonus Armor is applied to an item as an additional stat like stamina. I expect that the base armor of an item actually consumes an amount of the item's overall stat budget in whatever formula blizzard invented. I believe this is true due to how bonus armor affects an items level. This can be a thought experiment for another time (or person).
+Base Armor is calculated by item level and Bonus Armor is applied to an item as an additional stat. I hypothesize that the base armor of an item actually consumes an amount of the item's overall stat budget in whatever formula blizzard invented. I believe this is true due to how bonus armor affects an items level. This can be a thought experiment for another time (or person).
 
 ### Base Armor Modifiers
 
-These values are derived by dividing the armor value each type of armor of equivalent item level by that of the chest piece. The chest piece is assumed to have 100% of the armor assigned by its item level. The cloak armor value is derived by dividing against a cloth chestpiece of equivalent item level. Non-armor types are assumed or borrowed from other documentation.
+These values are derived by dividing the armor value each type of armor of equivalent item level by that of the chest piece. The chest piece is assumed to have 100% of the armor assigned by its item level. The cloak armor value is derived by dividing against a cloth chestpiece of equivalent item level.
 
 | Item Name    | InventoryType | armorMod |
 |--------------|---------------|----------|
@@ -230,7 +241,7 @@ The legendary curve is a copy of the Epic curve with a greater y intercept, set 
 
 ## Shield Block Value Calculation
 
-Each segment of calculation between vanilla, tbc, and wotlk is drastically different. Getting blizzlike results required the use of multiple expressions that are limited by item level ranges.
+Each segment of calculation between vanilla, tbc, and wotlk is drastically different. Getting blizzlike results required the use of multiple expressions split by item level ranges.
 
 | Quality | Item Level Range | Formula | Link |
 |---------|------------------|---------|------|
@@ -342,12 +353,10 @@ Feral Attack Power = Sacrificed DPS * 18.37 - 12.4843
 
 ## Sell Value Calculation
 
-[graph](https://dewmguy.github.io/PolynomialVisualizer/?a=102.66884&b=209.4352&c=2.74653&d=-0.0070181058230607656&min-x=0&max-x=400&min-y=0&max-y=400000&order=3&graph-title=Uncommon+Gold+Cost&csvPoints=W3sieCI6MCwieSI6MH0seyJ4IjoxLCJ5IjoxfSx7IngiOjY1LCJ5IjoxNzU3NH0seyJ4Ijo2MywieSI6Mjg4ODd9LHsieCI6NjIsInkiOjI5MTU2fSx7IngiOjYwLCJ5IjoyODM1N30seyJ4Ijo2MCwieSI6MTY4MjR9LHsieCI6NTksInkiOjI4MzU4fSx7IngiOjU4LCJ5IjoyNjQzOX0seyJ4Ijo1NywieSI6MjM4OTd9LHsieCI6NTcsInkiOjI1OTE4fSx7IngiOjU0LCJ5IjoyMDA3NX0seyJ4Ijo1MSwieSI6MTc5NDB9LHsieCI6NTAsInkiOjE2MTcwfSx7IngiOjQ4LCJ5IjoxNDMzN30seyJ4Ijo0NywieSI6MTM0MTZ9LHsieCI6NDYsInkiOjEyMzMwfSx7IngiOjQzLCJ5Ijo5MjU4fSx7IngiOjQyLCJ5Ijo5MDk2fSx7IngiOjEyMCwieSI6MzQ4OTh9LHsieCI6MTE0LCJ5Ijo0ODU4N30seyJ4IjoxMTEsInkiOjUxMDk4fSx7IngiOjEwOCwieSI6NDg5NjB9LHsieCI6MTA4LCJ5Ijo0OTE0MH0seyJ4IjoxMDgsInkiOjQ3ODc0fSx7IngiOjEwOCwieSI6NDg5MzZ9LHsieCI6MTA1LCJ5Ijo0NjI4MX0seyJ4IjoxMDIsInkiOjQ3NDc1fSx7IngiOjk5LCJ5Ijo0NjQ0MH0seyJ4Ijo5MywieSI6NDM1NzZ9LHsieCI6ODcsInkiOjQwMTg4fSx7IngiOjgxLCJ5IjozNzYxNH0seyJ4Ijo4MSwieSI6MzYwOTR9LHsieCI6ODEsInkiOjM0ODk4fSx7IngiOjE3NCwieSI6NzU1Njh9LHsieCI6MTc0LCJ5Ijo3NTI4OX0seyJ4IjoxNzQsInkiOjc2ODg1fSx7IngiOjE3NCwieSI6Nzg2MDh9LHsieCI6MTc0LCJ5Ijo3MTY0MH0seyJ4IjoxNzQsInkiOjc1ODE2fSx7IngiOjE3MCwieSI6NzQ5OTJ9LHsieCI6MTYyLCJ5Ijo3MTE2Nn0seyJ4IjoxNjIsInkiOjY3NTA3fSx7IngiOjE2MiwieSI6NjgwMjd9LHsieCI6MTU4LCJ5Ijo2NTk1OH0seyJ4IjoxNTgsInkiOjY3MjE2fSx7IngiOjE1NCwieSI6NjcxMjd9LHsieCI6MTU0LCJ5Ijo2NjM4OX0seyJ4IjoxNTQsInkiOjY4NjA0fSx7IngiOjE1MCwieSI6NjMwNjh9LHsieCI6MTQ2LCJ5Ijo2NTUxOX0seyJ4IjoxNDYsInkiOjYxMjUxfSx7IngiOjE0NiwieSI6NjMzOTh9LHsieCI6MTQ2LCJ5Ijo2NjcwMX0seyJ4IjoxNDYsInkiOjY2NDU4fSx7IngiOjE0MiwieSI6NjUwMTR9LHsieCI6MTM4LCJ5Ijo1Nzg0NH0seyJ4IjoxMzgsInkiOjYwNjAzfSx7IngiOjEzOCwieSI6NjEyNzZ9LHsieCI6MTM4LCJ5Ijo2MzMyMH0seyJ4IjoxMzgsInkiOjU3Njk4fSx7IngiOjEzOCwieSI6NjAzNzN9LHsieCI6MTM4LCJ5Ijo2MTk2Mn0seyJ4IjoxMzgsInkiOjYwMTYxfSx7IngiOjEzOCwieSI6NjAzODV9XQ%3D%3D)
-Uncommon Plate: `y = 102 + 209x + 2.74x^2 - 0.006x^3` 
-Uncommon Mail: `y = 102 + 175x + 2.74x^2 - 0.006x^3`
-Uncommon Leather: `y = 102 + 146x + 2.74x^2 - 0.006x^3`
-Uncommon Cloth: `y = 102 + 119x + 2.74x^2 - 0.006x^3`
-
+| Quality | Plate | Mail | Leather | Cloth | Graph |
+|---------|-------|------|---------|-------|-------|
+| 2 | `y = 102 + 209x + 2.74x^2 - 0.006x^3` | `y = 102 + 175x + 2.74x^2 - 0.006x^3` | `y = 102 + 146x + 2.74x^2 - 0.006x^3` | `y = 102 + 119x + 2.74x^2 - 0.006x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=102.66884&b=209.4352&c=2.74653&d=-0.0070181058230607656&min-x=0&max-x=400&min-y=0&max-y=400000&order=3&graph-title=Uncommon+Gold+Cost&csvPoints=W3sieCI6MCwieSI6MH0seyJ4IjoxLCJ5IjoxfSx7IngiOjY1LCJ5IjoxNzU3NH0seyJ4Ijo2MywieSI6Mjg4ODd9LHsieCI6NjIsInkiOjI5MTU2fSx7IngiOjYwLCJ5IjoyODM1N30seyJ4Ijo2MCwieSI6MTY4MjR9LHsieCI6NTksInkiOjI4MzU4fSx7IngiOjU4LCJ5IjoyNjQzOX0seyJ4Ijo1NywieSI6MjM4OTd9LHsieCI6NTcsInkiOjI1OTE4fSx7IngiOjU0LCJ5IjoyMDA3NX0seyJ4Ijo1MSwieSI6MTc5NDB9LHsieCI6NTAsInkiOjE2MTcwfSx7IngiOjQ4LCJ5IjoxNDMzN30seyJ4Ijo0NywieSI6MTM0MTZ9LHsieCI6NDYsInkiOjEyMzMwfSx7IngiOjQzLCJ5Ijo5MjU4fSx7IngiOjQyLCJ5Ijo5MDk2fSx7IngiOjEyMCwieSI6MzQ4OTh9LHsieCI6MTE0LCJ5Ijo0ODU4N30seyJ4IjoxMTEsInkiOjUxMDk4fSx7IngiOjEwOCwieSI6NDg5NjB9LHsieCI6MTA4LCJ5Ijo0OTE0MH0seyJ4IjoxMDgsInkiOjQ3ODc0fSx7IngiOjEwOCwieSI6NDg5MzZ9LHsieCI6MTA1LCJ5Ijo0NjI4MX0seyJ4IjoxMDIsInkiOjQ3NDc1fSx7IngiOjk5LCJ5Ijo0NjQ0MH0seyJ4Ijo5MywieSI6NDM1NzZ9LHsieCI6ODcsInkiOjQwMTg4fSx7IngiOjgxLCJ5IjozNzYxNH0seyJ4Ijo4MSwieSI6MzYwOTR9LHsieCI6ODEsInkiOjM0ODk4fSx7IngiOjE3NCwieSI6NzU1Njh9LHsieCI6MTc0LCJ5Ijo3NTI4OX0seyJ4IjoxNzQsInkiOjc2ODg1fSx7IngiOjE3NCwieSI6Nzg2MDh9LHsieCI6MTc0LCJ5Ijo3MTY0MH0seyJ4IjoxNzQsInkiOjc1ODE2fSx7IngiOjE3MCwieSI6NzQ5OTJ9LHsieCI6MTYyLCJ5Ijo3MTE2Nn0seyJ4IjoxNjIsInkiOjY3NTA3fSx7IngiOjE2MiwieSI6NjgwMjd9LHsieCI6MTU4LCJ5Ijo2NTk1OH0seyJ4IjoxNTgsInkiOjY3MjE2fSx7IngiOjE1NCwieSI6NjcxMjd9LHsieCI6MTU0LCJ5Ijo2NjM4OX0seyJ4IjoxNTQsInkiOjY4NjA0fSx7IngiOjE1MCwieSI6NjMwNjh9LHsieCI6MTQ2LCJ5Ijo2NTUxOX0seyJ4IjoxNDYsInkiOjYxMjUxfSx7IngiOjE0NiwieSI6NjMzOTh9LHsieCI6MTQ2LCJ5Ijo2NjcwMX0seyJ4IjoxNDYsInkiOjY2NDU4fSx7IngiOjE0MiwieSI6NjUwMTR9LHsieCI6MTM4LCJ5Ijo1Nzg0NH0seyJ4IjoxMzgsInkiOjYwNjAzfSx7IngiOjEzOCwieSI6NjEyNzZ9LHsieCI6MTM4LCJ5Ijo2MzMyMH0seyJ4IjoxMzgsInkiOjU3Njk4fSx7IngiOjEzOCwieSI6NjAzNzN9LHsieCI6MTM4LCJ5Ijo2MTk2Mn0seyJ4IjoxMzgsInkiOjYwMTYxfSx7IngiOjEzOCwieSI6NjAzODV9XQ%3D%3D) |
+ 
 multiply by the slotMod coefficient
 
 ---
