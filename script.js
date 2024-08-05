@@ -4,16 +4,11 @@ $(document).ready(function() {
   const exponentInverse = 1 / exponent;
 
   const dataFilter = (quality, lvl, data) => {
-    for (const set of data) {
-      if (quality === set.quality && set.min <= lvl) {
-        console.log(`dataFilter(${quality} === ${set.quality} && ${set.min} <= ${lvl}) => {${set.mod}}`);
-        return set.mod;
-      }
-    }
+    for (const set of data) { if (quality === set.quality && set.min <= lvl) { return set.mod; } }
     return null;
   };
 
-  const armorType = {
+  const armorClass = {
     "2": { name: "Neck", armorMod: 0, itemClass: 4, subClass: [0],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [
         { quality: 4, min: 200, mod: (3/16) },
@@ -130,7 +125,7 @@ $(document).ready(function() {
     "28": { name: "Relic", armorMod: 0, itemClass: 4, subClass: [7, 8, 9, 10], slotMod: (1/16) },
   };
   
-  const weaponType = {
+  const weaponClass = {
     "13": { name: "One-Hand", slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
     "21": { name: "Main-Hand", slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
     "22": { name: "Off-Hand", slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
@@ -273,7 +268,7 @@ $(document).ready(function() {
     "48": statAmount => `Increases the block value of your shield by ${statAmount}.`
   };
 
-  const armorTypes = {
+  const armorSubClass = {
     "0": { name: "Miscellaneous", tooltip: 0 },
     "1": { name: "Cloth", tooltip: 1 },
     "2": { name: "Leather", tooltip: 1 },
@@ -286,7 +281,7 @@ $(document).ready(function() {
     "10": { name: "Sigil", tooltip: 1 } // deathknight
   };
 
-  const weaponTypes = {
+  const weaponSubClass = {
     "0": { name: "Axe", tooltip: 1 },
     "1": { name: "Axe", tooltip: 1 },
     "2": { name: "Bow", tooltip: 0 },
@@ -305,7 +300,6 @@ $(document).ready(function() {
   };
 
   const weaponDamageTypes = {
-    //"0": { name: "Physical" },
     "1": { name: "Holy" },
     "2": { name: "Fire" },
     "3": { name: "Nature" },
@@ -315,35 +309,35 @@ $(document).ready(function() {
   };
   
   const armorData = {
-    "6": {
+    6: {
       Cloth: lvl => 2.5281010518232847 + 1.331747228269099 * lvl + 0.00944593034412355 * Math.pow(lvl, 2) - 0.00006849549050619422 * Math.pow(lvl, 3) + 1.2354987243172888e-7 * Math.pow(lvl, 4),
       Leather: lvl => 1.5555029361141006 + 3.0358551084632817 * lvl + 0.010441421831956765 * Math.pow(lvl, 2) - 0.00009593877599476476 * Math.pow(lvl, 3) + 1.8476622137336274e-7 * Math.pow(lvl, 4),
       Mail: lvl => -7.5320987581173 + 9.77641667353662 * lvl - 0.07509546031114869 * Math.pow(lvl, 2) + 0.0008277573203410827 * Math.pow(lvl, 3) - 0.000003968983245793348 * Math.pow(lvl, 4) + 6.374377745994348e-9 * Math.pow(lvl, 5),
       Plate: lvl => 5.102460977820272 + 9.509093276356396 * lvl + 0.07993511436723227 * Math.pow(lvl, 2) - 0.0005654807309686971 * Math.pow(lvl, 3) + 0.0000010185213184327804 * Math.pow(lvl, 4),
       Shield: lvl => -68.32056773225723 + 52.05238254766441 * lvl - 0.2633818416382036 * Math.pow(lvl, 2) + 0.0032416668345449868 * Math.pow(lvl, 3) - 0.000017286124455117578 * Math.pow(lvl, 4) + 2.9484202941863735e-8 * Math.pow(lvl, 5)
     },
-    "5": {
+    5: {
       Cloth: lvl => 2.5281010518232847 + 1.331747228269099 * lvl + 0.00944593034412355 * Math.pow(lvl, 2) - 0.00006849549050619422 * Math.pow(lvl, 3) + 1.2354987243172888e-7 * Math.pow(lvl, 4),
       Leather: lvl => 1.5555029361141006 + 3.0358551084632817 * lvl + 0.010441421831956765 * Math.pow(lvl, 2) - 0.00009593877599476476 * Math.pow(lvl, 3) + 1.8476622137336274e-7 * Math.pow(lvl, 4),
       Mail: lvl => -7.5320987581173 + 9.77641667353662 * lvl - 0.07509546031114869 * Math.pow(lvl, 2) + 0.0008277573203410827 * Math.pow(lvl, 3) - 0.000003968983245793348 * Math.pow(lvl, 4) + 6.374377745994348e-9 * Math.pow(lvl, 5),
       Plate: lvl => 5.102460977820272 + 9.509093276356396 * lvl + 0.07993511436723227 * Math.pow(lvl, 2) - 0.0005654807309686971 * Math.pow(lvl, 3) + 0.0000010185213184327804 * Math.pow(lvl, 4),
       Shield: lvl => -68.32056773225723 + 52.05238254766441 * lvl - 0.2633818416382036 * Math.pow(lvl, 2) + 0.0032416668345449868 * Math.pow(lvl, 3) - 0.000017286124455117578 * Math.pow(lvl, 4) + 2.9484202941863735e-8 * Math.pow(lvl, 5)
     },
-    "4": {
+    4: {
       Cloth: lvl => 2.5281010518232847 + 1.331747228269099 * lvl + 0.00944593034412355 * Math.pow(lvl, 2) - 0.00006849549050619422 * Math.pow(lvl, 3) + 1.2354987243172888e-7 * Math.pow(lvl, 4),
       Leather: lvl => 1.5555029361141006 + 3.0358551084632817 * lvl + 0.010441421831956765 * Math.pow(lvl, 2) - 0.00009593877599476476 * Math.pow(lvl, 3) + 1.8476622137336274e-7 * Math.pow(lvl, 4),
       Mail: lvl => -7.5320987581173 + 9.77641667353662 * lvl - 0.07509546031114869 * Math.pow(lvl, 2) + 0.0008277573203410827 * Math.pow(lvl, 3) - 0.000003968983245793348 * Math.pow(lvl, 4) + 6.374377745994348e-9 * Math.pow(lvl, 5),
       Plate: lvl => 5.102460977820272 + 9.509093276356396 * lvl + 0.07993511436723227 * Math.pow(lvl, 2) - 0.0005654807309686971 * Math.pow(lvl, 3) + 0.0000010185213184327804 * Math.pow(lvl, 4),
       Shield: lvl => -68.32056773225723 + 52.05238254766441 * lvl - 0.2633818416382036 * Math.pow(lvl, 2) + 0.0032416668345449868 * Math.pow(lvl, 3) - 0.000017286124455117578 * Math.pow(lvl, 4) + 2.9484202941863735e-8 * Math.pow(lvl, 5)
     },
-    "3": {
+    3: {
       Cloth: lvl => -1.3423883493277042 + 2.200587627369824 * lvl - 0.023452920240817212 * Math.pow(lvl, 2) + 0.0002057092987396633 * Math.pow(lvl, 3) - 5.346376377648381e-7 * Math.pow(lvl, 4),
       Leather: lvl => -4.3185941880426775 + 5.22367821032947 * lvl - 0.06638307153372526 * Math.pow(lvl, 2) + 0.0005313187225831865 * Math.pow(lvl, 3) - 0.0000013052892289727186 * Math.pow(lvl, 4),
       Mail: lvl => 31.445856660984333 + 8.055343208054605 * lvl - 0.08529020006193702 * Math.pow(lvl, 2) + 0.0007948792659050846 * Math.pow(lvl, 3) - 0.0000021078789263816906 * Math.pow(lvl, 4),
       Plate: lvl => -28.396604349521805 + 16.329061088393786 * lvl - 0.16567265946139803 * Math.pow(lvl, 2) + 0.0014420657876884682 * Math.pow(lvl, 3) - 0.000003730547431550686 * Math.pow(lvl, 4),
       Shield: lvl => -44.06927830732479 + 60.18645188729204 * lvl - 4.54601783641102 * Math.pow(lvl, 2) + 0.19213407170465685 * Math.pow(lvl, 3) - 0.003571960126176484 * Math.pow(lvl, 4) + 0.00003452904159703563 * Math.pow(lvl, 5) - 1.8099081604737638e-7 * Math.pow(lvl, 6) + 4.887914417526831e-10 * Math.pow(lvl, 7) - 5.340719565656609e-13 * Math.pow(lvl, 8)
     },
-    "2": {
+    2: {
       Cloth: lvl => 8.528248246851293 + 1.13588900743772 * lvl + 0.00018480865552209587 * Math.pow(lvl, 2),
       Leather: lvl => 39.0574346793 + 1.8042785077 * lvl + 0.0014831968 * Math.pow(lvl, 2),
       Mail: lvl => 74.58060541262037 + 3.93396431596397 * lvl + 0.004366253997171184 * Math.pow(lvl, 2),
@@ -353,27 +347,26 @@ $(document).ready(function() {
   };
 
   const shieldBlockCoefficients = {
-    uncommon: lvl => {
-      if (lvl >= 1 && lvl <= 80) return -3.0432462933 + 0.8825715740 * lvl - 0.0312968732 * Math.pow(lvl, 2) + 0.0007254284 * Math.pow(lvl, 3) - 0.0000046519 * Math.pow(lvl, 4);
-      if (lvl >= 80 && lvl <= 130) return -16.3908655872 + 0.6897096083 * lvl + 0.0013506088 * Math.pow(lvl, 2);
+    2: lvl => {
       if (lvl >= 130) return 958.2984725669 - 18.2166307096 * lvl + 0.1250629715 * Math.pow(lvl, 2) - 0.0002655468 * Math.pow(lvl, 3);
+      if (lvl >= 80) return -16.3908655872 + 0.6897096083 * lvl + 0.0013506088 * Math.pow(lvl, 2);
+      if (lvl >= 1) return -3.0432462933 + 0.8825715740 * lvl - 0.0312968732 * Math.pow(lvl, 2) + 0.0007254284 * Math.pow(lvl, 3) - 0.0000046519 * Math.pow(lvl, 4);
     },
-    rare: lvl => {
-      if (lvl >= 1 && lvl <= 70) return -3.5159255097 + 1.1796186496 * lvl - 0.0464979829 * Math.pow(lvl, 2) + 0.0011133817 * Math.pow(lvl, 3) - 0.0000079076 * Math.pow(lvl, 4);
-      if (lvl >= 71 && lvl <= 153) return -29.0000000000 + 1.0000000000 * lvl;
+    3: lvl => {
       if (lvl >= 154) return 18470.4850615834 - 421.5128438990 * lvl + 3.5991532696 * Math.pow(lvl, 2) - 0.0135272648 * Math.pow(lvl, 3) + 0.0000189300 * Math.pow(lvl, 4);
+      if (lvl >= 71) return -29.0000000000 + 1.0000000000 * lvl;
+      if (lvl >= 1) return -3.5159255097 + 1.1796186496 * lvl - 0.0464979829 * Math.pow(lvl, 2) + 0.0011133817 * Math.pow(lvl, 3) - 0.0000079076 * Math.pow(lvl, 4);
     },
-    epic: lvl => {
-      if (lvl >= 0 && lvl <= 189) return -36.7178644064 + 2.3738336805 * lvl - 0.0257785254 * Math.pow(lvl, 2) + 0.0002156921 * Math.pow(lvl, 3) - 0.0000005816 * Math.pow(lvl, 4);
-      if (lvl >= 190 && lvl <= 300) return 364.0853740290 - 1.7727768015 * lvl + 0.0050409241 * Math.pow(lvl, 2);
-    },
-    default: lvl => 54.5284833805 - 1.7511894287 * lvl + 0.0378136180 * Math.pow(lvl, 2) - 0.0001827142 * Math.pow(lvl, 3) + 0.0000002842 * Math.pow(lvl, 4)
+    4: lvl => {
+      if (lvl >= 190) return 364.0853740290 - 1.7727768015 * lvl + 0.0050409241 * Math.pow(lvl, 2);
+      if (lvl >= 1) return -36.7178644064 + 2.3738336805 * lvl - 0.0257785254 * Math.pow(lvl, 2) + 0.0002156921 * Math.pow(lvl, 3) - 0.0000005816 * Math.pow(lvl, 4);
+    }
   };
 
   const qualityCoefficients = {
     2: {
       name: 'uncommon',
-      calc: function(lvl) {
+      calc: lvl => {
         if (lvl >= 130) return qC(lvl,0.801,-38.3); // final
         if (lvl >= 80) return qC(lvl,0.505,-4.5); // final
         if (lvl >= 1) return qC(lvl,0.495,-2.85); // final
@@ -381,15 +374,15 @@ $(document).ready(function() {
     },
     3: {
       name: 'rare',
-      calc: function(lvl) {
+      calc: lvl => {
         if (lvl >= 136) return qC(lvl,0.86,-41);
         if (lvl >= 80) return qC(lvl,0.625,-1.15);
-        if (lvl >= 1) return qC(ivl,0.635,-3.6);
+        if (lvl >= 1) return qC(lvl,0.635,-3.6);
       }
     },
     4: {
       name: 'epic',
-      calc: function(lvl) {
+      calc: lvl => {
         if (lvl >= 200) return qC(lvl,1.8,-240);
         if (lvl >= 100) return qC(lvl,0.689,4);
         if (lvl >= 1) return qC(lvl,0.689,-1);
@@ -398,7 +391,6 @@ $(document).ready(function() {
   };
   
   function qC(lvl,mult,base) {
-    //console.log(`lvl: ${lvl}, mult: ${mult}, base: ${base} => ${(lvl * mult)} + ${base} => ${(lvl * mult) + base}`);
     return (lvl * mult) + base;
   }
 
@@ -406,109 +398,106 @@ $(document).ready(function() {
     console.error("calculating level from stats");
 
     let itemLevel = 0;
+    let consoleLog = [];
 
-    const array = itemClass == '4' ? armorType : weaponType;
+    const array = itemClass == '4' ? armorClass : weaponClass;
     const invType = array[slot];
     const slotMod = invType.slotMod;
     const slotModFunction = typeof slotMod === 'function';
-    
+
     for (let i = 1; i < 999; i++) {
 
       let totalStatBudget = 0;
-      let statName = '';
-      let statType = '';
-      let statValue = '';
-      let effectiveStatMod = '';
-      let statBudget = '';
+      consoleLog = [];
 
       $('#stats .group').each(function() {
-        statType = $(this).find('.stat-type').val();
-        statName = itemStats[statType]?.name || undefined;
-        const statMod = itemStats[statType]?.statMod || undefined;
-        statValue = parseFloat($(this).find('.stat-amount').val());
+        const statType = $(this).find('.stat-type').val();
+        const statName = itemStats[statType]?.name;
+        const statValue = parseFloat($(this).find('.stat-amount').val());
+        const statMod = itemStats[statType].statMod;
         const statModFunction = typeof statMod === 'function';
-        effectiveStatMod = statModFunction ? statMod(slot, quality, i) : statMod;
-        // statmod function is broken
-        //console.warn(`statMod ${statModFunction ? 'is function' : 'is variable'} => ${statMod}`);
+        const effectiveStatMod = statModFunction ? statMod(slot, quality, i) : statMod;
 
-        statBudget = Math.pow(statValue * effectiveStatMod, exponent);
+        const statBudget = Math.pow(statValue * effectiveStatMod, exponent);
         totalStatBudget += statBudget;
+        
+        consoleLog.push(`statType: ${statName}(${statType}), statValue: ${statValue}, statMod: ${effectiveStatMod}, statBudget: ${statBudget}`);
       });
 
-      const itemBudget = totalStatBudget * (slotModFunction ? slotMod(quality, i) : slotMod);
       const effectiveSlotMod = slotModFunction ? slotMod(quality, i) : slotMod;
-      const statBudgetIncrement = Math.pow(qualityMod(i+1) * effectiveSlotMod, exponent);
-      if (statBudgetIncrement > itemBudget) {
-        console.log(`statType: ${statName}(${statType}), statValue: ${statValue}, statMod: ${effectiveStatMod}, statBudget: ${statBudget}`);
-        console.log(`qualityMod: ${qualityMod(i+1)}, statBudget: ${totalStatBudget}, slotMod: ${effectiveSlotMod}, itemBudget: ${itemBudget}, itemLevel: ${i}`);
-        itemLevel = Math.max(i, 1);
+      const itemBudget = totalStatBudget * effectiveSlotMod;
+      const lookahead = i + 1;
+      const statBudgetIncrement = Math.pow(qualityMod(lookahead) * effectiveSlotMod, exponent);
+
+      if (statBudgetIncrement >= itemBudget) {
+        consoleLog.push(`qualityMod: ${qualityMod(i)}, statBudget: ${totalStatBudget}, slotMod: ${effectiveSlotMod}, itemBudget: ${itemBudget}, itemLevel: ${i}`);
+        itemLevel = i;
         break;
       }
     }
-    return itemLevel;
+
+    consoleLog.forEach(log => console.log(log));
+    return Math.max(itemLevel, 1);
   }
 
   function calculateStats(itemClass, level, slot, quality, qualityMod) {
     console.error(`calculating stats from level`);
 
-    // remove sockets from stat value percentage requirements
-    // fix sockets tooltip output on calculate    
+    const statValues = {};
+    let statBudget = '';
 
-    const array = itemClass == '4' ? armorType : weaponType;
+    const array = itemClass == '4' ? armorClass : weaponClass;
     const invType = array[slot];
     const slotMod = invType.slotMod;
     const slotModFunction = typeof slotMod === 'function';
     const effectiveSlotMod = slotModFunction ? slotMod(quality, level) : slotMod;
-
-    const itemBudget = Math.pow(qualityMod(level) * effectiveSlotMod, exponent)/effectiveSlotMod;
-    const statValues = {};
+    const itemBudget = Math.pow(qualityMod(level) * effectiveSlotMod, exponent) / effectiveSlotMod;
 
     $('#stats .group').each(function() {
       const statType = $(this).find('.stat-type').val();
-      const statName = itemStats[statType]?.name || '';
-      const statMod = itemStats[statType]?.statMod || 1;
-      const statPercent = parseFloat($(this).find('.stat-amount').val()) / 100 || 0;
-      const effectiveStatMod = typeof statMod === 'function' ? statMod(slot, quality, level) : statMod;
+      const statName = itemStats[statType]?.name;
+      const statPercent = parseFloat($(this).find('.stat-amount').val()) / 100;
+      const statMod = itemStats[statType].statMod;
+      const statModFunction = typeof statMod === 'function';
+      const effectiveStatMod = statModFunction ? statMod(slot, quality, level) : statMod;
 
-      const statBudget = itemBudget * statPercent;
+      statBudget = itemBudget * statPercent;
       const statValue = Math.pow(statBudget / effectiveStatMod, exponentInverse);
-      console.log(`statValue = ${statBudget} * ${effectiveStatMod} = ${statValue}`);
       
-      statValues[statType] = Math.floor(statValue);
+      statValues[statType] = Math.ceil(statValue);
       console.log(`statType: ${statName}(${statType}), statValue: ${statValue}, statMod: ${effectiveStatMod}, statBudget: ${statBudget}`);
     });
 
-    console.log(`qualityMod: ${qualityMod(level)}, slotMod: ${effectiveSlotMod}, itemBudget: ${itemBudget}, itemLevel: ${level}`);
+    console.log(`qualityMod: ${qualityMod(level)}, statBudget: ${statBudget}, slotMod: ${effectiveSlotMod}, itemBudget: ${itemBudget}, itemLevel: ${level}`);
     return statValues;
   }
 
   function calculateArmor(slot, type, level, quality, bonus) {
-    const slotData = armorType[slot];
+    const slotData = armorClass[slot];
     if (slotData.armorMod > 0) {
-      console.error("generating armor");
       const slotMod = slotData.armorMod;
-      console.log(`slotCoefficient: ${slotMod}`);
       const baseValue = armorData[quality][type](level);
-      console.log(`baseValue: ${baseValue}`);
-      console.log(`bonusArmor: ${bonus}`);
       const totalArmor = Math.max(Math.ceil(baseValue * slotMod), 0) + parseFloat(bonus);
-      console.log(`totalArmor: ${totalArmor}`);
+      console.warn(`generating armor`);
+      console.log(`slotCoefficient: ${slotMod}, baseValue: ${baseValue}, bonusArmor: ${bonus}, totalArmor: ${totalArmor}`);
       return `<div class="${bonus >= 1 ? 'green' : ''}">${totalArmor} Armor</div>`;
     }
     else { return ''; }
   }
   
   function calculateShieldBlock(level, quality) {
-    const calculateBlock = shieldBlockCoefficients[quality] || shieldBlockCoefficients.default;
+    const calculateBlock = shieldBlockCoefficients[quality];
     const baseBlock = calculateBlock(level);
-    const totalBlock = baseBlock > 0 ? Math.ceil(baseBlock) : 0;
+    const totalBlock = baseBlock > 7 ? Math.ceil(baseBlock) : 7;
+    console.warn(`generating block value`);
+    console.log(`baseBlock: ${baseBlock}, totalBlock: ${totalBlock}`);
     return `<div>${totalBlock} Block</div>`;
   }
 
   function populateItemSlots(itemClass) {
     const itemSlotObj = $('#item-slot');
     let name = itemClass == '4' ? 'Armor' : 'Weapon';
-    let array = itemClass == '4' ? armorType : weaponType;
+    let array = itemClass == '4' ? armorClass : weaponClass;
     itemSlotObj.empty().append(`<option value="">Choose ${name} Type</option>`);
     $.each(array, function(key, data) {
       itemSlotObj.append(`<option data-class="${itemClass}" value="${key}">${data.name}</option>`);
@@ -518,7 +507,7 @@ $(document).ready(function() {
   function populateSubClass(subClass, itemClass) {
     const subClassObj = $('#item-subclass');
     subClassObj.empty();
-    const array = itemClass == 4 ? armorTypes : weaponTypes;
+    const array = itemClass == 4 ? armorSubClass : weaponSubClass;
 
     if (subClass.length === 1) {
       const classKey = subClass[0];
@@ -604,7 +593,7 @@ $(document).ready(function() {
           <div class="group select" id="stat-group-${statCount}">
             <input type="number" class="stat-amount" data-calc="" id="stat-amount-${statCount}" value="0" />
             ${createStatDropdown(statCount)}
-            <div class="delete"></div>
+            <div class="delete"><i class="stage1 fa-solid fa-ellipsis-vertical"></i><i class="stage2 fa-regular fa-trash-can"></i></div>
           </div>`;
         $('#stats').append(statHtml);
         updateStatDropdowns();
@@ -615,7 +604,7 @@ $(document).ready(function() {
           <div class="group select socket" id="stat-group-${statCount}">
             <input type="number" class="stat-amount" data-calc="" id="stat-amount-${statCount}" value="1" disabled />
             ${createSocketDropdown(socketCount)}
-            <div class="delete"></div>
+            <div class="delete"><i class="fa-regular fa-trash-can"></i></div>
           </div>`;
         $('#stats').append(statHtml);
         updateSocketDropdowns();
@@ -652,11 +641,11 @@ $(document).ready(function() {
     const itemClass = $('#item-slot option:selected').data('class');
     const subClass = $('#item-subclass').val();
     let subClassName = '';
-    if (subClassVisible(subClass, itemClass === 4 ? armorTypes : weaponTypes) === 1) { subClassName = $('#item-subclass option:selected').text(); }
+    if (subClassVisible(subClass, itemClass === 4 ? armorSubClass : weaponSubClass) === 1) { subClassName = $('#item-subclass option:selected').text(); }
     return subClassName ? `<div class="item-subclass">${subClassName}</div>` : subClassName;
   }
   
-  function createTooltipHTML(itemQuality, itemName, itemLevel, durabilityHTML, itemReqLevel, sellPriceHTML, bindHTML, uniqueHTML, slotHTML, typeHTML, weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, socketsHTML, greenStatsHTML, itemFlavorHTML) {
+  function createTooltipHTML(itemQuality, itemName, itemLevel, durabilityHTML, requiredLevelHTML, sellPriceHTML, bindHTML, uniqueHTML, slotHTML, typeHTML, weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, socketsHTML, greenStatsHTML, itemFlavorHTML) {
     return `
       <div class="item-name ${itemQuality}">${itemName}</div>
       <div class="item-level">Item Level ${itemLevel}</div>
@@ -669,7 +658,7 @@ $(document).ready(function() {
       <div class="white stats">${whiteStatsHTML}</div>
       <div class="sockets">${socketsHTML}</div>
       ${durabilityHTML}
-      <div class="item-reqlvl">Requires Level ${itemReqLevel}</div>
+      ${requiredLevelHTML}
       <div class="green stats">${greenStatsHTML}</div>
       ${itemFlavorHTML}
       ${sellPriceHTML}
@@ -860,10 +849,12 @@ $(document).ready(function() {
     let slotName = $('#item-slot option:selected').text();
     let itemName = $("#item-name").val() || `${qualityName} ${slotName}`;
     
-    let itemReqLevel = $("#item-reqlvl").val() || 80;
+    let requiredLevel = parseFloat($('#item-reqlvl').val());
+    requiredLevel = requiredLevel === 0 ? '' : requiredLevel > 0 ? requiredLevel : itemLevel >= 200 ? 80 : itemLevel - 5 > 0 ? itemLevel - 5 : 1;
+    let requiredLevelHTML = requiredLevel >= 1 ? `<div>Requires Level ${requiredLevel}</div>` : '';
 
     let itemType = $('#item-subclass option:selected').text();
-    let itemTypeKey = $('#item-subclass option:selected').val();
+    let itemTypeKey = parseFloat($('#item-subclass option:selected').val());
 
     if (itemClass == 2) { // weapon properties
       const damageMin = parseFloat($("#damageMin").val());
@@ -890,11 +881,10 @@ $(document).ready(function() {
         `;
       }
     }
-    
-    // durability is not on misc
+
     const durabilityCalc = 145;
-    durabilityHTML = `<div>Durability ${durabilityCalc} / ${durabilityCalc}</div>`;
-    
+    durabilityHTML = itemTypeKey !== 0 ? `<div>Durability ${durabilityCalc} / ${durabilityCalc}</div>` : '';
+
     const [gold, silver, copper] = [19, 96, 36];
     sellPriceHTML = `
     <div id="sellprice">
@@ -905,16 +895,17 @@ $(document).ready(function() {
     </div>
     `;
 
-    let tooltipHtml = createTooltipHTML(qualityName, itemName, itemLevel, durabilityHTML, itemReqLevel, sellPriceHTML, bindHTML, uniqueHTML, slotName, subClassHTML(), weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, socketsHTML, greenStatsHTML, itemFlavorHTML);
+    let tooltipHtml = createTooltipHTML(qualityName, itemName, itemLevel, durabilityHTML, requiredLevelHTML, sellPriceHTML, bindHTML, uniqueHTML, slotName, subClassHTML(), weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, socketsHTML, greenStatsHTML, itemFlavorHTML);
     $('#output .tooltip').html(tooltipHtml);
   }
 
   // ui/ux
 
   $(document).on('click', '#stats .group .delete', function() {
-    if($(this).parent().hasClass('socket')) { updateStatGroup('socket','delete'); }
+    var parentGroup = $(this).parent();
+    if(parentGroup.hasClass('socket')) { updateStatGroup('socket','delete'); }
     else { updateStatGroup('stat', 'delete'); }
-    $(this).parent(".group").remove();
+    parentGroup.addClass('wipe-out').on('animationend', function() { $(this).remove(); });
   });
 
   $(document).on('change input', '#stats .stat-amount', function() {
@@ -1061,7 +1052,7 @@ $(document).ready(function() {
     }
     const itemSlot = $(this).find('option:selected').val();
     const itemClass = $(this).find('option:selected').data('class');
-    const array = itemClass == '4' ? armorType : weaponType;
+    const array = itemClass == '4' ? armorClass : weaponClass;
     if (itemSlot) { populateSubClass(array[itemSlot].subClass, itemClass); }
     $(".itemType").show();
     $(".weaponMethod").hide();
