@@ -31,6 +31,8 @@ A prime example of these outliers is the [Shining Buckle Gauntlets](https://www.
 - **QualityMod**: A weight coefficient of an item based on its quality. An epic shield will have a lower item level than an uncommon shield with the same stats.
 - **ItemLevel**: Effective level of an item.
 
+### Calculation Process - If you don't know the item level
+
 #### StatBudget Formula
 
 $$
@@ -48,12 +50,12 @@ $$
 The quality mod is calculated by multiplying a given item level by a coefficient, the product of which is added to a base integer.
 
 $$
-QualityMod = qualityMult \times ItemLevel(i) + qualityBase
+QualityMod(i) = qualityMult \times i_{ItemLevel} + qualityBase
 $$
 
 #### ItemLevel Calculation
 
-QualityMod is multiplied by the SlotMod raised to the power of the exponent in a loop with i increasing by the value of 1 each iteration. This is performed until the product meets or exceeds the value of the ItemBudget. The item level is the number of iterations required to meet the criteria.
+The QualityMod is multiplied by the SlotMod and the product is raised to the power of the exponent. This is performed in a loop with $i$ increasing by the value of 1 each iteration until the product meets or exceeds the value of the ItemBudget. The item level is the number of iterations required to meet the criteria.
 
 $$
 (\text{QualityMod}(i) \times \text{SlotMod})^{\frac{\log(2)}{\log(1.5)}} \geq \text{ItemBudget}
