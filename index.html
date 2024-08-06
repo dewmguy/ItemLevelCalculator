@@ -5,45 +5,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Warcraft Item Level Calculator</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="favicon.gif">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://kit.fontawesome.com/666b0b7246.js" crossorigin="anonymous"></script>
     <script src="script.js"></script>
 </head>
 <body>
     <div id="float">
-        <h1>Warcraft Item Level Calculator</h1>
-        <p class="text text-center">This project is a WIP. Visit the <a href="https://github.com/dewmguy/ItemLevelCalculator">github repo</a> for information or to contrubute.</p>
-        <hr />
         <div id="container">
+            <div id="header">
+                <h1>WoW Item Level Calculator</h1>
+                <div class="github"><a href="https://github.com/dewmguy/ItemLevelCalculator" target="_blank"><i class="fa-brands fa-github"></i></a></div>
+            </div>
             <form id="calculator">
-                <div class="configure">
+                <div id="configPanel">
                     <h3>Customize Your Item</h3>
-                    <div class="group select">
-                        <div class="item"><input class="full" type="radio" id="selectLevel" name="calcMethod" value="level" required checked /> <label for="selectLevel">Calculate Level</label></div>
-                        <div class="item"><input class="full" type="radio" id="selectStats" name="calcMethod" value="stats" required /> <label for="selectStats">Calculate Stats</label></div>
-                        <input class="full" type="number" id="item-level" name="itemLevel" placeholder="Item Level" />
+                    <div class="column">
+                        <div class="group pill">
+                            <div class="item"><input class="full" type="radio" id="selectLevel" name="calcMethod" value="level" required checked /> <label for="selectLevel">Calculate Level</label></div>
+                            <div class="item"><input class="full" type="radio" id="selectStats" name="calcMethod" value="stats" required /> <label for="selectStats">Calculate Stats</label></div>
+                            <input class="full" type="number" id="item-level" name="itemLevel" placeholder="Item Level" />
+                        </div>
+                        <div class="note textLevel">Determines the item level based on the stat values.</div>
+                        <div class="note textStats">Determines the stat values based on the item level.</div>
+                        <div class="note">Calculation interprets a stat value as <span id="statMethod">an integer</span>.</div>
                     </div>
-                    <div class="group">
-                        <div class="text note textLevel">Determine the item level based on the stat values.</div>
-                        <div class="text note textStats">Determine the stat values based on the item level.</div>
-                    </div>
-                    <div class="group select">
-                        <div class="item borderfix"><input type="radio" id="armor" name="itemClass" value="4" checked required /> <label for="armor">Armor</label></div>
-                        <div class="item"><input type="radio" id="weapon" name="itemClass" value="2" required /> <label for="weapon">Weapon</label></div>
-                    </div>
-                    <div class="group">
-                        <select class="itemSlot" id="item-slot" name="itemSlot" required></select>
-                        <select class="itemType" id="item-subclass" name="itemType" required></select>
-                    </div>
-                    <div class="group select">
+                    <div class="group pill">
                         <div class="item"><input type="radio" data-quality="2" id="uncommon" name="itemQuality" value="uncommon" checked required /> <label class="uncommon" for="uncommon">Uncommon</label></div>
                         <div class="item"><input type="radio" data-quality="3" id="rare" name="itemQuality" value="rare" required /> <label class="rare" for="rare">Rare</label></div>
                         <div class="item"><input type="radio" data-quality="4" id="epic" name="itemQuality" value="epic" required /> <label class="epic" for="epic">Epic</label></div>
                         <div class="item"><input type="radio" data-quality="5" id="legendary" name="itemQuality" value="legendary" required disabled /> <label class="legendary" for="legendary">Legendary</label></div>
                         <div class="item"><input type="radio" data-quality="6" id="artifact" name="itemQuality" value="artifact" required disabled /> <label class="artifact" for="artifact">Artifact</label></div>
                     </div>
-                    <div class="group select weaponMethod">
+                    <div class="group pill">
+                        <div class="item"><input type="radio" id="armor" name="itemClass" value="4" checked required /> <label for="armor">Armor</label></div>
+                        <div class="item"><input type="radio" id="weapon" name="itemClass" value="2" required /> <label for="weapon">Weapon</label></div>
+                    </div>
+                    <div class="group">
+                        <select class="itemSlot" id="item-slot" name="itemSlot" required></select>
+                        <select class="itemType" id="item-subclass" name="itemType" required></select>
+                    </div>
+                    <div class="group pill weaponMethod">
                         <div class="item"><input class="full" type="radio" id="weaponCaster" name="weaponMethod" value="caster" required checked /> <label for="weaponCaster">Caster</label></div>
                         <div class="item"><input class="full" type="radio" id="weaponMelee" name="weaponMethod" value="melee" required /> <label for="weaponMelee">Melee</label></div>
                     </div>
@@ -57,12 +58,12 @@
                         <div class="item"><input type="number" id="damageMin1" name="damageMin1" placeholder="Min" /></div>
                         <div class="item"><input type="number" id="damageMax1" name="damageMax1" placeholder="Max" /></div>
                     </div>
-                    <div class="group select">
+                    <div class="group pill">
                         <div class="item"><input type="radio" id="boe" name="itemBind" value="boe" checked /> <label for="boe">Bind on Equip</label></div>
                         <div class="item"><input type="radio" id="bop" name="itemBind" value="bop" /> <label for="bop">Bind on Pickup</label></div>
                         <div class="item"><input type="radio" id="nobind" name="itemBind" value="nobind" /> <label for="nobind">No Bind</label></div>
                     </div>
-                    <div class="group select">
+                    <div class="group pill">
                         <div class="item"><input type="radio" id="nounique" name="itemUnique" value="nounique" checked /> <label for="nounique">Not Unique</label></div>
                         <div class="item"><input type="radio" id="unique" name="itemUnique" value="unique" /> <label for="unique">Unique</label></div>
                         <div class="item"><input type="radio" id="equipped" name="itemUnique" value="equipped" /> <label for="equipped">Unique-Equipped</label></div>
@@ -77,17 +78,16 @@
                 </div>
                 <div id="statPanel">
                     <h3>Select Item Properties</h3>
-                    <p class="text note">Calculation interprets a stat value as a <span id="statMethod">integer</span>.</p>
                     <div class="group"><button type="button" id="add-stat">Add Stat</button><button type="button" id="add-socket">Add Socket</button></div>
                     <div id="stats"></div>
-                    <button class="calculate" type="submit">Calculate</button>
+                    <div class="group"><button type="submit">Calculate</button><i id="reset" class="link fa-solid fa-rotate-right"></i></div>
                 </div>
             </form>
-            <div id="output">
-                <h3>Item Tooltip Preview</h3>
-                <div class="tooltip"></div>
-                <p id="warning" class="note error"></p>
-            </div>
+        </div>
+        <div id="output">
+            <h3>Item Tooltip Preview</h3>
+            <div class="tooltip"></div>
+            <p id="warning" class="note error"></p>
         </div>
     </div>
 </body>

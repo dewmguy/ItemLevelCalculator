@@ -591,7 +591,7 @@ $(document).ready(function() {
     if (action == 'add') {
       if (type == 'stat' && statCount <= 10) {
         const statHtml = `
-          <div class="group select" id="stat-group-${statCount}">
+          <div class="group pill" id="stat-group-${statCount}">
             <input type="number" class="stat-amount" data-calc="" id="stat-amount-${statCount}" value="0" />
             ${createStatDropdown(statCount)}
             <div class="delete"><i class="stage1 fa-solid fa-ellipsis-vertical"></i><i class="stage2 fa-regular fa-trash-can"></i></div>
@@ -602,10 +602,10 @@ $(document).ready(function() {
       }
       if (type == 'socket' && socketCount <= 3) {
         const statHtml = `
-          <div class="group select socket" id="stat-group-${statCount}">
+          <div class="group pill socket" id="stat-group-${statCount}">
             <input type="number" class="stat-amount" data-calc="" id="stat-amount-${statCount}" value="1" disabled />
             ${createSocketDropdown(socketCount)}
-            <div class="delete"><i class="fa-regular fa-trash-can"></i></div>
+            <div class="delete"><i class="stage1 fa-solid fa-ellipsis-vertical"></i><i class="stage2 fa-regular fa-trash-can"></i></div>
           </div>`;
         $('#stats').append(statHtml);
         updateSocketDropdowns();
@@ -928,6 +928,25 @@ $(document).ready(function() {
     }
   });
 
+  $('#reset').on('click', function() {
+    $('form')[0].reset();
+    $('#stats .group').remove();
+    $('#item-subclass, #output').hide();
+    const itemClassObj = $('input[name="itemClass"]:checked');
+    const itemClass = $(itemClassObj).val();
+    populateItemSlots(itemClass);
+    $(".weaponDamage").hide();
+    $(".weaponDamageExtra").hide();
+    statCount = 0;
+    socketCount = 0;
+    const reset = $(this);
+    reset.removeClass('rotate');
+    reset.addClass('rotate');
+    reset.on('animationend', function() {
+      reset.removeClass('rotate');
+    });
+  });
+
   $("#stats").on('change input', '.stat-type, .stat-amount', function() {
     if($(this).hasClass('error')) {
       $(this).removeClass('error');
@@ -985,7 +1004,7 @@ $(document).ready(function() {
     $("#item-level").val('').hide();
     $(".textStats").hide();
     $(".textLevel").show();
-    $("#statMethod").html("integer");
+    $("#statMethod").html("an integer");
     $("#item-level").attr("required", false);
     $('.stat-amount').removeClass('error');
   });
@@ -993,7 +1012,7 @@ $(document).ready(function() {
     $("#item-level").val('').show();
     $(".textStats").show();
     $(".textLevel").hide();
-    $("#statMethod").html("percentage");
+    $("#statMethod").html("a percentage");
     $("#item-level").attr("required", true);
     $("#item-level").focus();
     let sum = 0;
