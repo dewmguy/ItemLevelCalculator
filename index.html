@@ -12,10 +12,10 @@
 <body>
     <div id="float">
         <div id="container">
-            <div id="header">
+            <header>
                 <h1>WoW Item Level Calculator</h1>
                 <div class="github"><a href="https://github.com/dewmguy/ItemLevelCalculator" target="_blank"><i class="fa-brands fa-github"></i></a></div>
-            </div>
+            </header>
             <form id="calculator">
                 <div id="configPanel">
                     <h3>Customize Your Item</h3>
@@ -49,14 +49,18 @@
                         <div class="item"><input class="full" type="radio" id="weaponMelee" name="weaponMethod" value="melee" required /> <label for="weaponMelee">Melee</label></div>
                     </div>
                     <div class="group weaponDamage">
-                        <div class="item"><input type="number" id="damageMin" name="damageMin" placeholder="Min" /></div>
-                        <div class="item"><input type="number" id="damageMax" name="damageMax" placeholder="Max" /></div>
+                        <div class="group pill">
+                            <div class="item"><input type="number" id="damageMin" name="damageMin" placeholder="Min" /></div>
+                            <div class="item"><input type="number" id="damageMax" name="damageMax" placeholder="Max" /></div>
+                        </div>
                         <div class="item"><input type="number" id="attackSpeed" name="attackSpeed" step="0.1" placeholder="Speed" /></div>
                     </div>
                     <div class="group weaponDamageExtra">
                         <select id="item-damage1" name="damageType1"></select>
-                        <div class="item"><input type="number" id="damageMin1" name="damageMin1" placeholder="Min" /></div>
-                        <div class="item"><input type="number" id="damageMax1" name="damageMax1" placeholder="Max" /></div>
+                        <div class="group pill">
+                            <div class="item"><input type="number" id="damageMin1" name="damageMin1" placeholder="Min" /></div>
+                            <div class="item"><input type="number" id="damageMax1" name="damageMax1" placeholder="Max" /></div>
+                        </div>
                     </div>
                     <div class="group pill">
                         <div class="item"><input type="radio" id="boe" name="itemBind" value="boe" checked /> <label for="boe">Bind on Equip</label></div>
@@ -85,7 +89,9 @@
             </form>
         </div>
         <div id="output">
-            <h3>Item Tooltip Preview</h3>
+            <header>
+                <h3>Item Tooltip Preview</h3>
+            </header>
             <div class="tooltip"></div>
             <p id="warning" class="note error"></p>
         </div>

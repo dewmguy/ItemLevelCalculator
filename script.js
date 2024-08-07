@@ -657,7 +657,7 @@ $(document).ready(function() {
       ${itemArmor}
       ${blockValue}
       <div class="white stats">${whiteStatsHTML}</div>
-      <div class="sockets">${socketsHTML}</div>
+      ${socketsHTML}
       ${durabilityHTML}
       ${requiredLevelHTML}
       <div class="green stats">${greenStatsHTML}</div>
@@ -881,6 +881,7 @@ $(document).ready(function() {
           </div>
         `;
       }
+      else { socketsHTML = ''; }
     }
 
     const durabilityCalc = 145;
@@ -911,7 +912,7 @@ $(document).ready(function() {
 
   $(document).on('change input', '#stats .stat-amount', function() {
     if ($(this).val() <= 0) { $(this).val(''); }
-    const val = 999;
+    const val = 10000;
     const pct = 100;
     let sum = 0;
 
@@ -953,7 +954,7 @@ $(document).ready(function() {
     }
   });
 
-  $("#output").hide();
+  $("#output, #sockets").hide();
   $("#warning").hide();
   $(".itemType").hide();
   $(".weaponMethod").hide();
