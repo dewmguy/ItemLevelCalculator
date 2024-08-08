@@ -733,22 +733,35 @@ $(document).ready(function() {
   
   function calculateForm() { // form calculation
     // error check
-    let errorDetected = false;
+    let err = false;
 
     const calcMethod = $('input[name="calcMethod"]:checked').val();
-    if (calcMethod === 'stats' && ($("#item-level").val() <= 0 || sumStatValues() != 100)) {
-      $(".stat-amount").addClass('error');
-      errorDetected = true;
+    if (calcMethod === 'stats') {
+      if ($("#item-level").val() <= 0) {
+        $("#item-level").addClass('error');
+        err = true;
+      }
+      if (sumStatValues() != 100) {
+        $(".stat-amount").addClass('error');
+        err = true;
+      }
     }
-    
     if (!$('#item-slot').val()) {
-      $('#item-slot').addClass('error'); errorDetected = true;
+      $('#item-slot').addClass('error');
+      err = true;
     }
     if (!$('#item-subclass').val()) {
-      $('#item-subclass').addClass('error'); errorDetected = true;
+      $('#item-subclass').addClass('error');
+      err = true;
     }
-    
-    if(!$('#item-slot').val() && !$('#item-subclass').val()) { errorDetected = true; }
+    if (!$('#item-slot').val() && !$('#item-subclass').val()) {
+      err = true;
+    }
+    if (!$('#stats .group').length) {
+      $('#add-stat').addClass('error');
+      $('#add-socket').addClass('error');
+      err = true;
+    }
     
     $('#stats .group').each(function() {
       const statTypeObj = $(this).find('.stat-type');
@@ -757,20 +770,20 @@ $(document).ready(function() {
       const statValue = parseFloat(statValueObj.val());
       if(statType && !statValue) {
         statValueObj.addClass('error');
-        errorDetected = true;
+        err = true;
       }
       else if(!statType && statValue) {
         statTypeObj.addClass('error');
-        errorDetected = true;
+        err = true;
       }
       else if(!statType && !statValue) {
         statValueObj.addClass('error');
         statTypeObj.addClass('error');
-        errorDetected = true;
+        err = true;
       }
     });
     
-    if(errorDetected) { return; }
+    if(err) { return; }
 
     $("#output").show();
 
@@ -940,6 +953,8 @@ $(document).ready(function() {
     $(".weaponDamageExtra").hide();
     statCount = 0;
     socketCount = 0;
+    $('#add-stat, #add-socket').show();
+    $('*').removeClass('error');
     const reset = $(this);
     reset.removeClass('rotate');
     reset.addClass('rotate');
@@ -955,7 +970,6 @@ $(document).ready(function() {
   });
 
   $("#output, #sockets").hide();
-  $("#warning").hide();
   $(".itemType").hide();
   $(".weaponMethod").hide();
   let lastSelected = null;
@@ -969,7 +983,6 @@ $(document).ready(function() {
     let maxDamage = parseFloat(maxDamageObj.val());
     let minDamageObj = $("#damageMin");
     let minDamage = parseFloat(minDamageObj.val());
-    //if(maxDamage < minDamage && maxDamage >= 0) { maxDamageObj.val(minDamage); }
   });
 
   $("#damageMax1, #damageMin1").on('change input', function() {
@@ -1022,9 +1035,20 @@ $(document).ready(function() {
     });
     if(sum > 100) { $('.stat-amount').addClass('error'); }
   });
-  $('#item-level').on('change input', function() { if ($(this).val() <= 0) { $(this).val(''); } });
-  $('#add-stat').click(function() { updateStatGroup('stat', 'add'); });
-  $('#add-socket').click(function() { updateStatGroup('socket', 'add'); });
+  $('#item-level').on('change input', function() {
+    if ($(this).val() <= 0) { $(this).val(''); }
+    else { $(this).removeClass('error'); }
+  });
+  $('#add-stat').click(function() {
+    $(this).removeClass('error');
+    $('#add-socket').removeClass('error');
+    updateStatGroup('stat', 'add');
+  });
+  $('#add-socket').click(function() {
+    $(this).removeClass('error');
+    $('#add-stat').removeClass('error');
+    updateStatGroup('socket', 'add');
+  });
   $('#stats').on('change', '.stat-type.stat', updateStatDropdowns);
   $('#stats').on('change', '.stat-type.socket', updateSocketDropdowns);
   $('input[name="itemQuality"]').click(function() {
@@ -1088,6 +1112,11 @@ $(document).ready(function() {
       e.preventDefault();
       calculateForm();
     }
+  });
+
+  $('#submit').on("click", function(e) {
+    e.preventDefault();
+    calculateForm();
   });
 
   // page load

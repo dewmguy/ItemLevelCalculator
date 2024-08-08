@@ -18,7 +18,6 @@
             </header>
             <form id="calculator">
                 <div id="configPanel">
-                    <h3>Customize Your Item</h3>
                     <div class="column">
                         <div class="group pill">
                             <div class="item"><input class="full" type="radio" id="selectLevel" name="calcMethod" value="level" required checked /> <label for="selectLevel">Calculate Level</label></div>
@@ -81,19 +80,14 @@
                     </div>
                 </div>
                 <div id="statPanel">
-                    <h3>Select Item Properties</h3>
                     <div class="group"><button type="button" id="add-stat">Add Stat</button><button type="button" id="add-socket">Add Socket</button></div>
                     <div id="stats"></div>
-                    <div class="group"><button type="submit">Calculate</button><i id="reset" class="link fa-solid fa-rotate-right"></i></div>
+                    <div class="group"><button id="submit" type="submit">Calculate</button><i id="reset" class="link fa-solid fa-rotate-right"></i></div>
                 </div>
             </form>
         </div>
         <div id="output">
-            <header>
-                <h3>Item Tooltip Preview</h3>
-            </header>
             <div class="tooltip"></div>
-            <p id="warning" class="note error"></p>
         </div>
     </div>
 </body>
