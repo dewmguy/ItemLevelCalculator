@@ -9,7 +9,7 @@ $(document).ready(function() {
   };
 
   const armorClass = {
-    "2": { name: "Neck", armorMod: 0, itemClass: 4, subClass: [0],
+    "2": { name: "Neck", sellMod: (8/16), armorMod: 0, itemClass: 4, subClass: [0],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [
         { quality: 4, min: 200, mod: (3/16) },
         { quality: 4, min: 90, mod: (3/16) },
@@ -22,7 +22,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (4/16) }, // final
       ])
     },
-    "6": { name: "Waist", armorMod: (9/16), itemClass: 4, subClass: [1, 2, 3, 4],
+    "6": { name: "Waist", sellMod: (8/16), armorMod: (9/16), itemClass: 4, subClass: [1, 2, 3, 4],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [
         { quality: 4, min: 200, mod: (9/16) },
         { quality: 4, min: 90, mod: (9/16) },
@@ -35,7 +35,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (8/16) }, // final
       ])
     },
-    "8": { name: "Feet", armorMod: (11/16), itemClass: 4, subClass: [1, 2, 3, 4],
+    "8": { name: "Feet", sellMod: (12/16), armorMod: (11/16), itemClass: 4, subClass: [1, 2, 3, 4],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [
         { quality: 4, min: 200, mod: (7/16) },
         { quality: 4, min: 90, mod: (7/16) },
@@ -48,7 +48,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (8/16) }, // final
       ])
     },
-    "10": { name: "Hands", armorMod: (10/16), itemClass: 4, subClass: [1, 2, 3, 4],
+    "10": { name: "Hands", sellMod: (8/16), armorMod: (10/16), itemClass: 4, subClass: [1, 2, 3, 4],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [
         { quality: 4, min: 200, mod: (4/16) },
         { quality: 4, min: 90, mod: (8/16) },
@@ -61,7 +61,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (8/16) }, // final
       ])
     },
-    "11": { name: "Finger", armorMod: 0, itemClass: 4, subClass: [0],
+    "11": { name: "Finger", sellMod: (8/16), armorMod: 0, itemClass: 4, subClass: [0],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [
         { quality: 4, min: 200, mod: (8/16) },
         { quality: 4, min: 90, mod: (3/16) },
@@ -74,7 +74,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (4/16) }, // final
       ])
     },
-    "12": { name: "Trinket", armorMod: 0, itemClass: 4, subClass: [0],
+    "12": { name: "Trinket", sellMod: (28/16), armorMod: 0, itemClass: 4, subClass: [0],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [
         { quality: 4, min: 200, mod: (3/16) },
         { quality: 4, min: 90, mod: (5/16) },
@@ -87,7 +87,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (8/16) }, // final
       ])
     },
-    "14": { name: "Shield", armorMod: (16/16), itemClass: 4, subClass: [6],
+    "14": { name: "Shield", sellMod: (15/16), armorMod: (16/16), itemClass: 4, subClass: [6],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [
         { quality: 4, min: 200, mod: (8/16) },
         { quality: 4, min: 90, mod: (4/16) },
@@ -100,7 +100,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (4/16) }, // final
       ])
     },
-    "16": { name: "Back", armorMod: (8/16), itemClass: 4, subClass: [1],
+    "16": { name: "Back", sellMod: (12/16), armorMod: (8/16), itemClass: 4, subClass: [1],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [
         { quality: 4, min: 200, mod: (4/16) },
         { quality: 4, min: 90, mod: (3/16) },
@@ -113,26 +113,26 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (3/16) }, // final
       ])
     },
-    "1": { name: "Head", armorMod: (13/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
-    "3": { name: "Shoulder", armorMod: (12/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (8/16) },
-    "4": { name: "Shirt", armorMod: 0, itemClass: 4, subClass: [1], slotMod: (1/32) },
-    "5": { name: "Chest", armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
-    "7": { name: "Legs", armorMod: (14/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
-    "9": { name: "Wrists", armorMod: (7/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (4/16) },
-    "19": { name: "Tabard", armorMod: 0, itemClass: 4, subClass: [0], slotMod: (1/32) },
-    "20": { name: "Chest (Robe)", armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
-    "23": { name: "Held Off-hand", armorMod: 0, itemClass: 4, subClass: [0], slotMod: (3/16) },
-    "28": { name: "Relic", armorMod: 0, itemClass: 4, subClass: [7, 8, 9, 10], slotMod: (1/32) },
+    "1": { name: "Head", sellMod: (12/16), armorMod: (13/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
+    "3": { name: "Shoulder", sellMod: (12/16), armorMod: (12/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (8/16) },
+    "4": { name: "Shirt", sellMod: (4/16), armorMod: 0, itemClass: 4, subClass: [1], slotMod: (1/32) },
+    "5": { name: "Chest", sellMod: (16/16), armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
+    "7": { name: "Legs", sellMod: (16/16), armorMod: (14/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
+    "9": { name: "Wrists", sellMod: (8/16), armorMod: (7/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (4/16) },
+    "19": { name: "Tabard", sellMod: (4/16), armorMod: 0, itemClass: 4, subClass: [0], slotMod: (1/32) },
+    "20": { name: "Chest (Robe)", sellMod: (16/16), armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
+    "23": { name: "Held Off-hand", sellMod: (8/16), armorMod: 0, itemClass: 4, subClass: [0], slotMod: (3/16) },
+    "28": { name: "Relic", sellMod: (4/16), armorMod: 0, itemClass: 4, subClass: [7, 8, 9, 10], slotMod: (1/32) },
   };
   
   const weaponClass = {
-    "13": { name: "One-Hand", slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
-    "21": { name: "Main-Hand", slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
-    "22": { name: "Off-Hand", slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
-    "17": { name: "Two-Hand", slotMod: (16/16), armorMod: 0, itemClass: 2, subClass: [1, 5, 8, 6, 10] },
-    "15": { name: "Bow", slotMod: (16/16), armorMod: 0, itemClass: 2, subClass: [2] },
-    "25": { name: "Thrown", slotMod: (5/16), armorMod: 0, itemClass: 2, subClass: [16] },
-    "26": { name: "Ranged", slotMod: (5/16), armorMod: 0, itemClass: 2, subClass: [3, 18, 19] }
+    "13": { name: "One-Hand", sellMod: (7/16), slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
+    "21": { name: "Main-Hand", sellMod: (7/16), slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
+    "22": { name: "Off-Hand", sellMod: (7/16), slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
+    "17": { name: "Two-Hand", sellMod: (16/16), slotMod: (16/16), armorMod: 0, itemClass: 2, subClass: [1, 5, 8, 6, 10] },
+    "15": { name: "Bow", sellMod: (16/16), slotMod: (16/16), armorMod: 0, itemClass: 2, subClass: [2] },
+    "25": { name: "Thrown", sellMod: (5/16), slotMod: (5/16), armorMod: 0, itemClass: 2, subClass: [16] },
+    "26": { name: "Ranged", sellMod: (5/16), slotMod: (5/16), armorMod: 0, itemClass: 2, subClass: [3, 18, 19] }
   };
 
   const resistMods = (slot, quality, lvl) => dataFilter(quality, lvl, [
@@ -269,16 +269,16 @@ $(document).ready(function() {
   };
 
   const armorSubClass = {
-    "0": { name: "Miscellaneous", tooltip: 0 },
-    "1": { name: "Cloth", tooltip: 1 },
-    "2": { name: "Leather", tooltip: 1 },
-    "3": { name: "Mail", tooltip: 1 },
-    "4": { name: "Plate", tooltip: 1 },
-    "6": { name: "Shield", tooltip: 0 },
-    "7": { name: "Libram", tooltip: 1 }, // paladin
-    "8": { name: "Idol", tooltip: 1 }, // druid
-    "9": { name: "Totem", tooltip: 1 }, // shaman
-    "10": { name: "Sigil", tooltip: 1 } // deathknight
+    "0": { name: "Miscellaneous", sellMod: (28/16), tooltip: 0 },
+    "1": { name: "Cloth", sellMod: (9/16), tooltip: 1 },
+    "2": { name: "Leather", sellMod: (11/16), tooltip: 1 },
+    "3": { name: "Mail", sellMod: (14/16), tooltip: 1 },
+    "4": { name: "Plate", sellMod: (16/16), tooltip: 1 },
+    "6": { name: "Shield", sellMod: (16/16), tooltip: 0 },
+    "7": { name: "Libram", sellMod: (16/16), tooltip: 1 }, // paladin
+    "8": { name: "Idol", sellMod: (16/16), tooltip: 1 }, // druid
+    "9": { name: "Totem", sellMod: (16/16), tooltip: 1 }, // shaman
+    "10": { name: "Sigil", sellMod: (16/16), tooltip: 1 } // deathknight
   };
 
   const weaponSubClass = {
@@ -366,6 +366,7 @@ $(document).ready(function() {
   const qualityCoefficients = {
     2: {
       name: 'uncommon',
+      sellValue: lvl => { return 439 * lvl },
       calc: lvl => {
         if (lvl >= 130) return qC(lvl,0.801,-38.3); // final
         if (lvl >= 80) return qC(lvl,0.505,-4.5); // final
@@ -374,6 +375,7 @@ $(document).ready(function() {
     },
     3: {
       name: 'rare',
+      sellValue: lvl => { return -463 + 525.4556036428294 * lvl },
       calc: lvl => {
         if (lvl >= 136) return qC(lvl,0.86,-41);
         if (lvl >= 80) return qC(lvl,0.625,-1.15);
@@ -382,6 +384,7 @@ $(document).ready(function() {
     },
     4: {
       name: 'epic',
+      sellValue: lvl => { return 13807 + 579.7694864805701 * lvl + Math.pow(0.16701574769247676 * lvl, 2) },
       calc: lvl => {
         if (lvl >= 200) return qC(lvl,1.8,-240);
         if (lvl >= 100) return qC(lvl,0.689,4);
@@ -731,6 +734,23 @@ $(document).ready(function() {
     return phraseFunction ? phraseFunction(statAmount) : 'broken';
   }
   
+  function calculateSellValue(itemClass, level, quality, slot, type) {
+    console.warn(`generating sell value`);
+    console.log(`calculateSellValue(${itemClass}, ${level}, ${quality}, ${slot}, ${type})`);
+
+    const array = itemClass == '4' ? armorClass : weaponClass;
+    const invType = array[slot];
+    const sellMod = invType.sellMod;
+    const qualityMod = armorSubClass[type].sellMod;
+    const totalCopper = qualityCoefficients[quality].sellValue(level) * sellMod * qualityMod;
+    
+    const gold = Math.floor(totalCopper / 10000);
+    const remainderAfterGold = totalCopper % 10000;
+    const silver = Math.floor(remainderAfterGold / 100);
+    const copper = Math.floor(remainderAfterGold % 100);
+    return [gold, silver, copper];
+  }
+
   function calculateForm() { // form calculation
     // error check
     let err = false;
@@ -900,13 +920,13 @@ $(document).ready(function() {
     const durabilityCalc = 145;
     durabilityHTML = itemTypeKey !== 0 ? `<div>Durability ${durabilityCalc} / ${durabilityCalc}</div>` : '';
 
-    const [gold, silver, copper] = [19, 96, 36];
+    const [gold, silver, copper] = calculateSellValue(itemClass, itemLevel, itemQuality, itemSlot, itemTypeKey);
     sellPriceHTML = `
     <div id="sellprice">
       <div>Sell Price:</div>
-      ${gold >= 0 ? '<div class="gold">'+gold+'</div>' : ''}
-      ${silver >= 0 ? '<div class="silver">'+silver+'</div> ' : ''}
-      ${copper >= 0 ? '<div class="copper">'+copper+'</div> ' : ''}
+      ${gold > 0 ? `<div class="gold">${gold}</div>` : ''}
+      ${silver > 0 ? `<div class="silver">${silver}</div>` : ''}
+      ${copper > 0 ? `<div class="copper">${copper}</div>` : ''}
     </div>
     `;
 

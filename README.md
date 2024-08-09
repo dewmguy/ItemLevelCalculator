@@ -393,12 +393,41 @@ Feral Attack Power = Sacrificed DPS * 18.37 - 12.4843
 |       3 | `y = -463.73512978492363 + 525.4556036428294x` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-463.73512978492363&b=525.4556036428294&min-x=0&max-x=400&min-y=0&max-y=400000&order=1&graph-title=Rare+Gold+Cost&plot=NobwRAHmBcAsCcAaMBPGBGeAGA7LAvouFHAEzJrTrUBs6hxMArLBTKQlgBwOTNKoYAZlhYxvEizbQONIUInMm00jlLwFRPtDnShOHE3iLoTHCvjpS9LSV2CZqmj1vNWD0kyzwXjHVj15HxMjPXQubhM6PVgDGiihPRYcLATpcOsmNIdw2HQs1x1EnK5S%2BML7SiEvHF9tSuEmOhs%2FUId5WHUo8naaPDq7ZXaWbGyquUjClL0uJtIx4RosMxN0LBppJlnYAYx0d0oadS4CQuohw9ghS1X86TouG8LZ6VgEIxNLV64hLHnnrjfJhCFraNbFShNLg0YxnLAQ5jXLg4W49SEGWq3C4wI6zUEkF4OWK4XbQQmUWIcFFnO4OJa1f5%2Bc73KxCRlg2mHaxHLH3UgTXkOIxXU5Mzk4jiTJliTZbfarGVC%2FLwanSgSQ%2BA0JYmUrfUi4T4HZjwpjskhrdXMLj5TR%2BLhomBXeAsBWW0zOa6uzYpLyCw7VYE6wFEiKkW0c7GmeCxVUR%2B7rNZ%2BnHyGGrJiRiLefEYHBux5bcPmoTBw7wbmrZHSZ2wVNnSsOeDR0QV8w5LCs0n6gIN7B4Exd9LLFVm9iKygqyzZmRjjBDkH9mdUP7UKcDntvApMrXSE44PqrPo7ozys65qtBUVgs8NuWX8318daxNnLY7hBatMlmARLWx%2B%2Bt8cDF%2BFsqx2FIDwAmBexwVdFzWPJMAPDYHGhdA2SQncaFgU0F27Sg1iaToILfLVCwwH4qw9Kdwkgpc%2FnkfAAF0gA%3D) |
 |       4 | `y = 13807.575256964943 + 579.7694864805701x + 0.16701574769247676x^2` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=13807.575256964943&b=579.7694864805701&c=0.16701574769247676&min-x=0&max-x=400&min-y=0&max-y=400000&order=2&graph-title=Epic+Gold+Cost&plot=NobwRAHmBcBsBMAaMBPGAWAHABgOwEYBfRcKOWZNaAVnmtwGZjSZYLUZr9tNNnIYudlXqxMREgOhDKnAJwMu%2FMnOyzo%2BfA0y5cymL3UJ4udPuiGOcfLtjnd66tUzwzkso0ewn1c7DVW6LD48HzurMIY1HJs9khW1LBBduHQcvFUYtTYvqnpRvSYTKk4jrr4uSwW1EYMsHXmqrXYDHqpWgFUCophVdy46kLwiuYhA1aYcujw2KNB6twz%2FqMV6uKwuJVSmjUT1AzwcqOha3KMs%2B3a6nLZjHP4C9jYsOmjXAvcDFOjT0Y3r%2B1VhNhjwVrsqEVxL1tjlBrRaD9wYI2Ohin1YVZcK5gojBtp9vdHs8AX0TlYpvh0BdSZhruh0JtRgwGHSsW0%2BtFHrQWm85FzgmjtkkPoccLyPjZvOKrJo6Jg3H0gRD6BVjkiLGICOYZp0YFoXEJtb8ZcyNtCyDqFlSGKDUvAtFbFF9tQ6ZehEjcXSy3VNnXbXVRKYx0BIqvbvYGvptQ1Jw1bcC54NraAt6tg5EdAer5YkUmGA3rtDEFbGCxpUTlzTB4PBIhp9mJBRbawtaFgYxb8HyZVwdOzYy2e9h7VsLV9W1j0Jn893Awz6dPS7O9VP8C9tYPA85XKPq%2B6Frhh%2Bu7c5U3IdE29%2Bq1zWYsnaTLznIO1fUyiX9A5Qeijy7cbI6iSh2vuMpsMOu6fiBgYIAwWjalBer1LQVafqeoFsFi94LDgJiLhaaGBuI%2BwoTurbPhs8HXtECZJsB17%2BF8JEIRo3jTBBpHoeBlFvkkH7DBkiFBCE2oHK29CenRqbcGc3E9uR%2Fadsu5bTL%2BM6tjwkzasKMrrKEWnoNha7iPp2F1FgIkCSxNgzBZE4ICRok9iEel2g4OlEXmsZuYRkw5Nq3l6pM4nJg8oGHKYIUHpq7HaYGuAxDidqxYF9SxElBk6YeJiRY%2BIQEulB70n5BWPmc2QmY%2BSSojl0E6FONV6gQmCxAAukAA%3D%3D) |
 
-multiply by the slotMod coefficient
+The chest InventoryType has the highest sell value of all slots, similar to slotMod, but does not share a correlation with slotMod beyond that. Sell value is determined by taking the highest value item (chest) and dividing its cost by the cost of the other items of an equivalent item type. This is also divided by chest pieces of each subclass to determine the difference between plate, mail, leather, and cloth within each quality.
+
+| Item Name       | InventoryType | sellMod |
+|-----------------|---------------|---------|
+| Neck            |             2 |    8/16 |
+| Waist           |             6 |    8/16 |
+| Feet            |             8 |   12/16 |
+| Hands           |            10 |    8/16 |
+| Finger          |            11 |    8/16 |
+| Trinket         |            12 |   16/16 |
+| Shield          |            14 |   15/16 |
+| Back            |             9 |   12/16 |
+| Head            |             1 |   12/16 |
+| Shoulder        |             3 |   12/16 |
+| Shirt           |             4 |    4/16 |
+| Chest           |             5 |   16/16 |
+| Legs            |             7 |   16/16 |
+| Wrists          |             9 |    8/16 |
+| Tabard          |            19 |    4/16 |
+| Chest (Robe)    |            20 |   16/16 |
+| Off-hand        |            23 |    8/16 |
+| Relic           |            28 |    4/16 |
 
 Rings, Amulets, and Off-hand items sell for 25% of the buy price.
 All othe armor types sell for 20% of the buy price.
 
----
+| name    | subclass | sellMod |
+|---------|----------|---------|
+| Misc    |        0 |   28/16 |
+| Cloth   |        1 |    9/16 |
+| Leather |        2 |   11/16 |
+| Mail    |        3 |   14/16 |
+| Plate   |        4 |   16/16 |
+| Shield  |        6 |   16/16 |
+| Relic   | 7,8,9,10 |   16/16 |
 
 ## Sources & Attribution
 
