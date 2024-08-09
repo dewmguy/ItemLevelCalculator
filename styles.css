@@ -241,14 +241,14 @@ button:active:after {
 }
 #sockets img { height: 1em }
 
-#sellprice {
+#sell, #buy {
   display: flex;
   flex-direction: row;
   text-transform: capitalize;
   gap: .5ch;
 }
 
-#sellprice .gold::after, #sellprice .silver::after, #sellprice .copper::after {
+.gold::after, .silver::after, .copper::after {
   content: '';
   display: inline-block;
   width: 1em;
@@ -258,9 +258,9 @@ button:active:after {
   background-repeat: no-repeat;
   vertical-align: middle;
 }
-#sellprice .gold::after { background-image: url('item-display/money/gold.png') }
-#sellprice .silver::after { background-image: url('item-display/money/silver.png') }
-#sellprice .copper::after { background-image: url('item-display/money/copper.png') }
+.gold::after { background-image: url('item-display/money/gold.png') }
+.silver::after { background-image: url('item-display/money/silver.png') }
+.copper::after { background-image: url('item-display/money/copper.png') }
 
 #item-level {
   border-left: 0;

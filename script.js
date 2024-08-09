@@ -649,7 +649,7 @@ $(document).ready(function() {
     return subClassName ? `<div class="item-subclass">${subClassName}</div>` : subClassName;
   }
   
-  function createTooltipHTML(itemQuality, itemName, itemLevel, durabilityHTML, requiredLevelHTML, sellPriceHTML, bindHTML, uniqueHTML, slotHTML, typeHTML, weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, socketsHTML, greenStatsHTML, itemFlavorHTML) {
+  function createTooltipHTML(itemQuality, itemName, itemLevel, durabilityHTML, requiredLevelHTML, moneyHTML, bindHTML, uniqueHTML, slotHTML, typeHTML, weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, socketsHTML, greenStatsHTML, itemFlavorHTML) {
     return `
       <div class="item-name ${itemQuality}">${itemName}</div>
       <div class="item-level">Item Level ${itemLevel}</div>
@@ -665,7 +665,7 @@ $(document).ready(function() {
       ${requiredLevelHTML}
       <div class="green stats">${greenStatsHTML}</div>
       ${itemFlavorHTML}
-      ${sellPriceHTML}
+      ${moneyHTML}
     `;
   }
 
@@ -734,21 +734,34 @@ $(document).ready(function() {
     return phraseFunction ? phraseFunction(statAmount) : 'broken';
   }
   
+  function calculateDenomination(totalCopper) {
+    const gold = Math.floor(totalCopper / 10000);
+    const remainder = totalCopper % 10000;
+    const silver = Math.floor(remainder / 100);
+    const copper = Math.floor(remainder % 100);
+    console.log(`gold:  ${gold}, silver: ${silver}, copper: ${copper}`);
+    return [gold, silver, copper];
+  }
+  
+  function calculateBuyValue(sellValue, type) {
+    console.warn(`generating buy value`);
+    console.log(`calculateBuyValue(${sellValue}, ${type})`);
+    const typeMod = type === 0 ? 0.25 : 0.2;
+    const totalCopper = sellValue / typeMod;
+    return calculateDenomination(totalCopper);
+  }
+
   function calculateSellValue(itemClass, level, quality, slot, type) {
     console.warn(`generating sell value`);
     console.log(`calculateSellValue(${itemClass}, ${level}, ${quality}, ${slot}, ${type})`);
-
     const array = itemClass == '4' ? armorClass : weaponClass;
     const invType = array[slot];
     const sellMod = invType.sellMod;
     const qualityMod = armorSubClass[type].sellMod;
     const totalCopper = qualityCoefficients[quality].sellValue(level) * sellMod * qualityMod;
-    
-    const gold = Math.floor(totalCopper / 10000);
-    const remainderAfterGold = totalCopper % 10000;
-    const silver = Math.floor(remainderAfterGold / 100);
-    const copper = Math.floor(remainderAfterGold % 100);
-    return [gold, silver, copper];
+    const buyValue = calculateBuyValue(totalCopper, type);
+    const sellValue = calculateDenomination(totalCopper);
+    return { buyValue, sellValue };
   }
 
   function calculateForm() { // form calculation
@@ -920,17 +933,31 @@ $(document).ready(function() {
     const durabilityCalc = 145;
     durabilityHTML = itemTypeKey !== 0 ? `<div>Durability ${durabilityCalc} / ${durabilityCalc}</div>` : '';
 
-    const [gold, silver, copper] = calculateSellValue(itemClass, itemLevel, itemQuality, itemSlot, itemTypeKey);
+    const { sellValue, buyValue } = calculateSellValue(itemClass, itemLevel, itemQuality, itemSlot, itemTypeKey);
+    const [goldSell, silverSell, copperSell] = sellValue;
+    const [goldBuy, silverBuy, copperBuy] = buyValue;
+
     sellPriceHTML = `
-    <div id="sellprice">
-      <div>Sell Price:</div>
-      ${gold > 0 ? `<div class="gold">${gold}</div>` : ''}
-      ${silver > 0 ? `<div class="silver">${silver}</div>` : ''}
-      ${copper > 0 ? `<div class="copper">${copper}</div>` : ''}
-    </div>
+      <div id="sell">
+        <div>Sell Price:</div>
+        ${goldSell > 0 ? `<div class="gold">${goldSell}</div>` : ''}
+        ${silverSell > 0 ? `<div class="silver">${silverSell}</div>` : ''}
+        ${copperSell > 0 ? `<div class="copper">${copperSell}</div>` : ''}
+      </div>
     `;
 
-    let tooltipHtml = createTooltipHTML(qualityName, itemName, itemLevel, durabilityHTML, requiredLevelHTML, sellPriceHTML, bindHTML, uniqueHTML, slotName, subClassHTML(), weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, socketsHTML, greenStatsHTML, itemFlavorHTML);
+    buyPriceHTML = `
+      <div id="buy">
+        <div>Buy Price:</div>
+        ${goldBuy > 0 ? `<div class="gold">${goldBuy}</div>` : ''}
+        ${silverBuy > 0 ? `<div class="silver">${silverBuy}</div>` : ''}
+        ${copperBuy > 0 ? `<div class="copper">${copperBuy}</div>` : ''}
+      </div>
+    `;
+
+    const moneyHTML = sellPriceHTML + buyPriceHTML;
+
+    let tooltipHtml = createTooltipHTML(qualityName, itemName, itemLevel, durabilityHTML, requiredLevelHTML, moneyHTML, bindHTML, uniqueHTML, slotName, subClassHTML(), weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, socketsHTML, greenStatsHTML, itemFlavorHTML);
     $('#output .tooltip').html(tooltipHtml);
   }
 
