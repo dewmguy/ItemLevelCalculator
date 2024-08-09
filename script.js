@@ -744,23 +744,20 @@ $(document).ready(function() {
   }
   
   function calculateBuyValue(sellValue, type) {
-    console.warn(`generating buy value`);
-    console.log(`calculateBuyValue(${sellValue}, ${type})`);
     const typeMod = type === 0 ? 0.25 : 0.2;
     const totalCopper = sellValue / typeMod;
     return calculateDenomination(totalCopper);
   }
 
   function calculateSellValue(itemClass, level, quality, slot, type) {
-    console.warn(`generating sell value`);
-    console.log(`calculateSellValue(${itemClass}, ${level}, ${quality}, ${slot}, ${type})`);
+    console.warn(`generating monetary values`);
     const array = itemClass == '4' ? armorClass : weaponClass;
     const invType = array[slot];
     const sellMod = invType.sellMod;
     const qualityMod = armorSubClass[type].sellMod;
     const totalCopper = qualityCoefficients[quality].sellValue(level) * sellMod * qualityMod;
-    const buyValue = calculateBuyValue(totalCopper, type);
     const sellValue = calculateDenomination(totalCopper);
+    const buyValue = calculateBuyValue(totalCopper, type);
     return { buyValue, sellValue };
   }
 
