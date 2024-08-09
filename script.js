@@ -115,14 +115,14 @@ $(document).ready(function() {
     },
     "1": { name: "Head", armorMod: (13/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
     "3": { name: "Shoulder", armorMod: (12/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (8/16) },
-    "4": { name: "Shirt", armorMod: 0, itemClass: 4, subClass: [1], slotMod: (1/16) },
+    "4": { name: "Shirt", armorMod: 0, itemClass: 4, subClass: [1], slotMod: (1/32) },
     "5": { name: "Chest", armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
     "7": { name: "Legs", armorMod: (14/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
     "9": { name: "Wrists", armorMod: (7/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (4/16) },
-    "19": { name: "Tabard", armorMod: 0, itemClass: 4, subClass: [0], slotMod: (1/16) },
+    "19": { name: "Tabard", armorMod: 0, itemClass: 4, subClass: [0], slotMod: (1/32) },
     "20": { name: "Chest (Robe)", armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
     "23": { name: "Held Off-hand", armorMod: 0, itemClass: 4, subClass: [0], slotMod: (3/16) },
-    "28": { name: "Relic", armorMod: 0, itemClass: 4, subClass: [7, 8, 9, 10], slotMod: (1/16) },
+    "28": { name: "Relic", armorMod: 0, itemClass: 4, subClass: [7, 8, 9, 10], slotMod: (1/32) },
   };
   
   const weaponClass = {
