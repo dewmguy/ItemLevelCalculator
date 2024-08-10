@@ -79,6 +79,10 @@ input, select, button, label {
   line-height: 2.5em;
 }
 
+input:focus-within, select:focus-within {
+  color: #EFD213;
+}
+
 input::placeholder { opacity: 1; }
 input:not(:placeholder-shown) { color: #FFF; }
 
@@ -348,6 +352,10 @@ input.artifact:not(:placeholder-shown) { color: #E6B453 !important }
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
+.stat-type.socket {
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+}
 
 .item {
   display: block;
@@ -405,6 +413,8 @@ input.artifact:not(:placeholder-shown) { color: #E6B453 !important }
 .tooltip .specialstat { color: #1eff00 }
 
 #remove-stat { display: none }
+
+.hide { display: none }
 
 .text-center { text-align: center }
 

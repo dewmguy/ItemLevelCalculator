@@ -446,33 +446,47 @@ $(document).ready(function() {
     console.error(`calculating stats from level`);
 
     const statValues = {};
-    let statBudget = '';
+    let statBudget = 0;
+    let socketBudgetTotal = 0;
 
     const array = itemClass == '4' ? armorClass : weaponClass;
     const invType = array[slot];
     const slotMod = invType.slotMod;
     const slotModFunction = typeof slotMod === 'function';
     const effectiveSlotMod = slotModFunction ? slotMod(quality, level) : slotMod;
-    const itemBudget = Math.pow(qualityMod(level) * effectiveSlotMod, exponent) / effectiveSlotMod;
-
-    $('#stats .group').each(function() {
+    let itemBudget = Math.pow(qualityMod(level) * effectiveSlotMod, exponent) / effectiveSlotMod;
+    
+    $('#stats .group.socket').each(function() {
+      const socketType = $(this).find('.stat-type.socket').val();
+      const socketName = itemStats[socketType]?.name;
+      const socketMod = itemStats[socketType].statMod;
+      const effectiveSocketMod = socketMod(slot, quality, level);
+      const socketBudget = Math.pow(effectiveSocketMod, exponent);
+      socketBudgetTotal += socketBudget;
+      itemBudget -= socketBudget;
+      statValues[socketType] = 1;
+      console.log(`socketType: ${socketName}(${socketType}), socketValue: 1, socketMod: ${effectiveSocketMod}, socketBudget: ${socketBudget}`);
+    });
+    
+    $('#stats .group.stat').each(function() {
       const statType = $(this).find('.stat-type').val();
       const statName = itemStats[statType]?.name;
       const statPercent = parseFloat($(this).find('.stat-amount').val()) / 100;
       const statMod = itemStats[statType].statMod;
       const statModFunction = typeof statMod === 'function';
       const effectiveStatMod = statModFunction ? statMod(slot, quality, level) : statMod;
-
       statBudget = itemBudget * statPercent;
       const statValue = Math.pow(statBudget / effectiveStatMod, exponentInverse);
-      
-      // perform a loop starting from 1 that multiplies 
-      
       statValues[statType] = Math.ceil(statValue);
       console.log(`statType: ${statName}(${statType}), statValue: ${statValue}, statMod: ${effectiveStatMod}, statBudget: ${statBudget}`);
     });
 
-    console.log(`qualityMod: ${qualityMod(level)}, statBudget: ${statBudget}, slotMod: ${effectiveSlotMod}, itemBudget: ${itemBudget}, itemLevel: ${level}`);
+    if(itemBudget <= 0) {
+      $('#output').hide();
+      $('#item-level').addClass('error');
+    }
+
+    console.log(`fuck qualityMod: ${qualityMod(level)}, statBudget: ${statBudget}, slotMod: ${effectiveSlotMod}, itemBudget: ${parseFloat(socketBudgetTotal) + parseFloat(itemBudget)}, itemLevel: ${level}`);
     return statValues;
   }
 
@@ -552,7 +566,7 @@ $(document).ready(function() {
   function createSocketDropdown(id) {
     let options = '<option value="">Select a Socket</option>';
     $.each(itemStats, function(key, data) {
-      options += `<option data-color="${data.color}" value="${key}">${data.name} FUCK</option>`;
+      options += `<option data-color="${data.color}" value="${key}">${data.name}</option>`;
     });
     return `<select id="stat-type-${id}" class="stat-type socket" data-id="${id}">${options}</select>`;
   }
@@ -581,7 +595,7 @@ $(document).ready(function() {
       selectObj.empty();
       selectObj.append('<option value="">Select a Socket</option>');
       $.each(itemStats, function(key, data) {
-        if (data.type === 2 && (selectedSockets.indexOf(key) === -1 || key === socketValue)) { selectObj.append(`<option data-color="${data.color}" value="${key}">${data.name}</option>`); }
+        if (data.type === 2 && (key !== 'meta_socket' || selectedSockets.indexOf(key) === -1 || key === socketValue)) { selectObj.append(`<option data-color="${data.color}" value="${key}">${data.name}</option>`); }
       });
       selectObj.val(socketValue);
     });
@@ -594,7 +608,7 @@ $(document).ready(function() {
     if (action == 'add') {
       if (type == 'stat' && statCount <= 10) {
         const statHtml = `
-          <div class="group pill" id="stat-group-${statCount}">
+          <div class="group pill stat" id="stat-group-${statCount}">
             <input type="number" class="stat-amount" data-calc="" id="stat-amount-${statCount}" value="0" />
             ${createStatDropdown(statCount)}
             <div class="delete"><i class="stage1 fa-solid fa-ellipsis-vertical"></i><i class="stage2 fa-regular fa-trash-can"></i></div>
@@ -606,7 +620,7 @@ $(document).ready(function() {
       if (type == 'socket' && socketCount <= 3) {
         const statHtml = `
           <div class="group pill socket" id="stat-group-${statCount}">
-            <input type="number" class="stat-amount" data-calc="" id="stat-amount-${statCount}" value="1" disabled />
+            <input type="number" class="stat-amount hide" data-calc="" id="stat-amount-${statCount}" value="1" disabled />
             ${createSocketDropdown(socketCount)}
             <div class="delete"><i class="stage1 fa-solid fa-ellipsis-vertical"></i><i class="stage2 fa-regular fa-trash-can"></i></div>
           </div>`;
@@ -723,10 +737,14 @@ $(document).ready(function() {
     `;
   }
 
-  function sumStatValues() {
+  function sumStats() {
     let sum = 0;
-    $('.stat-amount').each(function() { sum += parseFloat($(this).val()) || 0; });
+    $('#stats .group.stat .stat-amount').each(function() { sum += parseFloat($(this).val()) || 0; });
     return sum;
+  }
+  
+  function sumSockets() {
+    return $('#stats .group.socket').length;
   }
   
   function statPhrasing(itemStat, statAmount) {
@@ -764,6 +782,7 @@ $(document).ready(function() {
   function calculateForm() { // form calculation
     // error check
     let err = false;
+    $("#output").hide();
 
     const calcMethod = $('input[name="calcMethod"]:checked').val();
     if (calcMethod === 'stats') {
@@ -771,8 +790,8 @@ $(document).ready(function() {
         $("#item-level").addClass('error');
         err = true;
       }
-      if (sumStatValues() != 100) {
-        $(".stat-amount").addClass('error');
+      if ($('#stats .group.stat').length > 0 && sumStats() != 100) {
+        $("#stats .group.stat .stat-amount").addClass('error');
         err = true;
       }
     }
@@ -787,13 +806,22 @@ $(document).ready(function() {
     if (!$('#item-slot').val() && !$('#item-subclass').val()) {
       err = true;
     }
-    if (!$('#stats .group').length) {
+    if ($('#stats .group.stat').length <= 0 && $('#stats .group.socket').length <= 0) {
       $('#add-stat').addClass('error');
       $('#add-socket').addClass('error');
       err = true;
     }
+
+    $('#stats .group.socket').each(function() {
+      const statTypeObj = $(this).find('.stat-type');
+      const statType = statTypeObj.val();
+      if(!statType) {
+        statTypeObj.addClass('error');
+        err = true;
+      }
+    });
     
-    $('#stats .group').each(function() {
+    $('#stats .group.stat').each(function() {
       const statTypeObj = $(this).find('.stat-type');
       const statType = statTypeObj.val();
       const statValueObj = $(this).find('.stat-amount');
@@ -812,9 +840,8 @@ $(document).ready(function() {
         err = true;
       }
     });
-    
-    if(err) { return; }
 
+    if(err) { return; }
     $("#output").show();
 
     let itemLevel = $('#item-level').val() || null;
@@ -894,7 +921,7 @@ $(document).ready(function() {
     let itemName = $("#item-name").val() || `${qualityName} ${slotName}`;
     
     let requiredLevel = parseFloat($('#item-reqlvl').val());
-    requiredLevel = requiredLevel === 0 ? '' : requiredLevel > 80 ? 80 : requiredLevel < 1 ? 1 : itemLevel - 5 > 0 ? itemLevel - 5 : 1;
+    requiredLevel = requiredLevel == 0 ? '' : requiredLevel >= 1 ? requiredLevel : itemLevel-5 >= 1 ? itemLevel-5 : 0;
     let requiredLevelHTML = requiredLevel >= 1 ? `<div>Requires Level ${requiredLevel}</div>` : '';
 
     let itemType = $('#item-subclass option:selected').text();
@@ -974,14 +1001,14 @@ $(document).ready(function() {
     let sum = 0;
 
     if($("#selectStats").is(":checked")) {
-      $('.stat-amount').attr('max', pct);
+      $('.group.stat .stat-amount').attr('max', pct);
       if ($(this).val() >= pct) { $(this).val(pct); }
-      $('.stat-amount').each(function() { sum += parseFloat($(this).val()) || 0; });
-      if(sum != pct) { $('.stat-amount').addClass('error'); }
-      else { $('.stat-amount').removeClass('error'); }
+      $('.group.stat .stat-amount').each(function() { sum += parseFloat($(this).val()) || 0; });
+      if(sum != pct) { $('.group.stat .stat-amount').addClass('error'); }
+      else { $('.group.stat .stat-amount').removeClass('error'); }
     }
     else {
-      $('.stat-amount').attr('max', val);
+      $('.group.stat .stat-amount').attr('max', val);
       if ($(this).val() > val) { $(this).val(val); }
     }
   });
@@ -989,7 +1016,7 @@ $(document).ready(function() {
   $('#reset').on('click', function() {
     $('form')[0].reset();
     $('#stats .group').remove();
-    $('#item-subclass, #output').hide();
+    $('#item-subclass, #output, #item-level').hide();
     const itemClassObj = $('input[name="itemClass"]:checked');
     const itemClass = $(itemClassObj).val();
     populateItemSlots(itemClass);
@@ -1006,7 +1033,7 @@ $(document).ready(function() {
       reset.removeClass('rotate');
     });
   });
-
+  
   $("#stats").on('change input', '.stat-type, .stat-amount', function() {
     if($(this).hasClass('error')) {
       $(this).removeClass('error');
@@ -1017,6 +1044,10 @@ $(document).ready(function() {
   $(".itemType").hide();
   $(".weaponMethod").hide();
   let lastSelected = null;
+  
+  $("#item-reqlvl").on('change input', function() {
+    if ($(this).val() < 0) { $(this).val(''); }
+  });
   
   $("#damageMax, #damageMin, #damageMax1, #damageMin1, #attackSpeed").on('change input', function() {
     if ($(this).val() <= 0) { $(this).val(''); }
