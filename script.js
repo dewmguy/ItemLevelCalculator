@@ -375,7 +375,7 @@ $(document).ready(function() {
     },
     3: {
       name: 'rare',
-      sellValue: lvl => { return -463 + 525.4556036428294 * lvl },
+      sellValue: lvl => { return 500 + 525 * lvl },
       calc: lvl => {
         if (lvl >= 136) return qC(lvl,0.86,-41);
         if (lvl >= 80) return qC(lvl,0.625,-1.15);
@@ -384,7 +384,7 @@ $(document).ready(function() {
     },
     4: {
       name: 'epic',
-      sellValue: lvl => { return 13807 + 579.7694864805701 * lvl + Math.pow(0.16701574769247676 * lvl, 2) },
+      sellValue: lvl => { return 10000 + 600 * lvl + Math.pow(0.16 * lvl, 2) },
       calc: lvl => {
         if (lvl >= 200) return qC(lvl,1.8,-240);
         if (lvl >= 100) return qC(lvl,0.689,4);
