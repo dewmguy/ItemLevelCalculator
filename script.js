@@ -235,8 +235,6 @@ $(document).ready(function() {
         ]
       )
     },
-    // "0": { name: "Mana", type: 0, statMod: (32/16) }, // cannot test
-    // "1": { name: "Health", type: 0, statMod: (32/16) }, // cannot test
     "3": { name: "Agility", type: 0, statMod: (16/16) },
     "4": { name: "Strength", type: 0, statMod: (16/16) },
     "5": { name: "Intellect", type: 0, statMod: (16/16) },

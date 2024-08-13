@@ -397,7 +397,7 @@ The chest InventoryType has the highest sell value of all slots, similar to the 
 | Feet            |             8 |   12/16 |
 | Hands           |            10 |    8/16 |
 | Finger          |            11 |    8/16 |
-| Trinket         |            12 |   16/16 |
+| Trinket         |            12 |   28/16 |
 | Shield          |            14 |   15/16 |
 | Back            |             9 |   12/16 |
 | Head            |             1 |   12/16 |
@@ -426,7 +426,7 @@ All othe armor types sell for 20% of the buy price.
 
 ## Sources & Attribution
 
-Much of the data outlined in the documentation above are based on various wiki articles that have largely been inspired by the mathematics introduced by a Zul'jin player known as Hyzenthlei.
+The inspiration for the calculations and formulas above probably wouldn't have happened if it weren't for the hard work of the individuals who took the time to write wiki articles and forum threads outlined below. Their work was heavily influenced by the mathematics introduced by a Zul'jin player known as Hyzenthlei.
 
 - [TurtleWoW Forums](https://forum.turtle-wow.org/viewtopic.php?t=1567)
 - [Allakhazam Forums](https://wow.allakhazam.com/wiki/Itemization_Formulas_%28wow%29)
