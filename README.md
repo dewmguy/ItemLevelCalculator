@@ -66,12 +66,14 @@ These coefficients control the ceiling for stats on an item based on its quality
 
 | quality | ilvl range | qualityMult | qualityBase | final |
 |---------|------------|-------------|-------------|-------|
-|       4 |    200-300 |       1.800 |         240 |       |
-|       4 |    100-199 |       0.689 |          -4 |       |
-|       4 |       1-99 |       0.689 |           1 |       |
-|       3 |    136-300 |       0.860 |        41.0 |       |
-|       3 |     80-135 |       0.625 |        1.15 |       |
-|       3 |       1-79 |       0.635 |         3.6 |       |
+|       4 |    200-300 |       1.320 |        -120 |   yes |
+|       4 |    100-199 |       0.700 |          -2 |   yes |
+|       4 |       1-99 |       0.689 |          +1 |   yes |
+|---------|------------|-------------|-------------|-------|
+|       3 |    136-300 |       0.880 |      -39.25 |   yes |
+|       3 |     80-135 |       0.674 |        -8.0 |   yes |
+|       3 |       1-79 |       0.641 |        -4.0 |   yes |
+|---------|------------|-------------|-------------|-------|
 |       2 |       130+ |       0.801 |       -38.3 |   yes |
 |       2 |        80+ |       0.505 |        -4.5 |   yes |
 |       2 |         1+ |       0.495 |       -2.85 |   yes |
@@ -84,11 +86,7 @@ The values in this table are found to be static and do not change within any ite
 
 | InventoryType | Item Name     | defaults |
 |---------------|---------------|----------|
-|             1 | Head          |    16/16 |
-|             3 | Shoulder      |     8/16 |
 |             5 | Chest         |    16/16 |
-|             7 | Legs          |    16/16 |
-|             9 | Wrists        |     4/16 |
 |            20 | Chest (Robe)  |    16/16 |
 |            23 | Held Off-hand |     3/16 |
 |            28 | Relic         |     1/32 |
@@ -97,18 +95,22 @@ The values in this table are found to be static and do not change within any ite
 
 The values in this table are found to be dynamic and potentially very between item level ranges. As better methods for determining the accuracy of these coefficients is developed, these figures may change or be found to be static, and will be moved into the table above.
 
-| InventoryType | Item Name     | [2]   1+ | [2] 80+ | [2] 130+ | [3]   1+ | [3]    80+ | [3]    136+ | [4]   1+ | [4]    90+ | [4]    200+ |
-|---------------|---------------|----------|---------|----------|----------|------------|-------------|----------|------------|-------------|
-|             2 | Neck          |   4/16 f |   ... f |    ... f |      ... |        ... |         ... |      ... |        ... |         ... |
-|             6 | Waist         |   8/16 f |   ... f |    ... f |    10/16 |       9/16 |        9/16 |    10/16 |       9/16 |        9/16 |
-|             8 | Feet          |   8/16 f |   ... f |    ... f |     8/16 |       7/16 |        7/16 |     8/16 |       7/16 |        7/16 |
-|            10 | Hands         |   8/16 f |   ... f |    ... f |     9/16 |       9/16 |        6/16 |     9/16 |       8/16 |        4/16 |
-|            11 | Finger        |   4/16 f |   ... f |    ... f |     3/16 |       3/16 |        3/16 |     3/16 |       3/16 |        8/16 |
-|            12 | Trinket       |   8/16 f |   ... f |    ... f |     8/16 |      11/16 |       11/16 |     8/16 |       5/16 |        3/16 |
-|            14 | Shield        |   4/16 f |   ... f |    ... f |      ... |        ... |         ... |      ... |        ... |        8/16 |
-|            16 | Back          |   3/16 f |  4/16 f |   4/16 f |     3/16 |       3/16 |        3/16 |     3/16 |       3/16 |        4/16 |
+| InventoryType | Item Name     | [2]   1+ | [2]  80+ | [2] 130+ | [3]   1+ | [3]  80+ | [3] 136+ | [4]   1+ | [4]  90+ | [4] 200+ |
+|---------------|---------------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
+|             1 | Head          |    16/16 |      ... |      ... |      ... |      ... |      ... |      ... |    11/16 |    16/16 |
+|             2 | Neck          |     4/16 |      ... |      ... |      ... |      ... |      ... |      ... |     3/16 |     4/16 |
+|             3 | Shoulder      |     8/16 |      ... |      ... |      ... |      ... |      ... |      ... |     6/16 |     8/16 |
+|             6 | Waist         |     8/16 |      ... |      ... |      ... |      ... |      ... |      ... |     6/16 |     8/16 |
+|             7 | Legs          |    16/16 |      ... |      ... |      ... |      ... |      ... |      ... |    12/16 |    16/16 |
+|             8 | Feet          |     8/16 |      ... |      ... |      ... |      ... |      ... |      ... |     6/16 |     8/16 |
+|             9 | Wrists        |     4/16 |      ... |      ... |      ... |      ... |      ... |      ... |     3/16 |     4/16 |
+|            10 | Hands         |     8/16 |      ... |      ... |      ... |      ... |      ... |      ... |     6/16 |     8/16 |
+|            11 | Finger        |     4/16 |      ... |      ... |      ... |      ... |      ... |      ... |     3/16 |     4/16 |
+|            12 | Trinket       |     8/16 |      ... |      ... |      ... |    11/16 |    11/16 |     8/16 |     6/16 |     6/16 |
+|            14 | Shield        |     4/16 |      ... |      ... |      ... |      ... |      ... |      ... |     3/16 |     3/16 |
+|            16 | Back          |     3/16 |     4/16 |     4/16 |     4/16 |     4/16 |     4/16 |     4/16 |     3/16 |     3/16 |
 
-### Item Slot Modifiers (Weapon)
+### Item Slot Modifiers (Weapons)
 
 This coefficient (SlotMod) controls the ceiling for stats on an item based on the slot.
 
@@ -147,32 +149,25 @@ The values in this table are found to be static and do not change within any ite
 |        36 | Haste Rating       |           all |    16/16 |
 |        37 | Expertise          |           all |    16/16 |
 |        38 | Attack Power       |           all |     8/16 |
-|     armor | Bonus Armor        |           all |     3/32 |
 |        44 | Armor Penetration  |           all |    16/16 |
 |        47 | Spell Penetration  |           all |    16/16 |
+|     X_res | Resistances        |           all |    16/16 |
 
 The values in this table are found to be dynamic and frequently very between item level ranges. As better methods for determining the accuracy of these coefficients is developed, these figures may change or be found to be static, and will be moved into the table above.
 
 | stat_type | Stat Name          | InventoryType | [2]   1+ | [2]  80+ | [2] 130+ | [3]   1+ | [3]  80+ | [3] 136+ | [4]   1+ | [4]  90+ | [4] 200+ |
 |-----------|--------------------|---------------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
-|     X_res | Resistances        |           all |  16/16 f |    ... f |    ... f |      ... |      ... |      ... |      ... |      ... |    12/16 |
-|  X_socket | Sockets            |           all |   10/1 f |    ... f |   30/1 f |     10/1 |     10/1 |     25/1 |     10/1 |     10/1 |     25/1 |
-|         7 | Stamina            |           all |  16/16 f |    2/3 f |    2/3 f |    16/16 |      2/3 |      2/3 |    10/16 |      2/3 |      2/3 |
-|        45 | Spell Power        |           all |  45/64 f |  55/64 f |  55/64 f |      ... |      ... |      ... |      ... |      ... |      ... |
-|        43 | Mana Regen Per 5   |           all |  77/32 f |  88/32 f |  81/32 f |      ... |      ... |      ... |      ... |      ... |      ... |
-|        46 | Health Regen Per 5 |           all |  68/16 f |    ... ? |    ... ? |    ... ? |    ... ? |    ... ? |    ... ? |    ... ? |   4/16 ? |
-|        48 | Block Value        |     2, 11, 14 |  16/16 f |  21/64 ? |  21/64 ? |      ... |      ... |      ... |      ... |      ... |      ... |
-|        48 | Block Value        |          else |  16/16 f |  21/64 f |  21/64 ? |      ... |      ... |      ... |     8/16 |     4/16 |     4/16 |
-
-### Special Skill Modifiers
-
-The values in this table are not in use, and are not currently planned to be used, but these are somewhat accurate values based on minimal testing.
-
-| stat_type  | Unvalidated Stats |
-|------------|-------------------|
-| Swim Speed |              9/16 |
-| +x Stealth |               8/1 |
-| +x Gather  |              8/16 |
+|  X_socket | Sockets            | 2, 11, 14, 23 |      5/1 |      5/1 |      5/1 |     10/1 |     10/1 |     10/1 |     10/1 |     10/1 |     24/1 |
+|  X_socket | Sockets            |          else |     10/1 |     10/1 |     10/1 |     20/1 |     20/1 |     20/1 |     20/1 |     10/1 |     24/1 |
+|     armor | Bonus Armor        |           all |     3/32 |      ... |      ... |      ... |     2/32 |     2/32 |     2/32 |     2/32 |     2/32 |
+|         7 | Stamina            |           all |    16/16 |      2/3 |      2/3 |    16/16 |      2/3 |      2/3 |    16/16 |      2/3 |      2/3 |
+|        43 | Mana Regen Per 5   | 2, 11, 12, 23 |    48/32 |      ... |      ... |      ... |    32/16 |    32/16 |    32/16 |    32/16 |    24/16 |
+|        43 | Mana Regen Per 5   |          else |    92/32 |      ... |      ... |      ... |    32/16 |    32/16 |    32/16 |    32/16 |    32/16 |
+|        45 | Spell Power        |           all |    45/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |    45/64 |    45/64 |
+|        46 | Health Regen Per 5 | 2, 11, 12, 23 |    32/16 |      ... |      ... |      ... |      ... |      ... |    16/16 |     8/16 |     4/16 |
+|        46 | Health Regen Per 5 |          else |    64/16 |      ... |      ... |      ... |      ... |      ... |    32/16 |    16/16 |     8/16 |
+|        48 | Block Value        | 2, 11, 12, 14 |    16/16 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |     4/64 |
+|        48 | Block Value        |          else |    16/16 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |
 
 ## Base Armor Calculation
 

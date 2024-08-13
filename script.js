@@ -9,116 +9,116 @@ $(document).ready(function() {
   };
 
   const armorClass = {
+    "1": { name: "Head", sellMod: (12/16), armorMod: (13/16), itemClass: 4, subClass: [1, 2, 3, 4],
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
+        { quality: 4, min: 200, mod: (16/16) },
+        { quality: 4, min: 90, mod: (11/16) },
+        { quality: 4, min: 1, mod: (16/16) },
+        { quality: 3, min: 1, mod: (16/16) },
+        { quality: 2, min: 1, mod: (16/16) },
+      ])
+    },
     "2": { name: "Neck", sellMod: (8/16), armorMod: 0, itemClass: 4, subClass: [0],
-      slotMod: (quality, lvl) => dataFilter(quality, lvl, [
-        { quality: 4, min: 200, mod: (3/16) },
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
+        { quality: 4, min: 200, mod: (4/16) },
         { quality: 4, min: 90, mod: (3/16) },
         { quality: 4, min: 1, mod: (4/16) },
-        { quality: 3, min: 136, mod: (4/16) },
-        { quality: 3, min: 80, mod: (3/16) },
         { quality: 3, min: 1, mod: (4/16) },
-        { quality: 2, min: 130, mod: (4/16) }, // final
-        { quality: 2, min: 80, mod: (4/16) }, // final
-        { quality: 2, min: 1, mod: (4/16) }, // final
+        { quality: 2, min: 1, mod: (4/16) },
+      ])
+    },
+    "3": { name: "Shoulder", sellMod: (12/16), armorMod: (12/16), itemClass: 4, subClass: [1, 2, 3, 4],
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
+        { quality: 4, min: 200, mod: (8/16) },
+        { quality: 4, min: 90, mod: (6/16) },
+        { quality: 4, min: 1, mod: (8/16) },
+        { quality: 3, min: 1, mod: (8/16) },
+        { quality: 2, min: 1, mod: (8/16) },
       ])
     },
     "6": { name: "Waist", sellMod: (8/16), armorMod: (9/16), itemClass: 4, subClass: [1, 2, 3, 4],
-      slotMod: (quality, lvl) => dataFilter(quality, lvl, [
-        { quality: 4, min: 200, mod: (9/16) },
-        { quality: 4, min: 90, mod: (9/16) },
-        { quality: 4, min: 1, mod: (10/16) },
-        { quality: 3, min: 136, mod: (9/16) },
-        { quality: 3, min: 80, mod: (9/16) },
-        { quality: 3, min: 1, mod: (10/16) },
-        { quality: 2, min: 130, mod: (8/16) }, // final
-        { quality: 2, min: 80, mod: (8/16) }, // final
-        { quality: 2, min: 1, mod: (8/16) }, // final
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
+        { quality: 4, min: 200, mod: (8/16) },
+        { quality: 4, min: 90, mod: (6/16) },
+        { quality: 4, min: 1, mod: (8/16) },
+        { quality: 3, min: 1, mod: (8/16) },
+        { quality: 2, min: 1, mod: (8/16) },
+      ])
+    },
+    "7": { name: "Legs", sellMod: (16/16), armorMod: (14/16), itemClass: 4, subClass: [1, 2, 3, 4],
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
+        { quality: 4, min: 200, mod: (16/16) },
+        { quality: 4, min: 90, mod: (12/16) },
+        { quality: 4, min: 1, mod: (16/16) },
+        { quality: 3, min: 1, mod: (16/16) },
+        { quality: 2, min: 1, mod: (16/16) },
       ])
     },
     "8": { name: "Feet", sellMod: (12/16), armorMod: (11/16), itemClass: 4, subClass: [1, 2, 3, 4],
-      slotMod: (quality, lvl) => dataFilter(quality, lvl, [
-        { quality: 4, min: 200, mod: (7/16) },
-        { quality: 4, min: 90, mod: (7/16) },
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
+        { quality: 4, min: 200, mod: (8/16) },
+        { quality: 4, min: 90, mod: (6/16) },
         { quality: 4, min: 1, mod: (8/16) },
-        { quality: 3, min: 136, mod: (7/16) },
-        { quality: 3, min: 80, mod: (7/16) },
         { quality: 3, min: 1, mod: (8/16) },
-        { quality: 2, min: 130, mod: (8/16) }, // final
-        { quality: 2, min: 80, mod: (8/16) }, // final
-        { quality: 2, min: 1, mod: (8/16) }, // final
+        { quality: 2, min: 1, mod: (8/16) },
+      ])
+    },
+    "9": { name: "Wrists", sellMod: (8/16), armorMod: (7/16), itemClass: 4, subClass: [1, 2, 3, 4],
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
+        { quality: 4, min: 200, mod: (4/16) },
+        { quality: 4, min: 90, mod: (3/16) },
+        { quality: 4, min: 1, mod: (4/16) },
+        { quality: 3, min: 1, mod: (4/16) },
+        { quality: 2, min: 1, mod: (4/16) },
       ])
     },
     "10": { name: "Hands", sellMod: (8/16), armorMod: (10/16), itemClass: 4, subClass: [1, 2, 3, 4],
-      slotMod: (quality, lvl) => dataFilter(quality, lvl, [
-        { quality: 4, min: 200, mod: (4/16) },
-        { quality: 4, min: 90, mod: (8/16) },
-        { quality: 4, min: 1, mod: (9/16) },
-        { quality: 3, min: 136, mod: (6/16) },
-        { quality: 3, min: 80, mod: (9/16) },
-        { quality: 3, min: 1, mod: (9/16) },
-        { quality: 2, min: 130, mod: (8/16) }, // final
-        { quality: 2, min: 80, mod: (8/16) }, // final
-        { quality: 2, min: 1, mod: (8/16) }, // final
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
+        { quality: 4, min: 200, mod: (8/16) },
+        { quality: 4, min: 90, mod: (6/16) },
+        { quality: 4, min: 1, mod: (8/16) },
+        { quality: 3, min: 1, mod: (8/16) },
+        { quality: 2, min: 1, mod: (8/16) },
       ])
     },
     "11": { name: "Finger", sellMod: (8/16), armorMod: 0, itemClass: 4, subClass: [0],
-      slotMod: (quality, lvl) => dataFilter(quality, lvl, [
-        { quality: 4, min: 200, mod: (8/16) },
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
+        { quality: 4, min: 200, mod: (4/16) },
         { quality: 4, min: 90, mod: (3/16) },
-        { quality: 4, min: 1, mod: (3/16) },
-        { quality: 3, min: 136, mod: (3/16) },
-        { quality: 3, min: 80, mod: (3/16) },
-        { quality: 3, min: 1, mod: (3/16) },
-        { quality: 2, min: 130, mod: (4/16) }, // final
-        { quality: 2, min: 80, mod: (4/16) }, // final
-        { quality: 2, min: 1, mod: (4/16) }, // final
+        { quality: 4, min: 1, mod: (4/16) },
+        { quality: 3, min: 1, mod: (4/16) },
+        { quality: 2, min: 1, mod: (4/16) },
       ])
     },
     "12": { name: "Trinket", sellMod: (28/16), armorMod: 0, itemClass: 4, subClass: [0],
-      slotMod: (quality, lvl) => dataFilter(quality, lvl, [
-        { quality: 4, min: 200, mod: (3/16) },
-        { quality: 4, min: 90, mod: (5/16) },
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
+        { quality: 4, min: 90, mod: (6/16) },
         { quality: 4, min: 1, mod: (8/16) },
-        { quality: 3, min: 136, mod: (11/16) },
         { quality: 3, min: 80, mod: (11/16) },
         { quality: 3, min: 1, mod: (8/16) },
-        { quality: 2, min: 130, mod: (8/16) }, // final
-        { quality: 2, min: 80, mod: (8/16) }, // final
-        { quality: 2, min: 1, mod: (8/16) }, // final
+        { quality: 2, min: 1, mod: (8/16) },
       ])
     },
     "14": { name: "Shield", sellMod: (15/16), armorMod: (16/16), itemClass: 4, subClass: [6],
-      slotMod: (quality, lvl) => dataFilter(quality, lvl, [
-        { quality: 4, min: 200, mod: (8/16) },
-        { quality: 4, min: 90, mod: (4/16) },
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
+        { quality: 4, min: 90, mod: (3/16) },
         { quality: 4, min: 1, mod: (4/16) },
-        { quality: 3, min: 136, mod: (4/16) },
-        { quality: 3, min: 80, mod: (4/16) },
         { quality: 3, min: 1, mod: (4/16) },
-        { quality: 2, min: 130, mod: (4/16) }, // final
-        { quality: 2, min: 80, mod: (4/16) }, // final
-        { quality: 2, min: 1, mod: (4/16) }, // final
+        { quality: 2, min: 1, mod: (4/16) },
       ])
     },
     "16": { name: "Back", sellMod: (12/16), armorMod: (8/16), itemClass: 4, subClass: [1],
-      slotMod: (quality, lvl) => dataFilter(quality, lvl, [
-        { quality: 4, min: 200, mod: (4/16) },
+      slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
         { quality: 4, min: 90, mod: (3/16) },
-        { quality: 4, min: 1, mod: (3/16) },
-        { quality: 3, min: 136, mod: (3/16) },
-        { quality: 3, min: 80, mod: (3/16) },
-        { quality: 3, min: 1, mod: (3/16) },
-        { quality: 2, min: 130, mod: (4/16) }, // final
-        { quality: 2, min: 80, mod: (4/16) }, // final
-        { quality: 2, min: 1, mod: (3/16) }, // final
+        { quality: 4, min: 1, mod: (4/16) },
+        { quality: 3, min: 1, mod: (4/16) },
+        { quality: 2, min: 80, mod: (4/16) },
+        { quality: 2, min: 1, mod: (3/16) },
       ])
     },
-    "1": { name: "Head", sellMod: (12/16), armorMod: (13/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
-    "3": { name: "Shoulder", sellMod: (12/16), armorMod: (12/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (8/16) },
     "4": { name: "Shirt", sellMod: (4/16), armorMod: 0, itemClass: 4, subClass: [1], slotMod: (1/32) },
     "5": { name: "Chest", sellMod: (16/16), armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
     "7": { name: "Legs", sellMod: (16/16), armorMod: (14/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
-    "9": { name: "Wrists", sellMod: (8/16), armorMod: (7/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (4/16) },
     "19": { name: "Tabard", sellMod: (4/16), armorMod: 0, itemClass: 4, subClass: [0], slotMod: (1/32) },
     "20": { name: "Chest (Robe)", sellMod: (16/16), armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
     "23": { name: "Held Off-hand", sellMod: (8/16), armorMod: 0, itemClass: 4, subClass: [0], slotMod: (3/16) },
@@ -135,84 +135,103 @@ $(document).ready(function() {
     "26": { name: "Ranged", sellMod: (5/16), slotMod: (5/16), armorMod: 0, itemClass: 2, subClass: [3, 18, 19] }
   };
 
-  const resistMods = (slot, quality, lvl) => dataFilter(quality, lvl, [
-    { quality: 4, min: 200, mod: (12/16) },
-    { quality: 4, min: 1, mod: (16/16) },
-    { quality: 3, min: 1, mod: (16/16) },
-    { quality: 2, min: 130, mod: (16/16) }, // final
-    { quality: 2, min: 80, mod: (16/16) }, // final
-    { quality: 2, min: 1, mod: (16/16) }, // final
-  ]);
-
-  const socketMods = (slot, quality, lvl) => dataFilter(quality, lvl, [
-    { quality: 4, min: 200, mod: (25/1) },
-    { quality: 4, min: 90, mod: (10/1) },
-    { quality: 4, min: 1, mod: (10/1) },
-    { quality: 3, min: 130, mod: (25/1) },
-    { quality: 3, min: 80, mod: (10/1) },
-    { quality: 3, min: 1, mod: (10/1) },
-    { quality: 2, min: 130, mod: (30/1) }, // final
-    { quality: 2, min: 80, mod: (10/1) }, // final
-    { quality: 2, min: 1, mod: (10/1) }, // final
-  ]);
+  const socketMods = (slot, quality, lvl) => dataFilter(quality, lvl, 
+    [2, 11, 14, 23].includes(slot)
+    ? [ // ammys, rings, shields, offhands
+      { quality: 4, min: 200, mod: (24/1) },
+      { quality: 4, min: 1, mod: (10/1) },
+      { quality: 3, min: 1, mod: (10/1) },
+      { quality: 2, min: 1, mod: (5/1) },
+    ]
+    : [ // everything else
+      { quality: 4, min: 200, mod: (24/1) },
+      { quality: 4, min: 90, mod: (100/1) },
+      { quality: 4, min: 1, mod: (20/1) },
+      { quality: 3, min: 1, mod: (20/1) },
+      { quality: 2, min: 1, mod: (10/1) },
+    ]
+  );
 
   const itemStats = {
-    "7": { name: "Stamina", type: 0,
-      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, [
-        { quality: 4, min: 1, mod: (10/16) },
-        { quality: 3, min: 80, mod: (10/16) },
-        { quality: 3, min: 1, mod: (16/16) },
-        { quality: 2, min: 130, mod: (2/3) }, // final
-        { quality: 2, min: 80, mod: (2/3) }, // final
-        { quality: 2, min: 1, mod: (16/16) }, // final
+    "armor": { name: "Bonus Armor", type: 3,
+      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, [ 
+        { quality: 4, min: 1, mod: (2/32) },
+        { quality: 3, min: 80, mod: (2/32) },
+        { quality: 3, min: 1, mod: (3/32) },
+        { quality: 2, min: 1, mod: (3/32) },
       ])
     },
-    "45": { name: "Spell Power", type: 1,
-      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, [
-        { quality: 4, min: 200, mod: (4/16) },
-        { quality: 4, min: 1, mod: (68/64) },
-        { quality: 3, min: 1, mod: (68/64) },
-        { quality: 2, min: 130, mod: (55/64) }, // final
-        { quality: 2, min: 80, mod: (55/64) }, // final
-        { quality: 2, min: 1, mod: (45/64) }, // final
+    "7": { name: "Stamina", type: 0,
+      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, [ 
+        { quality: 4, min: 90, mod: (2/3) },
+        { quality: 4, min: 1, mod: (16/16) },
+        { quality: 3, min: 80, mod: (2/3) },
+        { quality: 3, min: 1, mod: (16/16) },
+        { quality: 2, min: 80, mod: (2/3) },
+        { quality: 2, min: 1, mod: (16/16) },
       ])
     },
     "43": { name: "Mana Regen MP5", type: 1,
-      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, [
-        { quality: 4, min: 200, mod: (4/16) },
-        { quality: 4, min: 1, mod: (68/16) },
-        { quality: 3, min: 1, mod: (68/64) },
-        { quality: 2, min: 130, mod: (81/32) }, // final
-        { quality: 2, min: 80, mod: (88/32) }, // final
-        { quality: 2, min: 1, mod: (77/32) }, // final
+      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, 
+        [2, 11, 12, 23].includes(slot)
+        ? [ // ammys, rings, trinkets, offhand
+          { quality: 4, min: 200, mod: (24/16) },
+          { quality: 4, min: 1, mod: (32/16) },
+          { quality: 3, min: 80, mod: (32/16) },
+          { quality: 3, min: 1, mod: (48/16) },
+          { quality: 2, min: 1, mod: (48/16) },
+        ]
+        : [ // everything else
+          { quality: 4, min: 1, mod: (32/16) },
+          { quality: 3, min: 80, mod: (32/16) },
+          { quality: 3, min: 1, mod: (92/32) },
+          { quality: 2, min: 1, mod: (92/32) },
+        ]
+      )
+    },
+    "45": { name: "Spell Power", type: 1,
+      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, [ 
+        { quality: 4, min: 90, mod: (45/64) },
+        { quality: 4, min: 1, mod: (55/64) },
+        { quality: 3, min: 1, mod: (55/64) },
+        { quality: 2, min: 80, mod: (55/64) },
+        { quality: 2, min: 1, mod: (45/64) },
       ])
     },
     "46": { name: "Health Regen HP5", type: 1,
-      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, [
-        { quality: 4, min: 200, mod: (4/16) },
-        { quality: 4, min: 1, mod: (68/16) },
-        { quality: 3, min: 1, mod: (68/16) },
-        { quality: 2, min: 1, mod: (68/64) }, // final
-      ])
-    },
-    "48": { name: "Block Value", type: 1,
-      statMod: (slot, quality, lvl) => dataFilter(quality, lvl,
-        [2, 11, 14].includes(slot)
-        ? [ // ammys, rings, shields
-          { quality: 4, min: 90, mod: (4/16) },
+      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, 
+        [2, 11, 12, 23].includes(slot)
+        ? [ // ammys, rings, trinkets, offhand
+          { quality: 4, min: 200, mod: (4/16) },
+          { quality: 4, min: 90, mod: (8/16) },
           { quality: 4, min: 1, mod: (16/16) },
-          { quality: 3, min: 1, mod: (16/16) },
-          { quality: 2, min: 130, mod: (21/64) }, // final
-          { quality: 2, min: 80, mod: (21/64) }, // final
-          { quality: 2, min: 1, mod: (16/16) }, // final
+          { quality: 3, min: 1, mod: (32/16) },
+          { quality: 2, min: 1, mod: (32/16) },
         ]
         : [ // everything else
-          { quality: 4, min: 90, mod: (4/16) },
-          { quality: 4, min: 1, mod: (8/16) },
+          { quality: 4, min: 200, mod: (8/16) },
+          { quality: 4, min: 90, mod: (16/16) },
+          { quality: 4, min: 1, mod: (32/16) },
+          { quality: 3, min: 1, mod: (64/16) },
+          { quality: 2, min: 1, mod: (64/16) },
+        ]
+      )
+    },
+    "48": { name: "Block Value", type: 1,
+      statMod: (slot, quality, lvl) => dataFilter(quality, lvl, 
+        [2, 11, 12, 14].includes(slot)
+        ? [ // ammys, rings, trinkets, shields
+          { quality: 4, min: 200, mod: (4/64) },
+          { quality: 4, min: 1, mod: (21/64) },
           { quality: 3, min: 1, mod: (21/64) },
-          { quality: 2, min: 130, mod: (21/64) }, // final
-          { quality: 2, min: 80, mod: (21/64) }, // final
-          { quality: 2, min: 1, mod: (16/16) }, // final
+          { quality: 2, min: 80, mod: (21/64) },
+          { quality: 2, min: 1, mod: (16/16) },
+        ]
+        : [ // everything else
+          { quality: 4, min: 1, mod: (21/64) },
+          { quality: 3, min: 1, mod: (21/64) },
+          { quality: 2, min: 80, mod: (21/64) },
+          { quality: 2, min: 1, mod: (16/16) },
         ]
       )
     },
@@ -229,19 +248,17 @@ $(document).ready(function() {
     "21": { name: "Spell Crit Rating", type: 1, statMod: (16/16) },
     "31": { name: "Hit Rating", type: 1, statMod: (16/16) },
     "32": { name: "Crit Rating", type: 1, statMod: (16/16) },
-    "35": { name: "Resilience Rating", type: 1, statMod: (16/16) },
+    "35": { name: "Resilience", type: 1, statMod: (16/16) },
     "36": { name: "Haste Rating", type: 1, statMod: (16/16) },
     "37": { name: "Expertise Rating", type: 1, statMod: (16/16) },
     "38": { name: "Attack Power", type: 1, statMod: (8/16) },
     "44": { name: "Armor Penetration Rating", type: 1, statMod: (16/16) },
     "47": { name: "Spell Penetration", type: 1, statMod: (12/16) },
-    "armor": { name: "Bonus Armor", type: 3, statMod: 3/32 },
-    "arcane_res": { name: "Resist Arcane", type: 0, statMod: resistMods },
-    "fire_res": { name: "Resist Fire", type: 0, statMod: resistMods },
-    "holy_res": { name: "Resist Holy", type: 0, statMod: resistMods },
-    "nature_res": { name: "Resist Nature", type: 0, statMod: resistMods },
-    "frost_res": { name: "Resist Frost", type: 0, statMod: resistMods },
-    "shadow_res": { name: "Resist Shadow", type: 0, statMod: resistMods },
+    "arcane_res": { name: "Resist Arcane", type: 0, statMod: (16/16) },
+    "fire_res": { name: "Resist Fire", type: 0, statMod: (16/16) },
+    "nature_res": { name: "Resist Nature", type: 0, statMod: (16/16) },
+    "frost_res": { name: "Resist Frost", type: 0, statMod: (16/16) },
+    "shadow_res": { name: "Resist Shadow", type: 0, statMod: (16/16) },
     "meta_socket": { name: "Meta Socket", color: "meta", type: 2, statMod: socketMods },
     "red_socket": { name: "Red Socket", color: "red", type: 2, statMod: socketMods },
     "blue_socket": { name: "Blue Socket", color: "blue", type: 2, statMod: socketMods },
@@ -347,48 +364,48 @@ $(document).ready(function() {
   };
 
   const shieldBlockCoefficients = {
+    4: lvl => {
+      if (lvl >= 190) return 364.0853740290 - 1.7727768015 * lvl + 0.0050409241 * Math.pow(lvl, 2);
+      if (lvl >= 1) return -36.7178644064 + 2.3738336805 * lvl - 0.0257785254 * Math.pow(lvl, 2) + 0.0002156921 * Math.pow(lvl, 3) - 0.0000005816 * Math.pow(lvl, 4);
+    },
+    3: lvl => {
+      if (lvl >= 154) return 18470.4850615834 - 421.5128438990 * lvl + 3.5991532696 * Math.pow(lvl, 2) - 0.0135272648 * Math.pow(lvl, 3) + 0.0000189300 * Math.pow(lvl, 4);
+      if (lvl >= 71) return -29 + 1 * lvl;
+      if (lvl >= 1) return -3.5159255097 + 1.1796186496 * lvl - 0.0464979829 * Math.pow(lvl, 2) + 0.0011133817 * Math.pow(lvl, 3) - 0.0000079076 * Math.pow(lvl, 4);
+    },
     2: lvl => {
       if (lvl >= 130) return 958.2984725669 - 18.2166307096 * lvl + 0.1250629715 * Math.pow(lvl, 2) - 0.0002655468 * Math.pow(lvl, 3);
       if (lvl >= 80) return -16.3908655872 + 0.6897096083 * lvl + 0.0013506088 * Math.pow(lvl, 2);
       if (lvl >= 1) return -3.0432462933 + 0.8825715740 * lvl - 0.0312968732 * Math.pow(lvl, 2) + 0.0007254284 * Math.pow(lvl, 3) - 0.0000046519 * Math.pow(lvl, 4);
-    },
-    3: lvl => {
-      if (lvl >= 154) return 18470.4850615834 - 421.5128438990 * lvl + 3.5991532696 * Math.pow(lvl, 2) - 0.0135272648 * Math.pow(lvl, 3) + 0.0000189300 * Math.pow(lvl, 4);
-      if (lvl >= 71) return -29.0000000000 + 1.0000000000 * lvl;
-      if (lvl >= 1) return -3.5159255097 + 1.1796186496 * lvl - 0.0464979829 * Math.pow(lvl, 2) + 0.0011133817 * Math.pow(lvl, 3) - 0.0000079076 * Math.pow(lvl, 4);
-    },
-    4: lvl => {
-      if (lvl >= 190) return 364.0853740290 - 1.7727768015 * lvl + 0.0050409241 * Math.pow(lvl, 2);
-      if (lvl >= 1) return -36.7178644064 + 2.3738336805 * lvl - 0.0257785254 * Math.pow(lvl, 2) + 0.0002156921 * Math.pow(lvl, 3) - 0.0000005816 * Math.pow(lvl, 4);
     }
   };
 
   const qualityCoefficients = {
-    2: {
-      name: 'uncommon',
-      sellValue: lvl => { return 439 * lvl },
+    4: {
+      name: 'epic',
+      sellValue: lvl => { return 10000 + 600 * lvl + Math.pow(0.16 * lvl, 2) },
       calc: lvl => {
-        if (lvl >= 130) return qC(lvl,0.801,-38.3); // final
-        if (lvl >= 80) return qC(lvl,0.505,-4.5); // final
-        if (lvl >= 1) return qC(lvl,0.495,-2.85); // final
+        if (lvl >= 200) return qC(lvl,1.32,-120);
+        if (lvl >= 100) return qC(lvl,0.700,-2);
+        if (lvl >= 1) return qC(lvl,0.689,1);
       }
     },
     3: {
       name: 'rare',
       sellValue: lvl => { return 500 + 525 * lvl },
       calc: lvl => {
-        if (lvl >= 136) return qC(lvl,0.86,-41);
-        if (lvl >= 80) return qC(lvl,0.625,-1.15);
-        if (lvl >= 1) return qC(lvl,0.635,-3.6);
+        if (lvl >= 136) return qC(lvl,0.88,-39.25);
+        if (lvl >= 80) return qC(lvl,0.674,-8);
+        if (lvl >= 1) return qC(lvl,0.641,-4);
       }
     },
-    4: {
-      name: 'epic',
-      sellValue: lvl => { return 10000 + 600 * lvl + Math.pow(0.16 * lvl, 2) },
+    2: {
+      name: 'uncommon',
+      sellValue: lvl => { return 439 * lvl },
       calc: lvl => {
-        if (lvl >= 200) return qC(lvl,1.8,-240);
-        if (lvl >= 100) return qC(lvl,0.689,4);
-        if (lvl >= 1) return qC(lvl,0.689,-1);
+        if (lvl >= 130) return qC(lvl,0.801,-38.3); 
+        if (lvl >= 80) return qC(lvl,0.505,-4.5); 
+        if (lvl >= 1) return qC(lvl,0.495,-2.85); 
       }
     }
   };
