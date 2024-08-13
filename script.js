@@ -323,6 +323,113 @@ $(document).ready(function() {
     "6": { name: "Arcane" }
   };
   
+  const weaponDamageMod = [
+    { type: 13, sub: 15, quality: 3, min: 101, max: 300, mod: 0.65 },
+    { type: 13, sub: 15, quality: 4, min: 1, max: 100, mod: 0.54 },
+    { type: 13, sub: 15, quality: 4, min: 101, max: 300, mod: 0.65 },
+    { type: 15, sub: 2, quality: 4, min: 1, max: 100, mod: 0.54 },
+    { type: 15, sub: 2, quality: 4, min: 101, max: 300, mod: 0.65 },
+    { type: 17, sub: [1, 5, 6, 8, 10], quality: [2, 3, 4], min: 1, max: 300, mod: 0.65 },
+    { type: 17, sub: 10, quality: [2, 3, 4], min: 101, max: 300, mod: 0.54 },
+    { type: 21, sub: [0, 13, 15], quality: 4, min: 101, max: 300, mod: 0.3125 },
+    { type: 21, sub: 4, quality: 4, min: 115, max: 164, mod: 0.155 },
+    { type: 21, sub: [13, 15], quality: 4, min: 200, max: 300, mod: 0.65 },
+    { type: 21, sub: 15, quality: 4, min: 101, max: 200, mod: 0.155 },
+    { type: 21, sub: 0, quality: 4, min: 1, max: 300, mod: 0.54 },
+    { type: 25, sub: 16, quality: [3, 4], min: 1, max: 300, mod: 0.65 },
+    { type: 26, sub: 18, quality: [3, 4], min: 1, max: 300, mod: 0.65 },
+    { type: 21, sub: null, quality: [2, 3, 4], min: 1, max: 100, mod: 0.54 },
+    { type: 21, sub: null, quality: [2, 3, 4], min: 101, max: 300, mod: 0.3125 }
+  ];
+  
+  const weaponDPS = {
+    4: {
+      13: [ // One-hand
+        { min: 1, max: 99, sub: null, mod: lvl => -0.46373319610341757 + 1.948435650742608 * lvl - 0.05134655549435444 * Math.pow(lvl, 2) + 0.0006882333623959314 * Math.pow(lvl, 3) - 0.000002864536021471839 * Math.pow(lvl, 4) },
+        { min: 100, max: 199, sub: null, mod: lvl => -0.2769968450289057 + 1.5484937105463996 * lvl - 0.011645982924600652 * Math.pow(lvl, 2) + 0.00004802296965314522 * Math.pow(lvl, 3) - 5.273652941191476e-8 * Math.pow(lvl, 4) },
+        { min: 200, max: 300, sub: null, mod: lvl => -0.08289582596875844 + 1.1576083521398557 * lvl - 0.005540388894214148 * Math.pow(lvl, 2) + 0.000016701140069482415 * Math.pow(lvl, 3) }
+      ],
+      15: [ // Bows
+        { min: 1, max: 300, sub: 2, mod: lvl => -1.8160185143165526 + 0.8176011515936384 * lvl + 0.00004631966853788777 * Math.pow(lvl, 2) - 0.00002190693147532568 * Math.pow(lvl, 3) + 9.05587408850838e-8 * Math.pow(lvl, 4) }
+      ],
+      17: [ // Two-hand
+        { type: 'caster', min: 1, max: 300, sub: 10, mod: lvl => -2.7137455672 + 1.2034848552 * lvl - 0.0078149234 * Math.pow(lvl, 2) + 0.0000237964 * Math.pow(lvl, 3) }
+        { type: 'druid', min: 1, max: 300, sub: 10, mod: lvl => -39.8477534594 + 2.2205407279 * lvl - 0.0111235858 * Math.pow(lvl, 2) + 0.0000284616 * Math.pow(lvl, 3) }
+        { type: null, min: 1, max: 100, sub: -10, mod: lvl => -0.7405045351583416 + 2.5291730790997162 * lvl - 0.06696995004352309 * Math.pow(lvl, 2) + 0.0009043795705405915 * Math.pow(lvl, 3) - 0.000003796542201089664 * Math.pow(lvl, 4) },
+        { type: null, min: 91, max: 300, sub: -10, mod: lvl => 0.904817539290022 + 1.5822436006525589 * lvl - 0.007940579189201744 * Math.pow(lvl, 2) + 0.000023354465861457816 * Math.pow(lvl, 3) }
+      ],
+      21: [ // Main-hand
+        { type: 'caster', min: 1, max: 199, sub: [4, 7, 15], mod: lvl => 0.33220409164479436 + 0.9289727447958701 * lvl - 0.0029446443452658348 * Math.pow(lvl, 2) - 0.00004346568763260079 * Math.pow(lvl, 3) + 2.2512744703653982e-7 * Math.pow(lvl, 4) },
+        { type: 'caster', min: 200, max: 300, sub: [4, 7, 15], mod: lvl => -1428.9508500081054 + 19.69433925384912 * lvl - 0.08717187138547562 * Math.pow(lvl, 2) + 0.0001325134232926368 * Math.pow(lvl, 3) },
+        { type: null, min: 1, max: 300, sub: null, mod: lvl => -0.5178790028826743 + 0.4607974744638549 * lvl + 0.0061377306628395585 * Math.pow(lvl, 2) - 0.00006505628736448377 * Math.pow(lvl, 3) + 2.70678156265153e-7 * Math.pow(lvl, 4) - 3.427754270710267e-10 * Math.pow(lvl, 5) }
+      ],
+      22: [ // Off-hand
+        { min: 1, max: 300, sub: null, mod: lvl => -0.8154206101027381 + 0.8306900043436485 * lvl - 0.00029042355648253686 * Math.pow(lvl, 2) - 0.000009668965907691205 * Math.pow(lvl, 3) + 4.243652454960742e-8 * Math.pow(lvl, 4) }
+      ],
+      25: [ // Thrown
+        { min: 1, max: 300, sub: null, mod: lvl => -0.12483151990909214 + 1.605551235747681 * lvl - 0.008135377299559524 * Math.pow(lvl, 2) + 0.000023833062012799013 * Math.pow(lvl, 3) }
+      ],
+      26: [ // Ranged: Guns & Crossbows
+        { min: 1, max: 300, sub: [3, 18], mod: lvl => -2.9838107517317654 + 1.044765562039762 * lvl - 0.003913212784379925 * Math.pow(lvl, 2) + 6.090860438060731e-7 * Math.pow(lvl, 3) + 5.016590029076527e-8 * Math.pow(lvl, 4) },
+        { min: 1, max: 94, sub: 19, mod: lvl => -0.19588388531408696 + 1.413551669030605 * lvl - 0.014741678597083266 * Math.pow(lvl, 2) + 0.00017194361662129607 * Math.pow(lvl, 3) },
+        { min: 95, max: 300, sub: 19, mod: lvl => 38.01542852693626 + 1.5934000590768418 * lvl - 0.007732119057129331 * Math.pow(lvl, 2) + 0.000027000350802930127 * Math.pow(lvl, 3) }
+      ]
+    },
+    3: {
+      13: [ // One-hand
+        { min: 1, max: 115, sub: null, mod: lvl => -0.20849222965398617 + 0.5638012041071734 * lvl + 0.006185098993217638 * Math.pow(lvl, 2) - 0.00010529221983632224 * Math.pow(lvl, 3) + 4.856933421922349e-7 * Math.pow(lvl, 4) },
+        { min: 116, max: 300, sub: null, mod: lvl => -1129.4203195277557 + 28.231290187427803 * lvl - 0.24779778144598605 * Math.pow(lvl, 2) + 0.0009711032569160498 * Math.pow(lvl, 3) - 0.0000014022912601703806 * Math.pow(lvl, 4) }
+      ],
+      15: [ // Bows
+        { min: 1, max: 300, sub: 2, mod: lvl => -0.743084783011632 + 0.7736504766853647 * lvl - 0.002608641911723087 * Math.pow(lvl, 2) + 0.000008555961584640232 * Math.pow(lvl, 3) }
+      ],
+      17: [ // Two-hand
+        { type: 'caster', min: 1, max: 300, sub: 10, mod: lvl => -1.5589456685719236 + 0.9962799588626463 * lvl - 0.002586859275705108 * Math.pow(lvl, 2) + 0.000009472522985824832 * Math.pow(lvl, 3) }
+        { type: null, min: 1, max: 300, sub: -10, mod: lvl => -1.4407940637747765 + 0.9868570871805012 * lvl - 0.0023989071048527186 * Math.pow(lvl, 2) + 0.00000872913868341514 * Math.pow(lvl, 3) }
+      ],
+      21: [ // Main-hand
+        { min: 1, max: 300, sub: [4, 7, 15], mod: lvl => 0.9195580731155433 + 0.7492658962645824 * lvl - 0.005319339993856751 * Math.pow(lvl, 2) + 0.000017593004422642952 * Math.pow(lvl, 3) },
+        { min: 1, max: 300, sub: null, mod: lvl => 0.7081542428231806 + 0.6667863115619928 * lvl - 0.0007860876748404416 * Math.pow(lvl, 2) + 0.000003503709149771536 * Math.pow(lvl, 3) }
+      ],
+      22: [ // Off-hand
+        { min: 1, max: 300, sub: null, mod: lvl => 0.31862967197133674 + 0.6822091250858717 * lvl - 0.0007913172544140505 * Math.pow(lvl, 2) + 0.000003122564997039902 * Math.pow(lvl, 3) }
+      ],
+      25: [ // Thrown
+        { min: 1, max: 300, sub: null, mod: lvl => 0.625697055774282 + 0.8215995459019617 * lvl - 0.0005425910100895496 * Math.pow(lvl, 2) + 0.0000032710921570688796 * Math.pow(lvl, 3) }
+      ],
+      26: [ // Ranged: Guns & Crossbows
+        { min: 1, max: 300, sub: [3, 18], mod: lvl => -0.2913340491058385 + 0.7574162727175957 * lvl - 0.0024457905894126005 * Math.pow(lvl, 2) + 0.000008067767939268019 * Math.pow(lvl, 3) },
+        { min: 1, max: 300, sub: 19, mod: lvl => 1.8294537711042669 + 0.7318471260336387 * lvl + 0.004969814407876487 * Math.pow(lvl, 2) - 0.000017145838654172353 * Math.pow(lvl, 3) + 1.7205349213855612e-8 * Math.pow(lvl, 4) }
+      ]
+    },
+    2: {
+      13: [ // One-hand
+        { min: 1, max: 300, sub: null, mod: lvl => 0.4042050606136029 + 0.49734508151683776 * lvl + 0.0007876333296000732 * Math.pow(lvl, 2) - 0.0000013811950352316454 * Math.pow(lvl, 3) }
+      ],
+      15: [ // Bow
+        { min: 1, max: 300, sub: 2, mod: lvl => 0.22444917005698017 + 0.5822163577210446 * lvl - 0.0006990769934425673 * Math.pow(lvl, 2) + 0.0000024109481894875313 * Math.pow(lvl, 3) }
+      ],
+      17: [ // Two-hand
+        { type: 'caster', min: 1, max: 300, sub: 10, mod: lvl => 0.5878275909223474 + 0.6486638702862207 * lvl - 0.0008183156661210863 * Math.pow(lvl, 2) }
+        { type: null, min: 1, max: 300, sub: null, mod: lvl => -1.2469017714620838 + 0.7595359183093786 * lvl - 0.00052 * Math.pow(lvl, 2) + 0.0000031790771502211193 * Math.pow(lvl, 3) }
+      ],
+      21: [ // Main-hand
+        { min: 1, max: 300, sub: null, mod: lvl => 0.1888986564358558 + 0.514467630955437 * lvl + 0.0001449871791498711 * Math.pow(lvl, 2) + 0.0000022300382306673762 * Math.pow(lvl, 3) },
+        { min: 1, max: 300, sub: [4, 7, 15], mod: lvl => 0.4835370552909741 + 0.8668090226204177 * lvl - 0.006599272125728605 * Math.pow(lvl, 2) + 0.000020415414066691894 * Math.pow(lvl, 3) }
+      ],
+      22: [ // Off-hand
+        { min: 1, max: 300, sub: null, mod: lvl => 0.9718419506869891 + 0.41682208197155196 * lvl + 0.001587412068902008 * Math.pow(lvl, 2) - 0.0000030964817997803457 * Math.pow(lvl, 3) }
+      ],
+      25: [ // Thrown
+        { min: 1, max: 300, sub: null, mod: lvl => 2.766343576702119 + 0.46057309703714083 * lvl + 0.0031338924726831943 * Math.pow(lvl, 2) - 0.000008297133052168907 * Math.pow(lvl, 3) }
+      ],
+      26: [ // Ranged: Guns & Crossbows
+        { min: 1, max: 300, sub: [3, 18], mod: lvl => 1.4129016032445012 + 0.4961550555995297 * lvl + 0.00032039463941715415 * Math.pow(lvl, 2) - 8.224505599804983e-7 * Math.pow(lvl, 3) },
+        { min: 1, max: 300, sub: 19, mod: lvl => 3.4857134522863866 + 0.48418168318576166 * lvl + 0.005842172301613738 * Math.pow(lvl, 2) - 0.000014078423351119631 * Math.pow(lvl, 3) }
+      ]
+    }
+  };
+
   const armorData = {
     6: {
       Cloth: lvl => 2.5281010518232847 + 1.331747228269099 * lvl + 0.00944593034412355 * Math.pow(lvl, 2) - 0.00006849549050619422 * Math.pow(lvl, 3) + 1.2354987243172888e-7 * Math.pow(lvl, 4),
@@ -503,6 +610,25 @@ $(document).ready(function() {
 
     console.log(`fuck qualityMod: ${qualityMod(level)}, statBudget: ${statBudget}, slotMod: ${effectiveSlotMod}, itemBudget: ${parseFloat(socketBudgetTotal) + parseFloat(itemBudget)}, itemLevel: ${level}`);
     return statValues;
+  }
+
+  function getDPSFormula(quality, type, lvl, sub, special = null) {
+    const array = weaponDPS[quality];
+    const data = special ? array[special] : array[type];
+    for (const row of data) {
+      const subMatch = row.sub === null || (Array.isArray(row.sub) && row.sub.some(s => s >= 0 && s === sub || s < 0 && s !== -sub)) || row.sub === sub;
+      if (subMatch && lvl >= row.min && lvl < row.max) { return row.mod(lvl); }
+    }
+    return null;
+  }
+
+  function getWeaponMod(type, sub, quality, lvl) {
+    return weaponDamageMod
+      .filter(entry => entry.type === type)
+      .filter(entry => entry.sub === null || entry.sub.includes(sub))
+      .filter(entry => entry.quality === quality || entry.quality.includes(quality))
+      .filter(entry => lvl >= entry.min && lvl <= entry.max)
+      .reduce((acc, entry) => entry.mod, null);
   }
 
   function calculateArmor(slot, type, level, quality, bonus) {

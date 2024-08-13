@@ -269,14 +269,6 @@ Where:
 
 Based on the calculated `DPS` and the `Mode Average Attack Speed`, the minimum and maximum attack values (`Min Damage`, `Max Damage`) for the weapon can be derived:
 
-$$
-\text{Min Damage} = \text{DPS} \times \text{Mode Average Attack Speed} - \frac{\text{Weapon Coefficient}}{2}
-$$
-
-$$
-\text{Max Damage} = \text{DPS} \times \text{Mode Average Attack Speed} + \frac{\text{Weapon Coefficient}}{2}
-$$
-
 | epic weapons             | quality | InventoryType | item level range | subclass | purpose | formula     | link |
 |--------------------------|---------|---------------|------------------|----------|---------|-------------|------|
 | one-hand                 | 4       | 13            | 1 to 99          | any      | general | `y = -0.46373319610341757 + 1.948435650742608x - 0.05134655549435444x^2 + 0.0006882333623959314x^3 - 0.000002864536021471839x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-0.46373319610341757&b=1.948435650742608&c=-0.05134655549435444&d=0.0006882333623959314&e=-0.000002864536021471839&min-x=0&max-x=400&min-y=0&max-y=400&order=4&graph-title=Epic+-+Vanilla+-+One-Hand+%2813%29&plot=NobwRAHmBcAcCcAaMBPGB2AzAOgIwFYBfRcKOJVDTY0mBZNaLbABgDYbI6AWBmNttkzxOZWJj7Q2%2BIbFF0JlKTMxySXOIsbShHdWK38ZAJjW1NknZlzy4uS8ezjbse0raPXLt9s839dCyWuNjoxi5B7iFs6BHBTuEBTBTaLNj4ZhroKfxp6P7m2ZZp%2BCJJ6LCSpdjcmWQVVfA1dRiVStW1tg3tTZ3lbYwdLUwDMENdo9Ad3BONNTP9c9wLhZPVRIs96V3oVbA1eoW77fvCO3tC1OVsVeiyXTftd5gbhfhVgqpd7%2B2fh1m8doyXBlQqAwYmYZYKrcGqJQrGKo4bj%2Feo%2BMaOTCxcroqaOV5ZXH4fFdIn40GEqok8qRQYhYldWljELcK6FJlTFmojAc%2FDRRlVfk0wXYGIC9r0in1Xn0%2BFZGXYYwE6UisVJNg5KYlblSSbcJroZX8PUGlYaASSWqsM1kC1KK24HV2xjcO5edWPF37R22aSWu7GG1Gf2KuW2wzQbgydBBqQRqPpKX8eMqYYeS1GqQc1npWP4Y4ulnDfOWlm2fCemDcNIIcvgmDCdJhsYR1TYeBsjT4DmYQRJrWSLHW2yuwcqTtkKODnC1pKsweeHXcXHWGrY8y4Fgc1xCfscli2XE2AC6QA%3D%3D) |
@@ -348,17 +340,33 @@ $$
 
 ## Attack Speeds per Weapon Type
 
-| InventoryType | subclass | quality | item level range | detail |
-|---------------|----------|---------|------------------|--------|
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
-|   |   |   |   |   |
+| InventoryType | subclass | avg delay | detail |
+
+| 13 | 0 | 2281 | one hand axe |
+| 13 | 4 | 2292 | one hand mace |
+| 13 | 7 | 2161 | one hand sword |
+| 13 | 13 | 1957 | one hand fist |
+| 13 | 15 | 1663 | one hand dagger |
+| 15 | 2 | 2686 | bow |
+| 17 | 0 | 3384 | two hand axe |
+| 17 | 5 | 3311 | two hand mace |
+| 17 | 6 | 3216 | two hand polearm |
+| 17 | 8 | 3331 | two hand sword |
+| 17 | 10 | 2719 | two hand staff |
+| 21 | 0 | 2450 | main hand axe |
+| 21 | 4 | 1996 | main hand mace |
+| 21 | 7 | 1946 | main hand sword |
+| 21 | 13 | 2569 | main hand fist |
+| 21 | 15 | 1667 | main hand dagger |
+| 22 | 0 | 2028 | off hand axe |
+| 22 | 4 | 1500 | off hand mace |
+| 22 | 7 | 1500 | off hand sword |
+| 22 | 13 | 2022 | off hand fist |
+| 22 | 15 | 1566 | off hand dagger |
+| 25 | 16 | 1853 | thrown |
+| 26 | 3 | 2747 | ranged - gun |
+| 26 | 18 | 2900 | ranged - crossbow |
+| 26 | 19 | 1714 | ranged - wand |
 
 ## Druid/Caster Weapon DPS Adjustment (old methodology)
 
