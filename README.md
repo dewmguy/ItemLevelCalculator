@@ -78,7 +78,7 @@ These coefficients control the ceiling for stats on an item based on its quality
 
 ### Item Slot Modifiers (Armor)
 
-This coefficient (SlotMod) controls the ceiling for stats on an item based on the slot. (Note: 2=Uncommon, 3=Rare, 4=Epic, ?=uncertain value, f=finalized value)
+This coefficient (SlotMod) controls the ceiling for stats on an item based on the slot.
 
 The values in this table are found to be static and do not change within any item level range. You'll notice that tabards, shirts, and relics are included in the table. Assuming these item slots were ever even considered to have stats in any capacity, I'd assume they'd have a very low stat budget. All of the tabards that have any spell abilities at all were toys for the GMs to have fun with while testing the game, they have no baseline from which to assume any amount of power, and are there just for grins.
 
@@ -124,14 +124,14 @@ This coefficient (SlotMod) controls the ceiling for stats on an item based on th
 
 ### Item Stat Modifiers
 
-This coefficient (StatMod) controls the ceiling for stats on an item based on the stat type. (Note: 2=Uncommon, 3=Rare, 4=Epic, ?=uncertain value, f=finalized value)
+This coefficient (StatMod) controls the ceiling for stats on an item based on the stat type.
 
 The values in this table are found to be static and do not change within any item level range.
 
 | stat_type | Stat Name          | InventoryType | defaults |
 |-----------|--------------------|---------------|----------|
-|         0 | Mana               |           all |      2/1 |
-|         1 | Health             |           all |      2/1 |
+|         0 | Mana               |           all |        ? |
+|         1 | Health             |           all |        ? |
 |         3 | Agility            |           all |    16/16 |
 |         4 | Strength           |           all |    16/16 |
 |         5 | Intellect          |           all |    16/16 |
