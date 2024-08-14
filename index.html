@@ -44,15 +44,11 @@
                         <select class="itemType" id="item-subclass" name="itemType" required></select>
                     </div>
                     <div class="group pill weaponMethod">
-                        <div class="item"><input class="full" type="radio" id="weaponCaster" name="weaponMethod" value="caster" required checked /> <label for="weaponCaster">Caster</label></div>
-                        <div class="item"><input class="full" type="radio" id="weaponMelee" name="weaponMethod" value="melee" required /> <label for="weaponMelee">Melee</label></div>
+                        <div class="item"><input class="full" type="radio" id="weaponMelee" name="weaponMethod" value="melee" required checked /> <label for="weaponMelee">Melee</label></div>
+                        <div class="item"><input class="full" type="radio" id="weaponCaster" name="weaponMethod" value="caster" required /> <label for="weaponCaster">Caster</label></div>
                     </div>
                     <div class="group weaponDamage">
-                        <div class="group pill">
-                            <div class="item"><input type="number" id="damageMin" name="damageMin" placeholder="Min" /></div>
-                            <div class="item"><input type="number" id="damageMax" name="damageMax" placeholder="Max" /></div>
-                        </div>
-                        <div class="item"><input type="number" id="attackSpeed" name="attackSpeed" step="0.1" placeholder="Speed" /></div>
+                        <div class="item"><input type="number" id="weaponSpeed" name="weaponSpeed" step="0.1" placeholder="Weapon Speed (1.0 to 6.0)" /></div>
                     </div>
                     <div class="group weaponDamageExtra">
                         <select id="item-damage1" name="damageType1"></select>

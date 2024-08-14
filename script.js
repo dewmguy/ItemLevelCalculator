@@ -9,7 +9,7 @@ $(document).ready(function() {
   };
 
   const armorClass = {
-    "1": { name: "Head", sellMod: (12/16), armorMod: (13/16), itemClass: 4, subClass: [1, 2, 3, 4],
+    1: { name: "Head", sellMod: (12/16), armorMod: (13/16), itemClass: 4, subClass: [1, 2, 3, 4],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
         { quality: 4, min: 200, mod: (16/16) },
         { quality: 4, min: 90, mod: (11/16) },
@@ -18,7 +18,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (16/16) },
       ])
     },
-    "2": { name: "Neck", sellMod: (8/16), armorMod: 0, itemClass: 4, subClass: [0],
+    2: { name: "Neck", sellMod: (8/16), armorMod: 0, itemClass: 4, subClass: [0],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
         { quality: 4, min: 200, mod: (4/16) },
         { quality: 4, min: 90, mod: (3/16) },
@@ -27,7 +27,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (4/16) },
       ])
     },
-    "3": { name: "Shoulder", sellMod: (12/16), armorMod: (12/16), itemClass: 4, subClass: [1, 2, 3, 4],
+    3: { name: "Shoulder", sellMod: (12/16), armorMod: (12/16), itemClass: 4, subClass: [1, 2, 3, 4],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
         { quality: 4, min: 200, mod: (8/16) },
         { quality: 4, min: 90, mod: (6/16) },
@@ -36,7 +36,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (8/16) },
       ])
     },
-    "6": { name: "Waist", sellMod: (8/16), armorMod: (9/16), itemClass: 4, subClass: [1, 2, 3, 4],
+    6: { name: "Waist", sellMod: (8/16), armorMod: (9/16), itemClass: 4, subClass: [1, 2, 3, 4],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
         { quality: 4, min: 200, mod: (8/16) },
         { quality: 4, min: 90, mod: (6/16) },
@@ -45,7 +45,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (8/16) },
       ])
     },
-    "7": { name: "Legs", sellMod: (16/16), armorMod: (14/16), itemClass: 4, subClass: [1, 2, 3, 4],
+    7: { name: "Legs", sellMod: (16/16), armorMod: (14/16), itemClass: 4, subClass: [1, 2, 3, 4],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
         { quality: 4, min: 200, mod: (16/16) },
         { quality: 4, min: 90, mod: (12/16) },
@@ -54,7 +54,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (16/16) },
       ])
     },
-    "8": { name: "Feet", sellMod: (12/16), armorMod: (11/16), itemClass: 4, subClass: [1, 2, 3, 4],
+    8: { name: "Feet", sellMod: (12/16), armorMod: (11/16), itemClass: 4, subClass: [1, 2, 3, 4],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
         { quality: 4, min: 200, mod: (8/16) },
         { quality: 4, min: 90, mod: (6/16) },
@@ -63,7 +63,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (8/16) },
       ])
     },
-    "9": { name: "Wrists", sellMod: (8/16), armorMod: (7/16), itemClass: 4, subClass: [1, 2, 3, 4],
+    9: { name: "Wrists", sellMod: (8/16), armorMod: (7/16), itemClass: 4, subClass: [1, 2, 3, 4],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
         { quality: 4, min: 200, mod: (4/16) },
         { quality: 4, min: 90, mod: (3/16) },
@@ -72,7 +72,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (4/16) },
       ])
     },
-    "10": { name: "Hands", sellMod: (8/16), armorMod: (10/16), itemClass: 4, subClass: [1, 2, 3, 4],
+    10: { name: "Hands", sellMod: (8/16), armorMod: (10/16), itemClass: 4, subClass: [1, 2, 3, 4],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
         { quality: 4, min: 200, mod: (8/16) },
         { quality: 4, min: 90, mod: (6/16) },
@@ -81,7 +81,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (8/16) },
       ])
     },
-    "11": { name: "Finger", sellMod: (8/16), armorMod: 0, itemClass: 4, subClass: [0],
+    11: { name: "Finger", sellMod: (8/16), armorMod: 0, itemClass: 4, subClass: [0],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
         { quality: 4, min: 200, mod: (4/16) },
         { quality: 4, min: 90, mod: (3/16) },
@@ -90,7 +90,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (4/16) },
       ])
     },
-    "12": { name: "Trinket", sellMod: (28/16), armorMod: 0, itemClass: 4, subClass: [0],
+    12: { name: "Trinket", sellMod: (28/16), armorMod: 0, itemClass: 4, subClass: [0],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
         { quality: 4, min: 90, mod: (6/16) },
         { quality: 4, min: 1, mod: (8/16) },
@@ -99,7 +99,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (8/16) },
       ])
     },
-    "14": { name: "Shield", sellMod: (15/16), armorMod: (16/16), itemClass: 4, subClass: [6],
+    14: { name: "Shield", sellMod: (15/16), armorMod: (16/16), itemClass: 4, subClass: [6],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
         { quality: 4, min: 90, mod: (3/16) },
         { quality: 4, min: 1, mod: (4/16) },
@@ -107,7 +107,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (4/16) },
       ])
     },
-    "16": { name: "Back", sellMod: (12/16), armorMod: (8/16), itemClass: 4, subClass: [1],
+    16: { name: "Back", sellMod: (12/16), armorMod: (8/16), itemClass: 4, subClass: [1],
       slotMod: (quality, lvl) => dataFilter(quality, lvl, [ 
         { quality: 4, min: 90, mod: (3/16) },
         { quality: 4, min: 1, mod: (4/16) },
@@ -116,23 +116,23 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (3/16) },
       ])
     },
-    "4": { name: "Shirt", sellMod: (4/16), armorMod: 0, itemClass: 4, subClass: [1], slotMod: (1/32) },
-    "5": { name: "Chest", sellMod: (16/16), armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
-    "7": { name: "Legs", sellMod: (16/16), armorMod: (14/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
-    "19": { name: "Tabard", sellMod: (4/16), armorMod: 0, itemClass: 4, subClass: [0], slotMod: (1/32) },
-    "20": { name: "Chest (Robe)", sellMod: (16/16), armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
-    "23": { name: "Held Off-hand", sellMod: (8/16), armorMod: 0, itemClass: 4, subClass: [0], slotMod: (3/16) },
-    "28": { name: "Relic", sellMod: (4/16), armorMod: 0, itemClass: 4, subClass: [7, 8, 9, 10], slotMod: (1/32) },
+    4: { name: "Shirt", sellMod: (4/16), armorMod: 0, itemClass: 4, subClass: [1], slotMod: (1/32) },
+    5: { name: "Chest", sellMod: (16/16), armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
+    7: { name: "Legs", sellMod: (16/16), armorMod: (14/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
+    19: { name: "Tabard", sellMod: (4/16), armorMod: 0, itemClass: 4, subClass: [0], slotMod: (1/32) },
+    20: { name: "Chest (Robe)", sellMod: (16/16), armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
+    23: { name: "Held Off-hand", sellMod: (8/16), armorMod: 0, itemClass: 4, subClass: [0], slotMod: (3/16) },
+    28: { name: "Relic", sellMod: (4/16), armorMod: 0, itemClass: 4, subClass: [7, 8, 9, 10], slotMod: (1/32) },
   };
   
   const weaponClass = {
-    "13": { name: "One-Hand", sellMod: (7/16), slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
-    "21": { name: "Main-Hand", sellMod: (7/16), slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
-    "22": { name: "Off-Hand", sellMod: (7/16), slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
-    "17": { name: "Two-Hand", sellMod: (16/16), slotMod: (16/16), armorMod: 0, itemClass: 2, subClass: [1, 5, 8, 6, 10] },
-    "15": { name: "Bow", sellMod: (16/16), slotMod: (16/16), armorMod: 0, itemClass: 2, subClass: [2] },
-    "25": { name: "Thrown", sellMod: (5/16), slotMod: (5/16), armorMod: 0, itemClass: 2, subClass: [16] },
-    "26": { name: "Ranged", sellMod: (5/16), slotMod: (5/16), armorMod: 0, itemClass: 2, subClass: [3, 18, 19] }
+    13: { name: "One-Hand", sellMod: (7/16), slotMod: (2/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
+    15: { name: "Bow", sellMod: (16/16), slotMod: (16/16), armorMod: 0, itemClass: 2, subClass: [2] },
+    17: { name: "Two-Hand", sellMod: (16/16), slotMod: (16/16), armorMod: 0, itemClass: 2, subClass: [1, 5, 8, 6, 10] },
+    21: { name: "Main-Hand", sellMod: (7/16), slotMod: (2/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
+    22: { name: "Off-Hand", sellMod: (7/16), slotMod: (2/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
+    25: { name: "Thrown", sellMod: (5/16), slotMod: (5/16), armorMod: 0, itemClass: 2, subClass: [16] },
+    26: { name: "Ranged", sellMod: (5/16), slotMod: (5/16), armorMod: 0, itemClass: 2, subClass: [3, 18, 19] }
   };
 
   const socketMods = (slot, quality, lvl) => dataFilter(quality, lvl, 
@@ -161,7 +161,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (3/32) },
       ])
     },
-    "7": { name: "Stamina", type: 0,
+    7: { name: "Stamina", type: 0,
       statMod: (slot, quality, lvl) => dataFilter(quality, lvl, [ 
         { quality: 4, min: 90, mod: (2/3) },
         { quality: 4, min: 1, mod: (16/16) },
@@ -171,7 +171,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (16/16) },
       ])
     },
-    "43": { name: "Mana Regen MP5", type: 1,
+    43: { name: "Mana Regen MP5", type: 1,
       statMod: (slot, quality, lvl) => dataFilter(quality, lvl, 
         [2, 11, 12, 23].includes(slot)
         ? [ // ammys, rings, trinkets, offhand
@@ -189,7 +189,7 @@ $(document).ready(function() {
         ]
       )
     },
-    "45": { name: "Spell Power", type: 1,
+    45: { name: "Spell Power", type: 1,
       statMod: (slot, quality, lvl) => dataFilter(quality, lvl, [ 
         { quality: 4, min: 90, mod: (45/64) },
         { quality: 4, min: 1, mod: (55/64) },
@@ -198,7 +198,7 @@ $(document).ready(function() {
         { quality: 2, min: 1, mod: (45/64) },
       ])
     },
-    "46": { name: "Health Regen HP5", type: 1,
+    46: { name: "Health Regen HP5", type: 1,
       statMod: (slot, quality, lvl) => dataFilter(quality, lvl, 
         [2, 11, 12, 23].includes(slot)
         ? [ // ammys, rings, trinkets, offhand
@@ -217,7 +217,7 @@ $(document).ready(function() {
         ]
       )
     },
-    "48": { name: "Block Value", type: 1,
+    48: { name: "Block Value", type: 1,
       statMod: (slot, quality, lvl) => dataFilter(quality, lvl, 
         [2, 11, 12, 14].includes(slot)
         ? [ // ammys, rings, trinkets, shields
@@ -235,23 +235,23 @@ $(document).ready(function() {
         ]
       )
     },
-    "3": { name: "Agility", type: 0, statMod: (16/16) },
-    "4": { name: "Strength", type: 0, statMod: (16/16) },
-    "5": { name: "Intellect", type: 0, statMod: (16/16) },
-    "6": { name: "Spirit", type: 0, statMod: (16/16) },
-    "12": { name: "Defense Rating", type: 1, statMod: (16/16) },
-    "13": { name: "Dodge Rating", type: 1, statMod: (16/16) },
-    "14": { name: "Parry Rating", type: 1, statMod: (16/16) },
-    "15": { name: "Block Rating", type: 1, statMod: (16/16) },
-    "21": { name: "Spell Crit Rating", type: 1, statMod: (16/16) },
-    "31": { name: "Hit Rating", type: 1, statMod: (16/16) },
-    "32": { name: "Crit Rating", type: 1, statMod: (16/16) },
-    "35": { name: "Resilience", type: 1, statMod: (16/16) },
-    "36": { name: "Haste Rating", type: 1, statMod: (16/16) },
-    "37": { name: "Expertise Rating", type: 1, statMod: (16/16) },
-    "38": { name: "Attack Power", type: 1, statMod: (8/16) },
-    "44": { name: "Armor Penetration Rating", type: 1, statMod: (16/16) },
-    "47": { name: "Spell Penetration", type: 1, statMod: (12/16) },
+    3: { name: "Agility", type: 0, statMod: (16/16) },
+    4: { name: "Strength", type: 0, statMod: (16/16) },
+    5: { name: "Intellect", type: 0, statMod: (16/16) },
+    6: { name: "Spirit", type: 0, statMod: (16/16) },
+    12: { name: "Defense Rating", type: 1, statMod: (16/16) },
+    13: { name: "Dodge Rating", type: 1, statMod: (16/16) },
+    14: { name: "Parry Rating", type: 1, statMod: (16/16) },
+    15: { name: "Block Rating", type: 1, statMod: (16/16) },
+    21: { name: "Spell Crit Rating", type: 1, statMod: (16/16) },
+    31: { name: "Hit Rating", type: 1, statMod: (16/16) },
+    32: { name: "Crit Rating", type: 1, statMod: (16/16) },
+    35: { name: "Resilience", type: 1, statMod: (16/16) },
+    36: { name: "Haste Rating", type: 1, statMod: (16/16) },
+    37: { name: "Expertise Rating", type: 1, statMod: (16/16) },
+    38: { name: "Attack Power", type: 1, statMod: (8/16) },
+    44: { name: "Armor Penetration Rating", type: 1, statMod: (16/16) },
+    47: { name: "Spell Penetration", type: 1, statMod: (12/16) },
     "arcane_res": { name: "Resist Arcane", type: 0, statMod: (16/16) },
     "fire_res": { name: "Resist Fire", type: 0, statMod: (16/16) },
     "nature_res": { name: "Resist Nature", type: 0, statMod: (16/16) },
@@ -264,84 +264,101 @@ $(document).ready(function() {
   };
 
   const statPhrases = {
-    "12": statAmount => `Increases defense rating by ${statAmount}.`,
-    "13": statAmount => `Increases your dodge rating by ${statAmount}.`,
-    "14": statAmount => `Increases your parry rating by ${statAmount}.`,
-    "15": statAmount => `Increases your shield block rating by ${statAmount}.`,
-    "21": statAmount => `Improves critical strike rating by ${statAmount}.`,
-    "31": statAmount => `Improves hit rating by ${statAmount}.`,
-    "32": statAmount => `Improves critical strike rating by ${statAmount}.`,
-    "35": statAmount => `Improves your resilience rating by ${statAmount}.`,
-    "36": statAmount => `Improves haste rating by ${statAmount}.`,
-    "37": statAmount => `Improves expertise rating by ${statAmount}.`,
-    "38": statAmount => `Increases attack power by ${statAmount}.`,
-    "43": statAmount => `Restores ${statAmount} mana per 5 sec.`,
-    "44": statAmount => `Increases your armor penetration rating by ${statAmount}.`,
-    "45": statAmount => `Increases spell power by ${statAmount}.`,
-    "46": statAmount => `Restores ${statAmount} health per 5 sec.`,
-    "47": statAmount => `Increases spell penetration by ${statAmount}.`,
-    "48": statAmount => `Increases the block value of your shield by ${statAmount}.`
+    12: statAmount => `Increases defense rating by ${statAmount}.`,
+    13: statAmount => `Increases your dodge rating by ${statAmount}.`,
+    14: statAmount => `Increases your parry rating by ${statAmount}.`,
+    15: statAmount => `Increases your shield block rating by ${statAmount}.`,
+    21: statAmount => `Improves critical strike rating by ${statAmount}.`,
+    31: statAmount => `Improves hit rating by ${statAmount}.`,
+    32: statAmount => `Improves critical strike rating by ${statAmount}.`,
+    35: statAmount => `Improves your resilience rating by ${statAmount}.`,
+    36: statAmount => `Improves haste rating by ${statAmount}.`,
+    37: statAmount => `Improves expertise rating by ${statAmount}.`,
+    38: statAmount => `Increases attack power by ${statAmount}.`,
+    43: statAmount => `Restores ${statAmount} mana per 5 sec.`,
+    44: statAmount => `Increases your armor penetration rating by ${statAmount}.`,
+    45: statAmount => `Increases spell power by ${statAmount}.`,
+    46: statAmount => `Restores ${statAmount} health per 5 sec.`,
+    47: statAmount => `Increases spell penetration by ${statAmount}.`,
+    48: statAmount => `Increases the block value of your shield by ${statAmount}.`
   };
 
   const armorSubClass = {
-    "0": { name: "Miscellaneous", sellMod: (28/16), tooltip: 0 },
-    "1": { name: "Cloth", sellMod: (9/16), tooltip: 1 },
-    "2": { name: "Leather", sellMod: (11/16), tooltip: 1 },
-    "3": { name: "Mail", sellMod: (14/16), tooltip: 1 },
-    "4": { name: "Plate", sellMod: (16/16), tooltip: 1 },
-    "6": { name: "Shield", sellMod: (16/16), tooltip: 0 },
-    "7": { name: "Libram", sellMod: (16/16), tooltip: 1 }, // paladin
-    "8": { name: "Idol", sellMod: (16/16), tooltip: 1 }, // druid
-    "9": { name: "Totem", sellMod: (16/16), tooltip: 1 }, // shaman
-    "10": { name: "Sigil", sellMod: (16/16), tooltip: 1 } // deathknight
-  };
-
-  const weaponSubClass = {
-    "0": { name: "Axe", tooltip: 1 },
-    "1": { name: "Axe", tooltip: 1 },
-    "2": { name: "Bow", tooltip: 0 },
-    "3": { name: "Gun", tooltip: 1 },
-    "4": { name: "Mace", tooltip: 1 },
-    "5": { name: "Mace", tooltip: 1 },
-    "6": { name: "Polearm", tooltip: 1 },
-    "7": { name: "Sword", tooltip: 1 },
-    "8": { name: "Sword", tooltip: 1 },
-    "10": { name: "Staff", tooltip: 1 },
-    "13": { name: "Fist", tooltip: 1 },
-    "15": { name: "Dagger", tooltip: 1 },
-    "16": { name: "Thrown", tooltip: 1 },
-    "18": { name: "Crossbow", tooltip: 1 },
-    "19": { name: "Wand", tooltip: 1 }
+    0: { name: "Miscellaneous", sellMod: (28/16), tooltip: 0 },
+    1: { name: "Cloth", sellMod: (9/16), tooltip: 1 },
+    2: { name: "Leather", sellMod: (11/16), tooltip: 1 },
+    3: { name: "Mail", sellMod: (14/16), tooltip: 1 },
+    4: { name: "Plate", sellMod: (16/16), tooltip: 1 },
+    6: { name: "Shield", sellMod: (16/16), tooltip: 0 },
+    7: { name: "Libram", sellMod: (16/16), tooltip: 1 }, // paladin
+    8: { name: "Idol", sellMod: (16/16), tooltip: 1 }, // druid
+    9: { name: "Totem", sellMod: (16/16), tooltip: 1 }, // shaman
+    10: { name: "Sigil", sellMod: (16/16), tooltip: 1 } // deathknight
   };
 
   const weaponDamageTypes = {
-    "1": { name: "Holy" },
-    "2": { name: "Fire" },
-    "3": { name: "Nature" },
-    "4": { name: "Frost" },
-    "5": { name: "Shadow" },
-    "6": { name: "Arcane" }
+    1: { name: "Holy" },
+    2: { name: "Fire" },
+    3: { name: "Nature" },
+    4: { name: "Frost" },
+    5: { name: "Shadow" },
+    6: { name: "Arcane" }
   };
   
-  const weaponDamageMod = [
-    { type: 13, sub: 15, quality: 3, min: 101, max: 300, mod: 0.65 },
-    { type: 13, sub: 15, quality: 4, min: 1, max: 100, mod: 0.54 },
-    { type: 13, sub: 15, quality: 4, min: 101, max: 300, mod: 0.65 },
-    { type: 15, sub: 2, quality: 4, min: 1, max: 100, mod: 0.54 },
-    { type: 15, sub: 2, quality: 4, min: 101, max: 300, mod: 0.65 },
-    { type: 17, sub: [1, 5, 6, 8, 10], quality: [2, 3, 4], min: 1, max: 300, mod: 0.65 },
-    { type: 17, sub: 10, quality: [2, 3, 4], min: 101, max: 300, mod: 0.54 },
-    { type: 21, sub: [0, 13, 15], quality: 4, min: 101, max: 300, mod: 0.3125 },
-    { type: 21, sub: 4, quality: 4, min: 115, max: 164, mod: 0.155 },
-    { type: 21, sub: [13, 15], quality: 4, min: 200, max: 300, mod: 0.65 },
-    { type: 21, sub: 15, quality: 4, min: 101, max: 200, mod: 0.155 },
-    { type: 21, sub: 0, quality: 4, min: 1, max: 300, mod: 0.54 },
-    { type: 25, sub: 16, quality: [3, 4], min: 1, max: 300, mod: 0.65 },
-    { type: 26, sub: 18, quality: [3, 4], min: 1, max: 300, mod: 0.65 },
-    { type: 21, sub: null, quality: [2, 3, 4], min: 1, max: 100, mod: 0.54 },
-    { type: 21, sub: null, quality: [2, 3, 4], min: 101, max: 300, mod: 0.3125 }
-  ];
+  const weaponDelays = {
+    0: { 21: 2400, 13: 2300, 22: 2000, 17: 3400 }, // Axe
+    4: { 21: 2000, 13: 2300, 22: 1500, 17: 3300 }, // Mace
+    7: { 21: 1900, 13: 2200, 22: 1500, 17: 3300 }, // Sword
+    15: { 21: 1700, 13: 1700, 22: 1600 }, // Dagger
+    13: { 21: 2600, 13: 2000, 22: 2000 }, // Fist
+    6: { 17: 3200 }, // Polearm
+    10: { 17: 2700 }, // Staff
+    2: { 15: 2700 }, // Bow
+    16: { 25: 1900 }, // Thrown
+    3: { 26: 2700 }, // Gun
+    18: { 26: 2900 }, // Crossbow
+    19: { 26: 1700 } // Wand
+  };
   
+  const weaponSubClass = {
+    0: { name: "Axe", delay: type => weaponDelays[0][type] || 2400, tooltip: 1 },
+    1: { name: "Axe", delay: type => weaponDelays[0][type] || 2400, tooltip: 1 },
+    2: { name: "Bow", delay: type => weaponDelays[2][type] || 2700, tooltip: 0 },
+    3: { name: "Gun", delay: type => weaponDelays[3][type] || 2700, tooltip: 1 },
+    4: { name: "Mace", delay: type => weaponDelays[4][type] || 2000, tooltip: 1 },
+    5: { name: "Mace", delay: type => weaponDelays[4][type] || 2000, tooltip: 1 },
+    6: { name: "Polearm", delay: type => weaponDelays[6][type] || 3200, tooltip: 1 },
+    7: { name: "Sword", delay: type => weaponDelays[7][type] || 1900, tooltip: 1 },
+    8: { name: "Sword", delay: type => weaponDelays[7][type] || 1900, tooltip: 1 },
+    10: { name: "Staff", delay: type => weaponDelays[10][type] || 2700, tooltip: 1 },
+    13: { name: "Fist", delay: type => weaponDelays[13][type] || 2000, tooltip: 1 },
+    15: { name: "Dagger", delay: type => weaponDelays[15][type] || 1700, tooltip: 1 },
+    16: { name: "Thrown", delay: type => weaponDelays[16][type] || 1900, tooltip: 1 },
+    18: { name: "Crossbow", delay: type => weaponDelays[18][type] || 2900, tooltip: 1 },
+    19: { name: "Wand", delay: type => weaponDelays[19][type] || 1700, tooltip: 1 }
+  };
+
+  const weaponDamageMod = [
+    { type: [13, 15, 22, 25, 26], sub: null, quality: [2, 3, 4], min: 1, max: 300, mod: 0.54 }, // Default for types 13, 15, 22, 25, 26
+    { type: 17, sub: [1, 5, 6, 8, 10], quality: [2, 3, 4], min: 1, max: 300, mod: 0.65 }, // Default two-hand for type 17
+    { type: 17, sub: 10, quality: [2, 3, 4], min: 101, max: 300, mod: 0.54 }, // Default caster staff for type 17
+    { type: 21, sub: null, quality: [2, 3, 4], min: 1, max: 100, mod: 0.54 }, // Default main-hand for type 21 (1 to 100)
+    { type: 21, sub: null, quality: [2, 3, 4], min: 101, max: 300, mod: 0.3125 }, // Default main-hand for type 21 (101 to 300)
+    { type: 13, sub: 15, quality: 3, min: 101, max: 300, mod: 0.65 }, // Rare one-hand daggers
+    { type: 13, sub: 15, quality: 4, min: 1, max: 100, mod: 0.54 }, // Epic one-hand daggers (1 to 100)
+    { type: 13, sub: 15, quality: 4, min: 101, max: 300, mod: 0.65 }, // Epic one-hand daggers (101 to 300)
+    { type: 15, sub: 2, quality: 4, min: 1, max: 100, mod: 0.54 }, // Epic bows (1 to 100)
+    { type: 15, sub: 2, quality: 4, min: 101, max: 300, mod: 0.65 }, // Epic bows (101 to 300)
+    { type: 21, sub: 13, quality: [2, 3], min: 1, max: 300, mod: 0.54 }, // Default main-hand fist (2, 3)
+    { type: 21, sub: 13, quality: 4, min: 200, max: 300, mod: 0.65 }, // Epic main-hand fist (200 to 300)
+    { type: 21, sub: 4, quality: 4, min: 115, max: 164, mod: 0.155 }, // Epic main-hand mace (115 to 164)
+    { type: 21, sub: 15, quality: 4, min: 101, max: 200, mod: 0.155 }, // Epic main-hand daggers (101 to 200)
+    { type: 21, sub: 15, quality: 4, min: 1, max: 100, mod: 0.3125 }, // Epic main-hand daggers (1 to 100)
+    { type: 21, sub: 0, quality: 4, min: 1, max: 300, mod: 0.54 }, // Epic main-hand axes
+    { type: 25, sub: 16, quality: [3, 4], min: 1, max: 300, mod: 0.65 }, // Rare and epic thrown
+    { type: 26, sub: 18, quality: [3, 4], min: 1, max: 300, mod: 0.65 }, // Rare and epic crossbows
+  ];
+
   const weaponDPS = {
     4: {
       13: [ // One-hand
@@ -353,10 +370,10 @@ $(document).ready(function() {
         { min: 1, max: 300, sub: 2, mod: lvl => -1.8160185143165526 + 0.8176011515936384 * lvl + 0.00004631966853788777 * Math.pow(lvl, 2) - 0.00002190693147532568 * Math.pow(lvl, 3) + 9.05587408850838e-8 * Math.pow(lvl, 4) }
       ],
       17: [ // Two-hand
-        { type: 'caster', min: 1, max: 300, sub: 10, mod: lvl => -2.7137455672 + 1.2034848552 * lvl - 0.0078149234 * Math.pow(lvl, 2) + 0.0000237964 * Math.pow(lvl, 3) }
-        { type: 'druid', min: 1, max: 300, sub: 10, mod: lvl => -39.8477534594 + 2.2205407279 * lvl - 0.0111235858 * Math.pow(lvl, 2) + 0.0000284616 * Math.pow(lvl, 3) }
+        { type: 'caster', min: 1, max: 300, sub: 10, mod: lvl => -2.7137455672 + 1.2034848552 * lvl - 0.0078149234 * Math.pow(lvl, 2) + 0.0000237964 * Math.pow(lvl, 3) },
+        { type: 'druid', min: 1, max: 300, sub: 10, mod: lvl => -39.8477534594 + 2.2205407279 * lvl - 0.0111235858 * Math.pow(lvl, 2) + 0.0000284616 * Math.pow(lvl, 3) },
         { type: null, min: 1, max: 100, sub: -10, mod: lvl => -0.7405045351583416 + 2.5291730790997162 * lvl - 0.06696995004352309 * Math.pow(lvl, 2) + 0.0009043795705405915 * Math.pow(lvl, 3) - 0.000003796542201089664 * Math.pow(lvl, 4) },
-        { type: null, min: 91, max: 300, sub: -10, mod: lvl => 0.904817539290022 + 1.5822436006525589 * lvl - 0.007940579189201744 * Math.pow(lvl, 2) + 0.000023354465861457816 * Math.pow(lvl, 3) }
+        { type: null, min: 91, max: 300, sub: -10, mod: lvl => 0.904817539290022 + 1.5822436006525589 * lvl - 0.007940579189201744 * Math.pow(lvl, 2) + 0.000023354465861457816 * Math.pow(lvl, 3) },
       ],
       21: [ // Main-hand
         { type: 'caster', min: 1, max: 199, sub: [4, 7, 15], mod: lvl => 0.33220409164479436 + 0.9289727447958701 * lvl - 0.0029446443452658348 * Math.pow(lvl, 2) - 0.00004346568763260079 * Math.pow(lvl, 3) + 2.2512744703653982e-7 * Math.pow(lvl, 4) },
@@ -372,7 +389,7 @@ $(document).ready(function() {
       26: [ // Ranged: Guns & Crossbows
         { min: 1, max: 300, sub: [3, 18], mod: lvl => -2.9838107517317654 + 1.044765562039762 * lvl - 0.003913212784379925 * Math.pow(lvl, 2) + 6.090860438060731e-7 * Math.pow(lvl, 3) + 5.016590029076527e-8 * Math.pow(lvl, 4) },
         { min: 1, max: 94, sub: 19, mod: lvl => -0.19588388531408696 + 1.413551669030605 * lvl - 0.014741678597083266 * Math.pow(lvl, 2) + 0.00017194361662129607 * Math.pow(lvl, 3) },
-        { min: 95, max: 300, sub: 19, mod: lvl => 38.01542852693626 + 1.5934000590768418 * lvl - 0.007732119057129331 * Math.pow(lvl, 2) + 0.000027000350802930127 * Math.pow(lvl, 3) }
+        { min: 95, max: 300, sub: 19, mod: lvl => 38.01542852693626 + 1.5934000590768418 * lvl - 0.007732119057129331 * Math.pow(lvl, 2) + 0.000027000350802930127 * Math.pow(lvl, 3) },
       ]
     },
     3: {
@@ -384,8 +401,8 @@ $(document).ready(function() {
         { min: 1, max: 300, sub: 2, mod: lvl => -0.743084783011632 + 0.7736504766853647 * lvl - 0.002608641911723087 * Math.pow(lvl, 2) + 0.000008555961584640232 * Math.pow(lvl, 3) }
       ],
       17: [ // Two-hand
-        { type: 'caster', min: 1, max: 300, sub: 10, mod: lvl => -1.5589456685719236 + 0.9962799588626463 * lvl - 0.002586859275705108 * Math.pow(lvl, 2) + 0.000009472522985824832 * Math.pow(lvl, 3) }
-        { type: null, min: 1, max: 300, sub: -10, mod: lvl => -1.4407940637747765 + 0.9868570871805012 * lvl - 0.0023989071048527186 * Math.pow(lvl, 2) + 0.00000872913868341514 * Math.pow(lvl, 3) }
+        { type: 'caster', min: 1, max: 300, sub: 10, mod: lvl => -1.5589456685719236 + 0.9962799588626463 * lvl - 0.002586859275705108 * Math.pow(lvl, 2) + 0.000009472522985824832 * Math.pow(lvl, 3) },
+        { type: null, min: 1, max: 300, sub: -10, mod: lvl => -1.4407940637747765 + 0.9868570871805012 * lvl - 0.0023989071048527186 * Math.pow(lvl, 2) + 0.00000872913868341514 * Math.pow(lvl, 3) },
       ],
       21: [ // Main-hand
         { min: 1, max: 300, sub: [4, 7, 15], mod: lvl => 0.9195580731155433 + 0.7492658962645824 * lvl - 0.005319339993856751 * Math.pow(lvl, 2) + 0.000017593004422642952 * Math.pow(lvl, 3) },
@@ -410,12 +427,12 @@ $(document).ready(function() {
         { min: 1, max: 300, sub: 2, mod: lvl => 0.22444917005698017 + 0.5822163577210446 * lvl - 0.0006990769934425673 * Math.pow(lvl, 2) + 0.0000024109481894875313 * Math.pow(lvl, 3) }
       ],
       17: [ // Two-hand
-        { type: 'caster', min: 1, max: 300, sub: 10, mod: lvl => 0.5878275909223474 + 0.6486638702862207 * lvl - 0.0008183156661210863 * Math.pow(lvl, 2) }
+        { type: 'caster', min: 1, max: 300, sub: 10, mod: lvl => 0.5878275909223474 + 0.6486638702862207 * lvl - 0.0008183156661210863 * Math.pow(lvl, 2) },
         { type: null, min: 1, max: 300, sub: null, mod: lvl => -1.2469017714620838 + 0.7595359183093786 * lvl - 0.00052 * Math.pow(lvl, 2) + 0.0000031790771502211193 * Math.pow(lvl, 3) }
       ],
       21: [ // Main-hand
-        { min: 1, max: 300, sub: null, mod: lvl => 0.1888986564358558 + 0.514467630955437 * lvl + 0.0001449871791498711 * Math.pow(lvl, 2) + 0.0000022300382306673762 * Math.pow(lvl, 3) },
-        { min: 1, max: 300, sub: [4, 7, 15], mod: lvl => 0.4835370552909741 + 0.8668090226204177 * lvl - 0.006599272125728605 * Math.pow(lvl, 2) + 0.000020415414066691894 * Math.pow(lvl, 3) }
+        { type: null, min: 1, max: 300, sub: null, mod: lvl => 0.1888986564358558 + 0.514467630955437 * lvl + 0.0001449871791498711 * Math.pow(lvl, 2) + 0.0000022300382306673762 * Math.pow(lvl, 3) },
+        { type: 'caster', min: 1, max: 300, sub: [4, 7, 15], mod: lvl => 0.4835370552909741 + 0.8668090226204177 * lvl - 0.006599272125728605 * Math.pow(lvl, 2) + 0.000020415414066691894 * Math.pow(lvl, 3) }
       ],
       22: [ // Off-hand
         { min: 1, max: 300, sub: null, mod: lvl => 0.9718419506869891 + 0.41682208197155196 * lvl + 0.001587412068902008 * Math.pow(lvl, 2) - 0.0000030964817997803457 * Math.pow(lvl, 3) }
@@ -423,7 +440,7 @@ $(document).ready(function() {
       25: [ // Thrown
         { min: 1, max: 300, sub: null, mod: lvl => 2.766343576702119 + 0.46057309703714083 * lvl + 0.0031338924726831943 * Math.pow(lvl, 2) - 0.000008297133052168907 * Math.pow(lvl, 3) }
       ],
-      26: [ // Ranged: Guns & Crossbows
+      26: [ // Ranged: Guns, Crossbows, & Wands
         { min: 1, max: 300, sub: [3, 18], mod: lvl => 1.4129016032445012 + 0.4961550555995297 * lvl + 0.00032039463941715415 * Math.pow(lvl, 2) - 8.224505599804983e-7 * Math.pow(lvl, 3) },
         { min: 1, max: 300, sub: 19, mod: lvl => 3.4857134522863866 + 0.48418168318576166 * lvl + 0.005842172301613738 * Math.pow(lvl, 2) - 0.000014078423351119631 * Math.pow(lvl, 3) }
       ]
@@ -608,27 +625,84 @@ $(document).ready(function() {
       $('#item-level').addClass('error');
     }
 
-    console.log(`fuck qualityMod: ${qualityMod(level)}, statBudget: ${statBudget}, slotMod: ${effectiveSlotMod}, itemBudget: ${parseFloat(socketBudgetTotal) + parseFloat(itemBudget)}, itemLevel: ${level}`);
+    console.log(`qualityMod: ${qualityMod(level)}, statBudget: ${statBudget}, slotMod: ${effectiveSlotMod}, itemBudget: ${parseFloat(socketBudgetTotal) + parseFloat(itemBudget)}, itemLevel: ${level}`);
     return statValues;
   }
 
-  function getDPSFormula(quality, type, lvl, sub, special = null) {
-    const array = weaponDPS[quality];
-    const data = special ? array[special] : array[type];
-    for (const row of data) {
-      const subMatch = row.sub === null || (Array.isArray(row.sub) && row.sub.some(s => s >= 0 && s === sub || s < 0 && s !== -sub)) || row.sub === sub;
-      if (subMatch && lvl >= row.min && lvl < row.max) { return row.mod(lvl); }
-    }
-    return null;
+  function getWeaponDelay(type, sub) {
+    return weaponSubClass[sub].delay(type);
   }
 
-  function getWeaponMod(type, sub, quality, lvl) {
-    return weaponDamageMod
-      .filter(entry => entry.type === type)
-      .filter(entry => entry.sub === null || entry.sub.includes(sub))
-      .filter(entry => entry.quality === quality || entry.quality.includes(quality))
-      .filter(entry => lvl >= entry.min && lvl <= entry.max)
-      .reduce((acc, entry) => entry.mod, null);
+  function calculateDamage(lvl, quality, type, sub, delay = null, special = null, bonus = null) {
+    console.warn(`calculating weapon damage`);
+
+    // Retrieve base DPS
+    const baseDps = (() => {
+      const array = weaponDPS[quality];
+      const data = special ? array[special] : array[type];
+      for (const row of data) {
+        const subMatch = row.sub === null || 
+                         (Array.isArray(row.sub) && row.sub.some(s => s >= 0 && s === sub || s < 0 && s !== -sub)) || 
+                         row.sub === sub;
+        if (subMatch && lvl >= row.min && lvl < row.max) {
+          return row.mod(lvl);
+        }
+      }
+      return null;
+    })();
+    console.log(`Base DPS: ${baseDps}`);
+
+    // Retrieve weapon modifier
+const coefficient = (() => {
+  const matchingEntry = weaponDamageMod.find(entry =>
+    (Array.isArray(entry.type) ? entry.type.includes(type) : entry.type === type) &&
+    (entry.sub === null || (Array.isArray(entry.sub) ? entry.sub.includes(sub) : entry.sub === sub)) &&
+    (Array.isArray(entry.quality) ? entry.quality.includes(quality) : entry.quality === quality) &&
+    lvl >= entry.min && lvl <= entry.max
+  );
+  return matchingEntry ? matchingEntry.mod : null;
+})();
+    console.log(`Coefficient (Modifier): ${coefficient}`);
+
+    // Determine attack speed
+    const attackSpeed = delay ? delay : weaponSubClass[sub].delay(type);
+    console.log(`Attack Speed: ${attackSpeed}`);
+
+    // Calculate damage
+    let minDamage = baseDps * (attackSpeed / 1000) * (1 - coefficient / 2);
+    let maxDamage = baseDps * (attackSpeed / 1000) * (1 + coefficient / 2);
+    console.log(`Min Damage before bonus: ${minDamage}`);
+    console.log(`Max Damage before bonus: ${maxDamage}`);
+
+    // Apply bonus damage
+    let damageHTML = '';
+    if (bonus) {
+      minDamage += bonus.min;
+      maxDamage += bonus.max ? bonus.max : bonus.min;
+      damageHTML = bonus.display;
+      console.log(`Bonus Min Damage: ${bonus.min}`);
+      console.log(`Bonus Max Damage: ${bonus.max ? bonus.max : bonus.min}`);
+    }
+
+    // Final damage values
+    console.log(`Final Min Damage: ${minDamage}`);
+    console.log(`Final Max Damage: ${maxDamage}`);
+
+    // Prepare final damage output
+    const baseDamageText = maxDamage === minDamage ? `${Math.ceil(minDamage)}` : `${Math.ceil(minDamage)} - ${Math.ceil(maxDamage)}`;
+    const finalDPS = ((minDamage + maxDamage) / 2) / (attackSpeed / 1000);
+    console.log(`Final DPS: ${finalDPS}`);
+
+    console.log(`calculateDamage(${lvl}, ${quality}, ${type}, ${sub}, ${delay}, ${special}, ${bonus}) => min: ${minDamage}, max: ${maxDamage}`);
+
+    return `
+      <div class="group spread">
+        <div>${baseDamageText} Damage</div>
+        <div>Speed ${(attackSpeed / 1000).toFixed(2)}</div>
+      </div>
+      ${damageHTML}
+      <div>(${finalDPS.toFixed(2)} damage per second)</div>
+    `;
   }
 
   function calculateArmor(slot, type, level, quality, bonus) {
@@ -690,7 +764,7 @@ $(document).ready(function() {
 
   function populateWeaponDamageTypes() {
     const damageObj = $('#item-damage1');
-    damageObj.empty().append('<option value="">Extra Damage</option>');
+    damageObj.empty().append('<option value="">Bonus Damage</option>');
     $.each(weaponDamageTypes, function(key, data) {
       damageObj.append(`<option value="${key}">${data.name}</option>`);
     });
@@ -844,38 +918,6 @@ $(document).ready(function() {
       };
     }
     return null;
-  }
-
-  function calculateDPS(min, max, rate) {
-    return ((min + max) / 2) / rate;
-  }
-
-  function calculateDamage(min, max, rate, bonus = null) {
-    console.error('calculating weapon damage');
-
-    let sumMin = min;
-    let sumMax = max;
-    let damageHTML = '';
-
-    if (bonus) {
-      sumMin += bonus.min;
-      sumMax += bonus.max ? bonus.max : bonus.min;
-      damageHTML = bonus.display;
-    }
-    
-    const base = max == min ? `${Math.ceil(min)}` : `${Math.ceil(min)} - ${Math.ceil(max)}`;
-
-    const dps = calculateDPS(sumMin, sumMax, rate);
-    console.log(`dps: ${dps}`);
-
-    return `
-      <div class="group spread">
-        <div>${base} Damage</div>
-        <div>Speed ${rate.toFixed(2)}</div>
-      </div>
-      ${damageHTML}
-      <div>(${dps.toFixed(2)} damage per second)</div>
-    `;
   }
 
   function sumStats() {
@@ -1071,9 +1113,8 @@ $(document).ready(function() {
     if (itemClass == 2) { // weapon properties
       const damageMin = parseFloat($("#damageMin").val());
       const damageMax = parseFloat($("#damageMax").val());
-      const attackSpeed = parseFloat($("#attackSpeed").val());
-      let delay = attackSpeed >= 5 ? 5 : attackSpeed <= 1 ? 1 : attackSpeed;
-      weaponDamageHTML = calculateDamage(damageMin, damageMax, delay, getBonusDamage());
+      const delay = parseFloat($("#weaponSpeed").val()*1000 || getWeaponDelay(itemSlot, itemTypeKey));
+      weaponDamageHTML = calculateDamage(itemLevel, itemQuality, itemSlot, itemTypeKey, delay, null, getBonusDamage());
       // calculate dps reduction
       // add feral attack power or spell power
     }
@@ -1189,19 +1230,22 @@ $(document).ready(function() {
   $("#item-reqlvl").on('change input', function() {
     if ($(this).val() < 0) { $(this).val(''); }
   });
-  
-  $("#damageMax, #damageMin, #damageMax1, #damageMin1, #attackSpeed").on('change input', function() {
-    if ($(this).val() <= 0) { $(this).val(''); }
+
+
+  $("#weaponSpeed").on('', function() {
+    let obj = $(this).val();
+    let val = obj.val();
   });
-  
-  $("#damageMax, #damageMin").on('change input', function() {
-    let maxDamageObj = $("#damageMax");
-    let maxDamage = parseFloat(maxDamageObj.val());
-    let minDamageObj = $("#damageMin");
-    let minDamage = parseFloat(minDamageObj.val());
+
+  $("#weaponSpeed").on('change input', function() {
+    let obj = $(this);
+    let val = obj.val();
+    if (val >= 6) { obj.val(6); }
+    if (val <= 0) { obj.val(''); }
   });
 
   $("#damageMax1, #damageMin1").on('change input', function() {
+    if ($(this).val() <= 0) { $(this).val(''); }
     let maxDamageObj = $("#damageMax1");
     let maxDamage = parseFloat(maxDamageObj.val());
     let minDamage = parseFloat($("#damageMin1").val());
@@ -1219,10 +1263,9 @@ $(document).ready(function() {
     $(".itemType").hide();
     if (currentSelection == 4) {
       $("#item-damage").empty();
-      $("#damageMax, #damageMin").val('');
+      $("#weaponSpeed").val('');
       $(".weaponDamage").hide();
-      $('.weaponDamageExtra input').val('');
-      $(".weaponDamageExtra").hide();
+      $('.weaponDamage input').val('');
     }
   });
 
@@ -1278,6 +1321,7 @@ $(document).ready(function() {
     if (selectedClass == 2) { // is a weapon
       populateWeaponDamageTypes();
       $(".weaponDamage").show();
+      $("#weaponSpeed").val();
 
       if ($("#item-subclass option:selected").val() == 10) { // staff
         $(".weaponMethod").show();
@@ -1316,7 +1360,11 @@ $(document).ready(function() {
     const array = itemClass == '4' ? armorClass : weaponClass;
     if (itemSlot) { populateSubClass(array[itemSlot].subClass, itemClass); }
     $(".itemType").show();
-    $(".weaponMethod").hide();
+    $(".weaponMethod, .weaponDamage").hide();
+    if(itemSlot == 15 || itemSlot == 25) {
+      $(".weaponDamage").show();
+      $('.weaponDamage input').val('');
+    }
     if(itemSlot == 26 || itemSlot == 25 || itemSlot == 15) {
       $('.weaponDamageExtra input').val('');
       $(".weaponDamageExtra").hide();

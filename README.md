@@ -340,33 +340,33 @@ Based on the calculated `DPS` and the `Mode Average Attack Speed`, the minimum a
 
 ## Attack Speeds per Weapon Type
 
-| InventoryType | subclass | avg delay | detail |
-
-| 13 | 0 | 2281 | one hand axe |
-| 13 | 4 | 2292 | one hand mace |
-| 13 | 7 | 2161 | one hand sword |
-| 13 | 13 | 1957 | one hand fist |
-| 13 | 15 | 1663 | one hand dagger |
-| 15 | 2 | 2686 | bow |
-| 17 | 0 | 3384 | two hand axe |
-| 17 | 5 | 3311 | two hand mace |
-| 17 | 6 | 3216 | two hand polearm |
-| 17 | 8 | 3331 | two hand sword |
-| 17 | 10 | 2719 | two hand staff |
-| 21 | 0 | 2450 | main hand axe |
-| 21 | 4 | 1996 | main hand mace |
-| 21 | 7 | 1946 | main hand sword |
-| 21 | 13 | 2569 | main hand fist |
-| 21 | 15 | 1667 | main hand dagger |
-| 22 | 0 | 2028 | off hand axe |
-| 22 | 4 | 1500 | off hand mace |
-| 22 | 7 | 1500 | off hand sword |
-| 22 | 13 | 2022 | off hand fist |
-| 22 | 15 | 1566 | off hand dagger |
-| 25 | 16 | 1853 | thrown |
-| 26 | 3 | 2747 | ranged - gun |
-| 26 | 18 | 2900 | ranged - crossbow |
-| 26 | 19 | 1714 | ranged - wand |
+| inventorytype | subclass | avg delay | detail            |
+|---------------|----------|-----------|-------------------|
+|            21 |        0 |      2400 | main hand axe     |
+|            13 |        0 |      2300 | one hand axe      |
+|            22 |        0 |      2000 | off hand axe      |
+|            17 |        1 |      3400 | two hand axe      |
+|            21 |        4 |      2000 | main hand mace    |
+|            13 |        4 |      2300 | one hand mace     |
+|            17 |        5 |      3300 | two hand mace     |
+|            22 |        4 |      1500 | off hand mace     |
+|            21 |        7 |      1900 | main hand sword   |
+|            13 |        7 |      2200 | one hand sword    |
+|            22 |        7 |      1500 | off hand sword    |
+|            17 |        8 |      3300 | two hand sword    |
+|            21 |       15 |      1700 | main hand dagger  |
+|            13 |       15 |      1700 | one hand dagger   |
+|            22 |       15 |      1600 | off hand dagger   |
+|            21 |       13 |      2600 | main hand fist    |
+|            13 |       13 |      2000 | one hand fist     | 
+|            22 |       13 |      2000 | off hand fist     |
+|            17 |        6 |      3200 | two hand polearm  |
+|            17 |       10 |      2700 | two hand staff    |
+|            15 |        2 |      2700 | bow               |
+|            25 |       16 |      1900 | thrown            |
+|            26 |        3 |      2700 | ranged - gun      |
+|            26 |       18 |      2900 | ranged - crossbow |
+|            26 |       19 |      1700 | ranged - wand     |
 
 ## Druid/Caster Weapon DPS Adjustment (old methodology)
 
