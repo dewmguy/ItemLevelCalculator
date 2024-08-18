@@ -21,6 +21,7 @@ body {
   width: 100vw;
   height: 100vh;
   font-size: 12pt;
+  padding: 20px;
 }
 
 header {
@@ -68,6 +69,7 @@ form {
   flex-direction: row;
   gap: 20px;
   justify-content: space-evenly;
+  flex-wrap: wrap;
 }
 
 input, select, button, label {
@@ -182,8 +184,10 @@ button:active:after {
 #float {
   display: flex;
   justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
 }
-
+#container { flex-wrap: wrap }
 #container, #output {
   display: flex;
   flex-direction: column;
@@ -192,12 +196,6 @@ button:active:after {
   background-color: #242424;
   border-radius: 22px;
   box-shadow: 0 2px 5px 0 rgba(0,0,0,.1);
-}
-
-#output {
-  gap: 20px;
-  width: 100%;
-  margin-left: 20px;
 }
 
 #configPanel, #statPanel, #stats {
@@ -387,7 +385,7 @@ input.artifact:not(:placeholder-shown) { color: #E6B453 !important }
 }
 
 .tooltip {
-  width: 275px;
+  width: 300px;
   background-color: #080D22;
   padding: 10px;
   border: .075em solid #555;

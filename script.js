@@ -297,6 +297,7 @@ $(document).ready(function() {
   };
 
   const weaponDamageTypes = {
+    0: { name: "Physical" },
     1: { name: "Holy" },
     2: { name: "Fire" },
     3: { name: "Nature" },
