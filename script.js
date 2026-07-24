@@ -945,8 +945,8 @@ const coefficient = (() => {
     return [gold, silver, copper];
   }
   
-  function calculateBuyValue(sellValue, type) {
-    const typeMod = type === 0 ? 0.25 : 0.2;
+  function calculateBuyValue(sellValue, itemClass, slot) {
+    const typeMod = itemClass == '4' && [2, 11, 23].includes(slot) ? 0.25 : 0.2;
     const totalCopper = sellValue / typeMod;
     return calculateDenomination(totalCopper);
   }
@@ -956,10 +956,10 @@ const coefficient = (() => {
     const array = itemClass == '4' ? armorClass : weaponClass;
     const invType = array[slot];
     const sellMod = invType.sellMod;
-    const qualityMod = armorSubClass[type].sellMod;
-    const totalCopper = qualityCoefficients[quality].sellValue(level) * sellMod * qualityMod;
+    const subClassSellMod = itemClass == '4' ? armorSubClass[type].sellMod : 1;
+    const totalCopper = qualityCoefficients[quality].sellValue(level) * sellMod * subClassSellMod;
     const sellValue = calculateDenomination(totalCopper);
-    const buyValue = calculateBuyValue(totalCopper, type);
+    const buyValue = calculateBuyValue(totalCopper, itemClass, slot);
     return { buyValue, sellValue };
   }
 
