@@ -1137,9 +1137,6 @@ const coefficient = (() => {
       else { socketsHTML = ''; }
     }
 
-    const durabilityCalc = 145;
-    durabilityHTML = itemTypeKey !== 0 ? `<div>Durability ${durabilityCalc} / ${durabilityCalc}</div>` : '';
-
     const { sellValue, buyValue } = calculateSellValue(itemClass, itemLevel, itemQuality, itemSlot, itemTypeKey);
     const [goldSell, silverSell, copperSell] = sellValue;
     const [goldBuy, silverBuy, copperBuy] = buyValue;
