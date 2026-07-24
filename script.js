@@ -145,7 +145,7 @@ $(document).ready(function() {
     ]
     : [ // everything else
       { quality: 4, min: 200, mod: (24/1) },
-      { quality: 4, min: 90, mod: (100/1) },
+      { quality: 4, min: 90, mod: (10/1) },
       { quality: 4, min: 1, mod: (20/1) },
       { quality: 3, min: 1, mod: (20/1) },
       { quality: 2, min: 1, mod: (10/1) },
