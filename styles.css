@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
 
+:root { color-scheme: dark }
+
 * {
   margin: 0;
   border: 0;
@@ -133,19 +135,31 @@ input[type="radio"]:hover + label {
 }
 
 select {
-  -webkit-appearance: menulist-button;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
   color-scheme: dark;
+  min-height: calc(2.5em + 2px);
+  padding-block: .55em;
+  padding-inline: 1em 2.4em;
+  line-height: 1.4em;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23A0A0A0' d='M1.4.6 6 5.2 10.6.6 12 2 6 8 0 2z'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, #3e3e3e, #373737);
+  background-position: right .85em center, 0 0;
+  background-repeat: no-repeat;
+  background-size: .65em auto, 100% 100%;
 }
 
 select option {
-  background-color: #282828;
-  color: #E2E2E2;
+  background: #282828 !important;
+  color: #E2E2E2 !important;
 }
 
-select option[value=""] { color: #A0A0A0 }
+select option[value=""] { color: #A0A0A0 !important }
 select option:checked:not([value=""]) {
-  background-color: #4A451C;
-  color: #FFF3A0;
+  background: #4A451C !important;
+  color: #FFF3A0 !important;
 }
 
 label {
