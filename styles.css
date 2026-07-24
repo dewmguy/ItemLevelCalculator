@@ -134,6 +134,18 @@ input[type="radio"]:hover + label {
 
 select {
   -webkit-appearance: menulist-button;
+  color-scheme: dark;
+}
+
+select option {
+  background-color: #282828;
+  color: #E2E2E2;
+}
+
+select option[value=""] { color: #A0A0A0 }
+select option:checked:not([value=""]) {
+  background-color: #4A451C;
+  color: #FFF3A0;
 }
 
 label {
@@ -254,6 +266,74 @@ button:focus-visible {
 
 #item-name::placeholder { color: #A0A0A0; }
 #item-name:not(:placeholder-shown) { color: inherit; }
+
+#configPanel select:has(option:checked:not([value=""])) {
+  color: #F3E7A1;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .04),
+    inset 0 -2px 0 rgba(239, 210, 19, .72);
+}
+
+#configPanel select:has(option:checked:not([value=""])):focus {
+  border-color: rgba(239, 210, 19, .75);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .04),
+    inset 0 -2px 0 rgba(239, 210, 19, .85),
+    0 0 0 3px rgba(239, 210, 19, .12);
+}
+
+#item-name.uncommon {
+  --field-accent: rgba(30, 255, 0, .75);
+  --field-focus: rgba(30, 255, 0, .12);
+}
+#item-name.rare {
+  --field-accent: rgba(36, 150, 255, .8);
+  --field-focus: rgba(36, 150, 255, .14);
+}
+#item-name.epic {
+  --field-accent: rgba(163, 53, 238, .8);
+  --field-focus: rgba(163, 53, 238, .14);
+}
+#item-name.legendary {
+  --field-accent: rgba(255, 128, 0, .8);
+  --field-focus: rgba(255, 128, 0, .14);
+}
+#item-name.artifact {
+  --field-accent: rgba(230, 180, 83, .8);
+  --field-focus: rgba(230, 180, 83, .14);
+}
+#item-level {
+  --field-accent: rgba(255, 209, 0, .78);
+  --field-focus: rgba(255, 209, 0, .13);
+}
+#item-reqlvl {
+  --field-accent: rgba(214, 201, 149, .72);
+  --field-focus: rgba(214, 201, 149, .12);
+}
+#item-description {
+  --field-accent: rgba(255, 209, 0, .62);
+  --field-focus: rgba(255, 209, 0, .1);
+}
+
+#configPanel :is(#item-name, #item-level, #item-reqlvl, #item-description):not(:placeholder-shown) {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .04),
+    inset 0 -2px 0 var(--field-accent);
+}
+
+#configPanel :is(#item-name, #item-level, #item-reqlvl, #item-description):not(:placeholder-shown):hover {
+  box-shadow:
+    inset 0 4px 8px rgba(0, 0, 0, .2),
+    inset 0 -2px 0 var(--field-accent);
+}
+
+#configPanel :is(#item-name, #item-level, #item-reqlvl, #item-description):not(:placeholder-shown):focus {
+  border-color: var(--field-accent);
+  box-shadow:
+    inset 0 4px 12px rgba(0, 0, 0, .3),
+    inset 0 -2px 0 var(--field-accent),
+    0 0 0 3px var(--field-focus);
+}
 
 #reset {
   font-size: 1.75em;
