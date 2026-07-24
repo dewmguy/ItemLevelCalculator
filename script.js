@@ -1089,7 +1089,7 @@ const coefficient = (() => {
           socketsHTML += `<div class="socket"><img src="item-display/socket/${socketColor}.png" />${socketColor} Socket</div>`;
         }
         else if (stat.type === 3) {
-          bonusArmor = $(this).find('.stat-amount').val();
+          bonusArmor = statAmount;
         }
       }
     });
