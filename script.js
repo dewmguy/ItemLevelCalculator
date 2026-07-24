@@ -118,7 +118,6 @@ $(document).ready(function() {
     },
     4: { name: "Shirt", sellMod: (4/16), armorMod: 0, itemClass: 4, subClass: [1], slotMod: (1/32) },
     5: { name: "Chest", sellMod: (16/16), armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
-    7: { name: "Legs", sellMod: (16/16), armorMod: (14/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
     19: { name: "Tabard", sellMod: (4/16), armorMod: 0, itemClass: 4, subClass: [0], slotMod: (1/32) },
     20: { name: "Chest (Robe)", sellMod: (16/16), armorMod: (16/16), itemClass: 4, subClass: [1, 2, 3, 4], slotMod: (16/16) },
     23: { name: "Held Off-hand", sellMod: (8/16), armorMod: 0, itemClass: 4, subClass: [0], slotMod: (3/16) },
