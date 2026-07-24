@@ -569,10 +569,10 @@ $(document).ready(function() {
 
       const effectiveSlotMod = slotModFunction ? slotMod(quality, i) : slotMod;
       const itemBudget = totalStatBudget * effectiveSlotMod;
-      const statBudgetIncrement = Math.pow(qualityMod(i+1) * effectiveSlotMod, exponent);
+      const statBudgetIncrement = Math.pow(qualityMod(i) * effectiveSlotMod, exponent);
 
       if (statBudgetIncrement >= itemBudget) {
-        consoleLog.push(`qualityMod: ${qualityMod(i+1)}, statBudget: ${totalStatBudget}, slotMod: ${effectiveSlotMod}, itemBudget: ${itemBudget}, itemLevel: ${i}`);
+        consoleLog.push(`qualityMod: ${qualityMod(i)}, statBudget: ${totalStatBudget}, slotMod: ${effectiveSlotMod}, itemBudget: ${itemBudget}, itemLevel: ${i}`);
         itemLevel = i;
         break;
       }
