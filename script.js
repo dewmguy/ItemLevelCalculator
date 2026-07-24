@@ -655,7 +655,8 @@ $(document).ready(function() {
 
     // Retrieve weapon modifier
 const coefficient = (() => {
-  const matchingEntry = weaponDamageMod.find(entry =>
+  // Later entries are more specific and override the broad defaults above.
+  const matchingEntry = [...weaponDamageMod].reverse().find(entry =>
     (Array.isArray(entry.type) ? entry.type.includes(type) : entry.type === type) &&
     (entry.sub === null || (Array.isArray(entry.sub) ? entry.sub.includes(sub) : entry.sub === sub)) &&
     (Array.isArray(entry.quality) ? entry.quality.includes(quality) : entry.quality === quality) &&
