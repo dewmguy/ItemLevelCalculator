@@ -556,8 +556,17 @@ input.artifact:not(:placeholder-shown) { color: #E6B453 !important }
   font-size: 2em;
 }
 .github a, .github a:hover { border-bottom: 0 }
-.github a { opacity: .82 }
-.github a:hover { opacity: 1 }
+.github-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .4em;
+  font-size: .45em;
+  font-weight: 600;
+  opacity: .82;
+  white-space: nowrap;
+}
+.github-link i { font-size: 1.7em }
+.github-link:hover { opacity: 1 }
 .build-version {
   color: #858585;
   font-family: Consolas, monospace;
