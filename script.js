@@ -1128,11 +1128,9 @@ const coefficient = (() => {
         blockValue = calculateShieldBlock(itemLevel, itemQuality);
       }
       if(socketsHTML) {
-        const socketBonus = '+8 Strength';
         socketsHTML = `
           <div id="sockets">
             ${socketsHTML}
-            <div class="socket">Socket Bonus: ${socketBonus}</div>
           </div>
         `;
       }
