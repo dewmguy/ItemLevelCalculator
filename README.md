@@ -17,12 +17,27 @@ For instance, consider item level 277 gear dropped in Icecrown Citadel (ICC). Th
 
 A prime example of these outliers is the [Shining Buckle Gauntlets](https://www.wowhead.com/wotlk/item=39183/shining-buckle-gauntlets) and the [Discoverer's Mitts](https://www.wowhead.com/wotlk/item=39013/discoverers-mitts). Both are item level 154 leather items with identical stats despite differing qualities, an impossibility under standard calculations.
 
+### Executable model and research status
+
+The calculator's current stat-budget coefficients and equations live in
+[`budget-model.js`](budget-model.js), with reusable power-law transforms in
+[`model-math.js`](model-math.js). The identifier boundary is frozen in
+[`item-identifiers.js`](item-identifiers.js) and documented in
+[`IDENTIFIER_CONTRACT.md`](IDENTIFIER_CONTRACT.md). Those tested modules are the
+source of truth when prose or an older research table disagrees.
+
+The coefficient tables below describe the executable model unless a section is
+explicitly marked as historical methodology. The formula comparison and
+acceptance protocol are documented in
+[`FORMULA_VALIDATION.md`](FORMULA_VALIDATION.md); benchmark conclusions are not
+treated as production changes until they satisfy those gates.
+
 ## Fundamentals of Item Level Calculation
 
 #### Terms and Definitions
 
 - **StatMod**: The weight coefficient or "cost" of a given Stat. Stamina is often less expensive than strength.
-- **Exponent**: $log(2)/log(1.5) ≈ 1.7095$ is applied to inflate the expense of a stat into a StatValue. This makes a lone stat of higher quantity more expensive than multiple lower quantity stats while maintaining a relatively similar overall expense. (e.g. at item level 172, 100 strength ≈ 53 strength + 53 agility + 53 crit)
+- **Exponent**: $p=\log(2)/\log(1.5)\approx 1.7095$ is applied to inflate the expense of a stat into a StatValue. This makes a lone stat of higher quantity more expensive than multiple lower quantity stats while maintaining a relatively similar overall expense. (For example, 100 strength is approximately equivalent to 53 strength + 53 agility + 53 crit when all three stats have the same StatMod.)
 - **StatValue**: The inflated expense of the Stat on an item.
 - **StatBudget**: The sum of all of the StatValues on an item.
 - **SlotMod**: The weight coefficient of an item based on its slot. A chest will have a lower item level than gloves with the same stats.
@@ -33,7 +48,7 @@ A prime example of these outliers is the [Shining Buckle Gauntlets](https://www.
 #### Calculating StatBudget
 
 $$
-StatBudget = \left( (StatValue_{1} \times StatMod_{1})^{\frac{\log(2)}{\log(1.5)}} + (StatValue_{2} \times StatMod_{2})^{\frac{\log(2)}{\log(1.5)}} + \ldots \right)
+StatBudget = \sum_i (StatAmount_i \times StatMod_i)^p
 $$
 
 #### Calculating ItemBudget
@@ -41,6 +56,15 @@ $$
 $$
 ItemBudget = StatBudget \times SlotMod
 $$
+
+For stat generation, the inverse of the forward transform is:
+
+$$
+StatAmount_i = \frac{AllocatedBudget_i^{1/p}}{StatMod_i}
+$$
+
+Placing `StatMod` inside the root is not algebraically equivalent and was
+corrected in build `2026.07.24.1`.
 
 #### Calculating QualityMod
 
@@ -57,6 +81,17 @@ The QualityMod is multiplied by the SlotMod and the product is raised to the exp
 $$
 (\text{QualityMod}(i) \times \text{SlotMod})^{\frac{\log(2)}{\log(1.5)}} \geq \text{ItemBudget}
 $$
+
+Equivalently:
+
+$$
+\sum_i(StatAmount_i \times StatMod_i)^p
+\leq QualityMod(i)^p \times SlotMod^{p-1}
+$$
+
+This is a power-law model, not an exponential model. The production exponent
+is not $\log(3)/\log(2)$. Alternative exponents, including $p=3/2$, are being
+evaluated against a held-out item corpus before any production change.
 
 ## Stat & Slot Coefficients
 
@@ -141,14 +176,14 @@ The values in this table are found to be static and do not change within any ite
 |        14 | Parry Rating       |           all |    16/16 |
 |        15 | Block Rating       |           all |    16/16 |
 |        21 | Spell Crit Rating  |           all |    16/16 |
-|        21 | Hit Rating         |           all |    16/16 |
+|        31 | Hit Rating         |           all |    16/16 |
 |        32 | Crit Rating        |           all |    16/16 |
 |        35 | Resiliance Rating  |           all |    16/16 |
 |        36 | Haste Rating       |           all |    16/16 |
 |        37 | Expertise          |           all |    16/16 |
 |        38 | Attack Power       |           all |     8/16 |
 |        44 | Armor Penetration  |           all |    16/16 |
-|        47 | Spell Penetration  |           all |    16/16 |
+|        47 | Spell Penetration  |           all |    12/16 |
 |     X_res | Resistances        |           all |    16/16 |
 
 The values in this table are found to be dynamic and frequently very between item level ranges. As better methods for determining the accuracy of these coefficients is developed, these figures may change or be found to be static, and will be moved into the table above.
@@ -157,17 +192,25 @@ The values in this table are found to be dynamic and frequently very between ite
 |-----------|--------------------|---------------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
 |  X_socket | Sockets            | 2, 11, 14, 23 |      5/1 |      5/1 |      5/1 |     10/1 |     10/1 |     10/1 |     10/1 |     10/1 |     24/1 |
 |  X_socket | Sockets            |          else |     10/1 |     10/1 |     10/1 |     20/1 |     20/1 |     20/1 |     20/1 |     10/1 |     24/1 |
-|     armor | Bonus Armor        |           all |     3/32 |      ... |      ... |      ... |     2/32 |     2/32 |     2/32 |     2/32 |     2/32 |
+|     armor | Bonus Armor        |           all |     3/32 |     3/32 |     3/32 |     3/32 |     2/32 |     2/32 |     2/32 |     2/32 |     2/32 |
 |         7 | Stamina            |           all |    16/16 |      2/3 |      2/3 |    16/16 |      2/3 |      2/3 |    16/16 |      2/3 |      2/3 |
-|        43 | Mana Regen Per 5   | 2, 11, 12, 23 |    48/32 |      ... |      ... |      ... |    32/16 |    32/16 |    32/16 |    32/16 |    24/16 |
-|        43 | Mana Regen Per 5   |          else |    92/32 |      ... |      ... |      ... |    32/16 |    32/16 |    32/16 |    32/16 |    32/16 |
+|        43 | Mana Regen Per 5   | 2, 11, 12, 23 |    48/16 |    48/16 |    48/16 |    48/16 |    32/16 |    32/16 |    32/16 |    32/16 |    24/16 |
+|        43 | Mana Regen Per 5   |          else |    92/32 |    92/32 |    92/32 |    92/32 |    32/16 |    32/16 |    32/16 |    32/16 |    32/16 |
 |        45 | Spell Power        |           all |    45/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |    45/64 |    45/64 |
-|        46 | Health Regen Per 5 | 2, 11, 12, 23 |    32/16 |      ... |      ... |      ... |      ... |      ... |    16/16 |     8/16 |     4/16 |
-|        46 | Health Regen Per 5 |          else |    64/16 |      ... |      ... |      ... |      ... |      ... |    32/16 |    16/16 |     8/16 |
+|        46 | Health Regen Per 5 | 2, 11, 12, 23 |    32/16 |    32/16 |    32/16 |    32/16 |    32/16 |    32/16 |    16/16 |     8/16 |     4/16 |
+|        46 | Health Regen Per 5 |          else |    64/16 |    64/16 |    64/16 |    64/16 |    64/16 |    64/16 |    32/16 |    16/16 |     8/16 |
 |        48 | Block Value        | 2, 11, 12, 14 |    16/16 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |     4/64 |
 |        48 | Block Value        |          else |    16/16 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |
 
 ## Base Armor Calculation
+
+> **Historical regression reference:** The armor, block, weapon-damage, and
+> sell-value tables from this point preserve the original research notes and
+> rounded graph inputs. They are useful for provenance, but they are not an
+> exact executable specification. The higher-precision functions in
+> [`script.js`](script.js) govern current tooltip output. These effect models
+> remain scheduled for isolated corpus validation in Phases 3–5 of
+> [`MODEL_RESEARCH.md`](MODEL_RESEARCH.md).
 
 Base Armor is calculated by item level and Bonus Armor is applied to an item as an additional stat. I hypothesize that the base armor of an item actually consumes an amount of the item's overall stat budget in whatever formula blizzard invented. I believe this is true due to how bonus armor affects an items level. This can be a thought experiment for another time (or person).
 
@@ -185,7 +228,7 @@ These values are derived by dividing the armor value each type of armor of equiv
 | Feet         |             8 |    11/16 |
 | Hands        |            10 |    10/16 |
 | Waist        |             6 |     9/16 |
-| Shield       |            14 |     9/16 |
+| Shield       |            14 |    16/16 |
 | Back         |            16 |     8/16 |
 | Wrists       |             9 |     7/16 |
 
@@ -253,17 +296,27 @@ Weapon DPS is inherent to the item level of the weapon and varies based on item 
 
 ### Formula
 
-The calculator determines the dps value corelated to the item level for the weapon type and an attack speed derived from the mode average for that weapon type. Based on the attack speed, it will determine the minimum and maximum attack values for that weapon. Each weapon type has a coefficient value of the difference between min and max damage.
+The calculator first selects a fitted DPS function using quality,
+InventoryType, weapon subclass, calculator profile, and item level:
 
 $$
-\text{DPS} = \frac{\text{Item Level} \times \text{Weapon Coefficient}}{\text{Mode Average Attack Speed}}
+BaseDPS = f_{quality,InventoryType,subclass,profile}(ItemLevel)
 $$
 
-Where:
+It then applies the weapon's attack delay and its min/max spread coefficient
+`c`:
 
-- **Item Level**: The level of the item being evaluated.
-- **Weapon Coefficient**: A constant value specific to the weapon type that determines the relationship between minimum and maximum damage.
-- **Mode Average Attack Speed**: The most frequently occurring attack speed value for the weapon type.
+$$
+MinDamage = BaseDPS \times \frac{Delay}{1000} \times (1 - c/2)
+$$
+
+$$
+MaxDamage = BaseDPS \times \frac{Delay}{1000} \times (1 + c/2)
+$$
+
+The default delay is the modal delay for that weapon tuple, but the user may
+override it. The spread coefficient controls the difference between minimum
+and maximum damage; it is not the DPS itself.
 
 #### Minimum and Maximum Attack Value Calculation
 
@@ -370,6 +423,10 @@ Based on the calculated `DPS` and the `Mode Average Attack Speed`, the minimum a
 
 ## Druid/Caster Weapon DPS Adjustment (old methodology)
 
+This section records an earlier spell-power hypothesis and is not used to
+invent hidden caster spell power. The application now generates feral attack
+power with AzerothCore's runtime DPS conversion shown below.
+
 Because weapon damage is not an effective mechanic of damage for druids and casters, caster and druid weapons sacrifice a portion of their DPS to either gain a base amount of spell power or feral attack power, or increase the stat budget ceiling to accomodate more spellpower or feral attack power. The amount of Spell Power or Feral Attack Power gained is proportional to the amount of DPS reduction on the item.
 
 One-hand caster weapons from tbc and below have the full allotment of spellpower attributed as a stat. Feral Druids do not use one-handed weapons.
@@ -388,6 +445,21 @@ Spell Power = Sacrificed DPS * 4
 Feral Attack Power = Sacrificed DPS * 18.37 - 12.4843
 ```
 
+For AzerothCore WotLK, the server's effective feral attack power calculation is
+instead:
+
+```math
+Feral Attack Power = max(0, floor((Weapon DPS + Extra DPS) * 14) - 767)
+```
+
+It applies to eligible weapons in InventoryTypes 13, 17, 21, and 22. Caster
+base spell power has no equivalent generic AzerothCore DPS conversion and
+requires a separately validated empirical model.
+
+The current calculator displays this derived feral attack power for supported
+feral weapon profiles. Caster spell power remains an explicit item stat unless
+a separately validated spell-based model is selected in a future phase.
+
 ## Sell Value Calculation
 
 | Quality | Formula | Graph |
@@ -395,6 +467,11 @@ Feral Attack Power = Sacrificed DPS * 18.37 - 12.4843
 |       2 | `y = 439x` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0&b=439&min-x=0&max-x=400&min-y=0&max-y=400000&order=1&graph-title=Uncommon+Gold+Sell+Value&plot=NobwRAHmBcAsBsAaMBPGBGATAZmwBgF9Fwo4AOZNadBWAViJJlgHZKNtZ15HJnN20AJx4hPYn2h10g9CyGxCE0nTaoYmOkPRlepWLFl5V6PczqydeJUzhDZreLuUw6h9dEx4y2Z7boUHpraDC5SAh466EKh%2FhZBXqJm0PB4gpg%2BqsnwEVSYIeK28NiC%2BPA52fF5QmRkmMmq6b5CLNlpkU6YsA3tVNxyNpKp6ZmtYTnpLXjdYbAlHkKafpKwgX1z2GP%2B7nnWLLGSWiPYAdnzebVkWysyHmQB2D2y8HJCDecaeF2Fh2p59HQDqQJh58Jh4EDmEhIjpag1bn0yF9lipoXlwXNsgiYPhvI9xlUNGIKmERIInEiUTBirJ7uUGmsNPA5m8wugvoJWKxIdAyNjoM0kckyDscftpsK%2FsxRNxkmTQYs6INSEIPnBMCx9nK0eYMjyhPYPAY6PS2RyjSwsKzbOzCXAcvdkuzGeQRPU2eh%2BaxVfibTRBErUr7JJ6pVJWJhTGyvAHMHGfqRbZyHVGbcZOXUcHK1XNVAmYFdOXhYU7PQH2TVhfzNi8ZrY%2BaVUgond5OSwrnWQ62jWRVfnqP6ewFronu1RVmJlRgx8xtIo5Ybx8z52zfOS8Jtg4m1x4XmJ3Tad1RUkGnfgAyKuGfRSkdBqzy7UiL%2BzRctS5hK2Qhydh0ICnUq5LlI6bJuOSdDYE4AGPr28DWiGILHiwrBUtQ5SCJaf6piGLC9DALBOHBTrIRh2BdFuGDthh2g6E6dQYXQODwduj64F4D4BvIJwcbuxYvDxx4biBh6PlgBECa4BGVl%2BOopPAuHYYm367oC0ROspx7MqcMk%2Ftg0k2hp1JYNIElSO2BjqW%2BKRKjQAE3uUzR2eSlr3qB9lkKknaJiRHgEbUPLcFZ8lKiOGCIdSSKuTa4XQJhpo2gEzmRi%2BiUqTEqF%2FnhKRlBluEYbABoHjhN7tk%2BxElQEspsj5VCWsyU7UDV%2BGMb25UMSaugALpAA%3D%3D) |
 |       3 | `y = 500 + 525x` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=500&b=525&min-x=0&max-x=400&min-y=0&max-y=400000&order=1&graph-title=Rare+Gold+Sell+Value&plot=NobwRAHmBcAsCcAaMBPGBGeAGA7LAvouFHAEzJrTrUBs6hxMArLBTKQlgBwOTNKoYAZlhYxvEizbQONIUInMm00jlLwFRPtDnShOHE3iLoTHCvjpS9LSV2CZqmj1vNWD0kyzwXjHVj15HxMjPXQubhM6PVgDGiihPRYcLATpcOsmNIdw2HQs1x1EnK5S%2BML7SiEvHF9tSuEmOhs%2FUId5WHUo8naaPDq7ZXaWbGyquUjClL0uJtIx4RosMxN0LBppJlnYAYx0d0oadS4CQuohw9ghS1X86TouG8LZ6VgEIxNLV64hLHnnrjfJhCFraNbFShNLg0YxnLAQ5jXLg4W49SEGWq3C4wI6zUEkF4OWK4XbQQmUWIcFFnO4OJa1f5%2Bc73KxCRlg2mHaxHLH3UgTXkOIxXU5Mzk4jiTJliTZbfarGVC%2FLwanSgSQ%2BA0JYmUrfUi4T4HZjwpjskhrdXMLj5TR%2BLhomBXeAsBWW0zOa6uzYpLyCw7VYE6wFEiKkW0c7GmeCxVUR%2B7rNZ%2BnHyGGrJiRiLefEYHBux5bcPmoTBw7wbmrZHSZ2wVNnSsOeDR0QV8w5LCs0n6gIN7B4Exd9LLFVm9iKygqyzZmRjjBDkH9mdUP7UKcDntvApMrXSE44PqrPo7ozys65qtBUVgs8NuWX8318daxNnLY7hBatMlmARLWx%2B%2Bt8cDF%2BFsqx2FIDwAmBexwVdFzWPJMAPDYHGhdA2SQncaFgU0F27Sg1iaToILfLVCwwH4qw9Kdwkgpc%2FnkfAAF0gA%3D) |
 |       4 | `y = 10000 + 600x + 0.16x^2` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=10000&b=600&c=0.16&min-x=0&max-x=400&min-y=0&max-y=400000&order=2&graph-title=Epic+Gold+Sell+Value&plot=NobwRAHmBcBsBMAaMBPGAWAHABgOwEYBfRcKOWZNaAVnmtwGZjSZYLUZr9tNNnIYudlXqxMREgOhDKnAJwMu%2FMnOyzo%2BfA0y5cymL3UJ4udPuiGOcfLtjnd66tUzwzkso0ewn1c7DVW6LD48HzurMIY1HJs9khW1LBBduHQcvFUYtTYvqnpRvSYTKk4jrr4uSwW1EYMsHXmqrXYDHqpWgFUCophVdy46kLwiuYhA1aYcujw2KNB6twz%2FqMV6uKwuJVSmjUT1AzwcqOha3KMs%2B3a6nLZjHP4C9jYsOmjXAvcDFOjT0Y3r%2B1VhNhjwVrsqEVxL1tjlBrRaD9wYI2Ohin1YVZcK5gojBtp9vdHs8AX0TlYpvh0BdSZhruh0JtRgwGHSsW0%2BtFHrQWm85FzgmjtkkPoccLyPjZvOKrJo6Jg3H0gRD6BVjkiLGICOYZp0YFoXEJtb8ZcyNtCyDqFlSGKDUvAtFbFF9tQ6ZehEjcXSy3VNnXbXVRKYx0BIqvbvYGvptQ1Jw1bcC54NraAt6tg5EdAer5YkUmGA3rtDEFbGCxpUTlzTB4PBIhp9mJBRbawtaFgYxb8HyZVwdOzYy2e9h7VsLV9W1j0Jn893Awz6dPS7O9VP8C9tYPA85XKPq%2B6Frhh%2Bu7c5U3IdE29%2Bq1zWYsnaTLznIO1fUyiX9A5Qeijy7cbI6iSh2vuMpsMOu6fiBgYIAwWjalBer1LQVafqeoFsFi94LDgJiLhaaGBuI%2BwoTurbPhs8HXtECZJsB17%2BF8JEIRo3jTBBpHoeBlFvkkH7DBkiFBCE2oHK29CenRqbcGc3E9uR%2Fadsu5bTL%2BM6tjwkzasKMrrKEWnoNha7iPp2F1FgIkCSxNgzBZE4ICRok9iEel2g4OlEXmsZuYRkw5Nq3l6pM4nJg8oGHKYIUHpq7HaYGuAxDidqxYF9SxElBk6YeJiRY%2BIQEulB70n5BWPmc2QmY%2BSSojl0E6FONV6gQmCxAAukAA%3D%3D) |
+
+The executable epic expression currently squares the product:
+`10000 + 600x + (0.16x)^2`, equivalent to a quadratic coefficient of
+`0.0256`. The historical `0.16x^2` row above remains a separate hypothesis to
+validate against vendor data.
 
 The chest InventoryType has the highest sell value of all slots, similar to the weight of slotMod. Sell value is determined by taking the highest value item (chest) and dividing its cost by the cost of the other items of an equivalent item level and subclass. Weight coefficients for plate, mail, leather, and cloth are derived by dividing the plate chest piece against the chest of each other subclass to determine the difference between.
 
@@ -407,7 +484,7 @@ The chest InventoryType has the highest sell value of all slots, similar to the 
 | Finger          |            11 |    8/16 |
 | Trinket         |            12 |   28/16 |
 | Shield          |            14 |   15/16 |
-| Back            |             9 |   12/16 |
+| Back            |            16 |   12/16 |
 | Head            |             1 |   12/16 |
 | Shoulder        |             3 |   12/16 |
 | Shirt           |             4 |    4/16 |

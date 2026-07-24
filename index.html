@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="application-version" content="2026.07.23.4">
+    <meta name="application-version" content="2026.07.24.2">
     <title>Warcraft Item Level Calculator</title>
     <link rel="stylesheet" href="styles.css?v=2026.07.23.4">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://kit.fontawesome.com/666b0b7246.js" crossorigin="anonymous"></script>
-    <script src="script.js?v=2026.07.23.1"></script>
+    <script src="item-identifiers.js?v=2026.07.24.4"></script>
+    <script src="model-math.js?v=2026.07.24.4"></script>
+    <script src="budget-model.js?v=2026.07.24.4"></script>
+    <script src="script.js?v=2026.07.24.4"></script>
 </head>
 <body>
     <div id="float">
@@ -16,7 +19,7 @@
             <header>
                 <h1>WoW Item Level Calculator</h1>
                 <div class="github">
-                    <span class="build-version" title="Hosted build version">build 2026.07.23.4</span>
+                    <span class="build-version" title="Hosted build version">build 2026.07.24.4</span>
                     <a href="https://github.com/dewmguy/ItemLevelCalculator" target="_blank" rel="noopener" aria-label="View source on GitHub"><i class="fa-brands fa-github"></i></a>
                 </div>
             </header>
@@ -26,7 +29,7 @@
                         <div class="group pill">
                             <div class="item"><input class="full" type="radio" id="selectLevel" name="calcMethod" value="level" required checked /> <label for="selectLevel">Calculate Level</label></div>
                             <div class="item"><input class="full" type="radio" id="selectStats" name="calcMethod" value="stats" required /> <label for="selectStats">Calculate Stats</label></div>
-                            <input class="full" type="number" id="item-level" name="itemLevel" placeholder="Item Level" />
+                            <input class="full" type="number" id="item-level" name="itemLevel" min="1" max="300" step="1" placeholder="Item Level" />
                         </div>
                         <div class="note textLevel">Determines the item level based on the stat values.</div>
                         <div class="note textStats">Determines the stat values based on the item level.</div>
@@ -53,7 +56,7 @@
                         <div class="item"><input class="full" type="radio" id="weaponCaster" name="weaponMethod" value="caster" required /> <label for="weaponCaster">Caster</label></div>
                     </div>
                     <div class="group weaponDamage">
-                        <div class="item"><input type="number" id="weaponSpeed" name="weaponSpeed" step="0.1" placeholder="Weapon Speed (1.0 to 6.0)" /></div>
+                        <div class="item"><input type="number" id="weaponSpeed" name="weaponSpeed" min="1" max="6" step="0.1" placeholder="Weapon Speed (1.0 to 6.0)" /></div>
                     </div>
                     <div class="group weaponDamageExtra">
                         <select id="item-damage1" name="damageType1"></select>
