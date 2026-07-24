@@ -634,22 +634,23 @@ $(document).ready(function() {
     return weaponSubClass[sub].delay(type);
   }
 
-  function calculateDamage(lvl, quality, type, sub, delay = null, special = null, bonus = null) {
+  function calculateDamage(lvl, quality, type, sub, delay = null, method = null, bonus = null) {
     console.warn(`calculating weapon damage`);
 
     // Retrieve base DPS
     const baseDps = (() => {
       const array = weaponDPS[quality];
-      const data = special ? array[special] : array[type];
-      for (const row of data) {
-        const subMatch = row.sub === null || 
-                         (Array.isArray(row.sub) && row.sub.some(s => s >= 0 && s === sub || s < 0 && s !== -sub)) || 
+      const data = array[type];
+      const matchingRows = data.filter(row => {
+        const subMatch = row.sub === null ||
+                         (Array.isArray(row.sub) && row.sub.some(s => s >= 0 && s === sub || s < 0 && s !== -sub)) ||
                          row.sub === sub;
-        if (subMatch && lvl >= row.min && lvl <= row.max) {
-          return row.mod(lvl);
-        }
-      }
-      return null;
+        return subMatch && lvl >= row.min && lvl <= row.max;
+      });
+      const matchingRow = matchingRows.find(row => row.type === method) ||
+                          matchingRows.find(row => row.type == null) ||
+                          matchingRows[0];
+      return matchingRow ? matchingRow.mod(lvl) : null;
     })();
     console.log(`Base DPS: ${baseDps}`);
 
@@ -694,7 +695,7 @@ const coefficient = (() => {
     const finalDPS = ((minDamage + maxDamage) / 2) / (attackSpeed / 1000);
     console.log(`Final DPS: ${finalDPS}`);
 
-    console.log(`calculateDamage(${lvl}, ${quality}, ${type}, ${sub}, ${delay}, ${special}, ${bonus}) => min: ${minDamage}, max: ${maxDamage}`);
+    console.log(`calculateDamage(${lvl}, ${quality}, ${type}, ${sub}, ${delay}, ${method}, ${bonus}) => min: ${minDamage}, max: ${maxDamage}`);
 
     return `
       <div class="group spread">
@@ -1115,7 +1116,8 @@ const coefficient = (() => {
       const damageMin = parseFloat($("#damageMin").val());
       const damageMax = parseFloat($("#damageMax").val());
       const delay = parseFloat($("#weaponSpeed").val()*1000 || getWeaponDelay(itemSlot, itemTypeKey));
-      weaponDamageHTML = calculateDamage(itemLevel, itemQuality, itemSlot, itemTypeKey, delay, null, getBonusDamage());
+      const weaponMethod = $('input[name="weaponMethod"]:checked').val();
+      weaponDamageHTML = calculateDamage(itemLevel, itemQuality, itemSlot, itemTypeKey, delay, weaponMethod, getBonusDamage());
       // calculate dps reduction
       // add feral attack power or spell power
     }
@@ -1226,6 +1228,7 @@ const coefficient = (() => {
   $("#output, #sockets").hide();
   $(".itemType").hide();
   $(".weaponMethod").hide();
+  $(".weaponDruid").hide();
   let lastSelected = null;
   
   $("#item-reqlvl").on('change input', function() {
@@ -1326,13 +1329,21 @@ const coefficient = (() => {
 
       if ($("#item-subclass option:selected").val() == 10) { // staff
         $(".weaponMethod").show();
+        $(".weaponMelee").hide();
+        $(".weaponDruid").show();
+        if ($("#weaponMelee").is(":checked")) { $("#weaponDruid").prop("checked", true); }
       }
       else {
         $(".weaponMethod").hide();
+        $(".weaponMelee").show();
+        $(".weaponDruid").hide();
       }
 
       if ($("#item-slot option:selected").val() == 21) { // main-hand
         $(".weaponMethod").show();
+        $(".weaponMelee").show();
+        $(".weaponDruid").hide();
+        if ($("#weaponDruid").is(":checked")) { $("#weaponMelee").prop("checked", true); }
       }
 
       if ($("#item-slot option:selected").val() == 26) {
