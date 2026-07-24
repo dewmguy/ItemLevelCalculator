@@ -125,11 +125,11 @@ $(document).ready(function() {
   };
   
   const weaponClass = {
-    13: { name: "One-Hand", sellMod: (7/16), slotMod: (2/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
+    13: { name: "One-Hand", sellMod: (7/16), slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
     15: { name: "Bow", sellMod: (16/16), slotMod: (16/16), armorMod: 0, itemClass: 2, subClass: [2] },
     17: { name: "Two-Hand", sellMod: (16/16), slotMod: (16/16), armorMod: 0, itemClass: 2, subClass: [1, 5, 8, 6, 10] },
-    21: { name: "Main-Hand", sellMod: (7/16), slotMod: (2/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
-    22: { name: "Off-Hand", sellMod: (7/16), slotMod: (2/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
+    21: { name: "Main-Hand", sellMod: (7/16), slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
+    22: { name: "Off-Hand", sellMod: (7/16), slotMod: (7/16), armorMod: 0, itemClass: 2, subClass: [0, 4, 7, 15, 13] },
     25: { name: "Thrown", sellMod: (5/16), slotMod: (5/16), armorMod: 0, itemClass: 2, subClass: [16] },
     26: { name: "Ranged", sellMod: (5/16), slotMod: (5/16), armorMod: 0, itemClass: 2, subClass: [3, 18, 19] }
   };
