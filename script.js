@@ -645,7 +645,7 @@ $(document).ready(function() {
         const subMatch = row.sub === null || 
                          (Array.isArray(row.sub) && row.sub.some(s => s >= 0 && s === sub || s < 0 && s !== -sub)) || 
                          row.sub === sub;
-        if (subMatch && lvl >= row.min && lvl < row.max) {
+        if (subMatch && lvl >= row.min && lvl <= row.max) {
           return row.mod(lvl);
         }
       }
