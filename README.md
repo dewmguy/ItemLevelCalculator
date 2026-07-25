@@ -55,8 +55,19 @@ explicitly marked as historical methodology.
 #### Calculating StatBudget
 
 $$
-StatBudget = \sum_i (StatAmount_i \times StatMod_i)^p
+StatBudget = \sum_i \operatorname{sgn}(StatAmount_i)
+\left(\lvert StatAmount_i\rvert \times StatMod_i\right)^p
 $$
+
+Build `2026.07.25.9` treats negative stat amounts as budget credits. The
+magnitude of a penalty uses the same modifier and exponent as the equivalent
+positive stat, then subtracts from the item's used budget. Applying the power
+to the absolute amount before restoring its sign keeps fractional exponents
+real-valued and makes equal positive and negative amounts cancel exactly.
+
+In Calculate Stats mode, percentage allocations may also be negative but their
+signed total must remain 100%. For example, `-20%` assigned to a sacrificed
+stat permits `120%` to be assigned across positive stats.
 
 #### Calculating ItemBudget
 

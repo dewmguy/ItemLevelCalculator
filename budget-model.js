@@ -521,7 +521,8 @@
           itemClass
         );
         if (!modelMath.isFinitePositive(effectiveStatMod) ||
-            !modelMath.isFinitePositive(stat.amount)) {
+            !Number.isFinite(stat.amount) ||
+            stat.amount === 0) {
           valid = false;
           break;
         }

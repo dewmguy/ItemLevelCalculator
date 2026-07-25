@@ -11,11 +11,16 @@
   const FERAL_WEAPON_INVENTORY_TYPES = Object.freeze([13, 17, 21, 22]);
 
   function statBudget(statAmount, statMod, exponent = DEFAULT_EXPONENT) {
-    return Math.pow(statAmount * statMod, exponent);
+    return Math.sign(statAmount) * Math.pow(
+      Math.abs(statAmount) * statMod,
+      exponent
+    );
   }
 
   function statAmountFromBudget(statBudgetValue, statMod, exponent = DEFAULT_EXPONENT) {
-    return Math.pow(statBudgetValue, 1 / exponent) / statMod;
+    return Math.sign(statBudgetValue) * (
+      Math.pow(Math.abs(statBudgetValue), 1 / exponent) / statMod
+    );
   }
 
   function reconcileIntegerStatAmounts(
@@ -31,7 +36,6 @@
 
     const normalized = allocations.map((allocation, index) => {
       if (!Number.isFinite(allocation.exactAmount) ||
-          allocation.exactAmount < 0 ||
           !isFinitePositive(allocation.statMod)) {
         return null;
       }

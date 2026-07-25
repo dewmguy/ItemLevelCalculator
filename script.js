@@ -671,7 +671,7 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
         const rowId = statRowId++;
         const statHtml = `
           <div class="group pill stat" id="stat-group-${rowId}">
-            <input type="number" class="stat-amount" data-calc="" id="stat-amount-${rowId}" min="0" value="0" />
+            <input type="number" class="stat-amount" data-calc="" id="stat-amount-${rowId}" min="-10000" max="10000" value="0" />
             ${createStatDropdown(rowId)}
             <div class="delete"><i class="stage1 fa-solid fa-ellipsis-vertical"></i><i class="stage2 fa-regular fa-trash-can"></i></div>
           </div>`;
@@ -876,8 +876,8 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
       const statValueObj = $(this).find('.stat-amount');
       const statValue = parseFloat(statValueObj.val());
       const validStatValue = calcMethod === 'level'
-        ? Number.isInteger(statValue) && statValue > 0
-        : Number.isFinite(statValue) && statValue > 0;
+        ? Number.isInteger(statValue) && statValue !== 0
+        : Number.isFinite(statValue) && statValue !== 0;
       if(statType && !validStatValue) {
         statValueObj.addClass('error');
         err = true;
@@ -955,11 +955,16 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
       const statValueObj = $(this).find('.stat-amount');
       let statTypeText = statTypeObj.text();
       let statTypeKey = statTypeObj.val();
-      let statAmount = calcMethod == 'level' ? statValueObj.val() : statValueObj.data('calc');
-      if (statTypeKey && statAmount > 0) {
+      const statAmount = Number(
+        calcMethod == 'level'
+          ? statValueObj.val()
+          : statValueObj.data('calc')
+      );
+      if (statTypeKey && statAmount !== 0) {
         let stat = itemStats[statTypeKey];
         if (stat.type === 0) {
-          whiteStatsHTML += `<div class="stat white">+${statAmount} ${statTypeText}</div>`;
+          const sign = statAmount > 0 ? '+' : '';
+          whiteStatsHTML += `<div class="stat white">${sign}${statAmount} ${statTypeText}</div>`;
         }
         else if (stat.type === 1) {
           let customPhrase = statPhrasing(statTypeKey, statAmount);
@@ -1063,21 +1068,26 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
   });
 
   $(document).on('change input', '#stats .stat-amount', function() {
-    if ($(this).val() <= 0) { $(this).val(''); }
     const val = 10000;
     const pct = 100;
     let sum = 0;
 
     if($("#selectStats").is(":checked")) {
-      $('.group.stat .stat-amount').attr('max', pct);
-      if ($(this).val() >= pct) { $(this).val(pct); }
+      $('.group.stat .stat-amount').attr({
+        min: -val,
+        max: val
+      });
       $('.group.stat .stat-amount').each(function() { sum += parseFloat($(this).val()) || 0; });
       if(sum != pct) { $('.group.stat .stat-amount').addClass('error'); }
       else { $('.group.stat .stat-amount').removeClass('error'); }
     }
     else {
-      $('.group.stat .stat-amount').attr('max', val);
+      $('.group.stat .stat-amount').attr({
+        min: -val,
+        max: val
+      });
       if ($(this).val() > val) { $(this).val(val); }
+      if ($(this).val() < -val) { $(this).val(-val); }
     }
   });
 
@@ -1178,7 +1188,7 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
     $('.stat-amount').each(function() {
       sum += parseFloat($(this).val()) || 0;
     });
-    if(sum > 100) { $('.stat-amount').addClass('error'); }
+    if(sum != 100) { $('.stat-amount').addClass('error'); }
   });
   $('#item-level').on('change input', function() {
     const level = Number($(this).val());

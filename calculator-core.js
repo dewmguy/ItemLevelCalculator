@@ -138,10 +138,9 @@
     }));
     if (stats.some(stat =>
       stat.type == null ||
-      stat.percent === null ||
-      stat.percent < 0
+      stat.percent === null
     )) {
-      return error(mode, 'Every stat requires a type and non-negative percent.');
+      return error(mode, 'Every stat requires a type and finite percent.');
     }
     const percentTotal = stats.reduce(
       (sum, stat) => sum + stat.percent,
@@ -324,9 +323,10 @@
     }));
     if (stats.some(stat =>
       stat.type == null ||
-      !modelMath.isFinitePositive(stat.amount)
+      stat.amount === null ||
+      stat.amount === 0
     )) {
-      return error(mode, 'Every stat requires a type and positive amount.');
+      return error(mode, 'Every stat requires a type and non-zero amount.');
     }
 
     const maximumLevel = finiteNumber(request.maximumLevel) ??
