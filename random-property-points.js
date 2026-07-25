@@ -341,6 +341,99 @@
     26: 4
   });
 
+  // Quartic least-squares fits over every item-level row from 10 through 300
+  // in RandPropPoints.dbc build 3.3.5.12340. Coefficients are ordered from
+  // x^4 through the constant. Unlike the discrete DBC rows, these curves are
+  // continuous and remain evaluable outside the observed table range.
+  const CAPACITY_FORMULAS = Object.freeze({
+    2: Object.freeze([
+      Object.freeze([
+        2.92619681971e-8, -3.46061257407e-6, 5.62023480631e-4,
+        4.46767238212e-1, -2.67823856283
+      ]),
+      Object.freeze([
+        1.99097550879e-8, -1.44516398289e-6, 1.82736634538e-4,
+        3.50790342655e-1, -2.37514197948
+      ]),
+      Object.freeze([
+        1.53462721797e-8, -1.33496272276e-6, 1.85223097289e-4,
+        2.60086890845e-1, -1.75858528536
+      ]),
+      Object.freeze([
+        1.32979679502e-8, -2.08214907983e-6, 3.9898891126e-4,
+        1.77589822976e-1, -1.07984551791
+      ]),
+      Object.freeze([
+        8.833553126e-9, -8.36639900065e-7, 1.17024684443e-4,
+        1.46149369593e-1, -1.03430444954
+      ])
+    ]),
+    3: Object.freeze([
+      Object.freeze([
+        1.71459565573e-8, 7.33474764602e-6, -1.86101231301e-3,
+        6.88961796644e-1, -2.29129251253
+      ]),
+      Object.freeze([
+        1.10720313572e-8, 6.59872333823e-6, -1.65575452399e-3,
+        5.35875545625e-1, -2.05614088351
+      ]),
+      Object.freeze([
+        8.52075253266e-9, 4.77529155536e-6, -1.19356644641e-3,
+        3.96870940617e-1, -1.43139761436
+      ]),
+      Object.freeze([
+        7.74995772321e-9, 2.82010981686e-6, -7.0836127865e-4,
+        2.86542296579e-1, -8.1552234736e-1
+      ]),
+      Object.freeze([
+        4.44325758244e-9, 2.91370463307e-6, -7.16452067105e-4,
+        2.26640103665e-1, -8.30124216978e-1
+      ])
+    ]),
+    4: Object.freeze([
+      Object.freeze([
+        4.25100570785e-9, 1.88143729134e-5, -4.35693813246e-3,
+        9.32276167757e-1, -6.1361844792e-1
+      ]),
+      Object.freeze([
+        1.43397063815e-9, 1.50904066194e-5, -3.47884832112e-3,
+        7.11042715968e-1, -5.70615921453e-1
+      ]),
+      Object.freeze([
+        1.68313499731e-9, 1.09563606809e-5, -2.5335929487e-3,
+        5.26948262163e-1, -2.8470634198e-1
+      ]),
+      Object.freeze([
+        2.75713078489e-9, 7.32992752539e-6, -1.67794876683e-3,
+        3.83016129855e-1, -7.44134462841e-2
+      ]),
+      Object.freeze([
+        4.25452312329e-10, 6.46917510705e-6, -1.48003822855e-3,
+        3.00124157392e-1, -1.840027189e-1
+      ])
+    ])
+  });
+
+  function evaluatePolynomial(coefficients, level) {
+    return coefficients.reduce(
+      (value, coefficient) => value * level + coefficient,
+      0
+    );
+  }
+
+  function formulaPoints(quality, level, inventoryType) {
+    if (!Number.isFinite(level) || level < 1) {
+      return null;
+    }
+    const group = INVENTORY_GROUP[inventoryType];
+    const coefficients = CAPACITY_FORMULAS[quality]?.[group];
+    if (!coefficients) {
+      return null;
+    }
+    const capacity = evaluatePolynomial(coefficients, level);
+    return capacity > 0 ? capacity : null;
+  }
+
   function uncommonPoints(level, inventoryType) {
     if (!Number.isInteger(level) || level < 1 || level >= UNCOMMON.length) {
       return null;
@@ -355,6 +448,8 @@
   return Object.freeze({
     UNCOMMON,
     INVENTORY_GROUP,
-    uncommonPoints
+    CAPACITY_FORMULAS,
+    uncommonPoints,
+    formulaPoints
   });
 });

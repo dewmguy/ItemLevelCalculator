@@ -190,8 +190,8 @@
   });
 
   function qualityMod(quality, level) {
-    if (quality === 2) {
-      return randomPropertyPoints.uncommonPoints(level, 17);
+    if ([2, 3, 4].includes(quality)) {
+      return randomPropertyPoints.formulaPoints(quality, level, 17);
     }
     const rule = QUALITY_RULES[quality]?.find(candidate => level >= candidate.min);
     return rule ? rule.multiplier * level + rule.base : null;
@@ -337,8 +337,9 @@
     level,
     exponent = modelMath.DEFAULT_EXPONENT
   }) {
-    if (quality === 2) {
-      const capacity = randomPropertyPoints.uncommonPoints(
+    if ([2, 3, 4].includes(quality)) {
+      const capacity = randomPropertyPoints.formulaPoints(
+        quality,
         level,
         inventoryType
       );
@@ -356,6 +357,16 @@
       effectiveSlotMod,
       1 - 1 / exponent
     );
+  }
+
+  function dbcReferenceCapacityAtLevel({
+    inventoryType,
+    quality,
+    level
+  }) {
+    return quality === 2
+      ? randomPropertyPoints.uncommonPoints(level, inventoryType)
+      : null;
   }
 
   function itemBudgetAtLevel({
@@ -456,6 +467,7 @@
     statMod,
     socketMod,
     budgetCapacityAtLevel,
+    dbcReferenceCapacityAtLevel,
     itemBudgetAtLevel,
     calculateLevel
   });

@@ -26,21 +26,28 @@ test('all uncommon capacity groups are monotone through the DBC domain', () => {
   }
 });
 
-test('uncommon budget capacity uses inventory-specific DBC columns', () => {
-  const configurations = [
-    [17, 108],
-    [10, 81],
-    [11, 60],
-    [13, 46],
-    [26, 34]
-  ];
-  for (const [inventoryType, expected] of configurations) {
+test('budget capacity uses inventory-specific fitted DBC curves', () => {
+  for (const inventoryType of [17, 10, 11, 13, 26]) {
+    const expected = points.formulaPoints(2, 182, inventoryType);
     assert.equal(budget.budgetCapacityAtLevel({
       itemClass: inventoryType >= 13 && inventoryType !== 14 ? 2 : 4,
       inventoryType,
       quality: 2,
       level: 182
     }), expected);
+    assert.ok(Math.abs(
+      expected - points.uncommonPoints(182, inventoryType)
+    ) < 0.6);
+  }
+});
+
+test('fitted curves cover rare and epic qualities and can extrapolate', () => {
+  for (const quality of [2, 3, 4]) {
+    assert.ok(points.formulaPoints(quality, 182, 17) > 0);
+    assert.ok(
+      points.formulaPoints(quality, 400, 17) >
+      points.formulaPoints(quality, 300, 17)
+    );
   }
 });
 

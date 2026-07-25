@@ -1055,24 +1055,26 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
   });
 
   $('#reset').on('click', function() {
-    $('form')[0].reset();
+    HTMLFormElement.prototype.reset.call($('#calculator')[0]);
     $('#stats .group').remove();
     $('#item-subclass, #output, #item-level').hide();
+    $('.textStats').hide();
+    $('.textLevel').show();
+    $('#statMethod').html('an integer');
+    $('#item-level').attr('required', false);
+    $('#item-name').removeClass(
+      'uncommon rare epic legendary artifact'
+    ).addClass('uncommon');
     const itemClassObj = $('input[name="itemClass"]:checked');
     const itemClass = $(itemClassObj).val();
     populateItemSlots(itemClass);
-    $(".weaponDamage").hide();
-    $(".weaponDamageExtra").hide();
+    $('.itemSlot').show();
+    $('.itemType, .weaponMethod, .weaponDamage, .weaponDamageExtra').hide();
     statCount = 0;
     socketCount = 0;
+    lastSelected = null;
     $('#add-stat, #add-socket').show();
     $('*').removeClass('error');
-    const reset = $(this);
-    reset.removeClass('rotate');
-    reset.addClass('rotate');
-    reset.on('animationend', function() {
-      reset.removeClass('rotate');
-    });
   });
 
   $("#stats").on('change input', '.stat-type, .stat-amount', function() {
@@ -1119,8 +1121,9 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
     if (currentSelection == 4) {
       $("#item-damage").empty();
       $("#weaponSpeed").val('');
-      $(".weaponDamage").hide();
-      $('.weaponDamage input').val('');
+      $(".weaponMethod, .weaponDamage, .weaponDamageExtra").hide();
+      $('.weaponDamage input, .weaponDamageExtra input').val('');
+      $('#item-damage1').empty();
     }
   });
 

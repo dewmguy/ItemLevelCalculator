@@ -25,11 +25,14 @@ The calculator's current stat-budget coefficients and equations live in
 [`item-identifiers.js`](item-identifiers.js). These modules are the source of
 truth when prose or an older research table disagrees.
 
-For uncommon items, [`random-property-points.js`](random-property-points.js)
-contains the exact five inventory-group capacities from
-`RandPropPoints.dbc`. [`calculator-core.js`](calculator-core.js) exposes the
-stat, item-level, weapon-damage, and price calculations as JSON-compatible
-functions without requiring the browser UI. See
+[`random-property-points.js`](random-property-points.js) retains the exact
+uncommon reference rows from `RandPropPoints.dbc` and contains continuous
+inventory-specific capacity curves fitted to all uncommon, rare, and epic
+columns in the WotLK table. The calculator uses the fitted curves so it can
+interpolate and extrapolate instead of becoming a rigid table lookup.
+[`calculator-core.js`](calculator-core.js) exposes the stat, item-level,
+weapon-damage, and price calculations as JSON-compatible functions without
+requiring the browser UI. See
 [`docs/UNCOMMON_RANDOM_ENCHANTMENT_AUDIT.md`](docs/UNCOMMON_RANDOM_ENCHANTMENT_AUDIT.md)
 for batch commands, corpus coverage, measured error, and known exclusions.
 
@@ -103,10 +106,13 @@ evaluated against a held-out item corpus before any production change.
 
 These coefficients control the ceiling for stats on an item based on its quality.
 
-Build `2026.07.25.2` replaces the uncommon linear approximation below with the
-exact inventory-specific `RandPropPoints.dbc` uncommon columns for item levels
-1–300. The uncommon rows remain here as historical methodology; rare and epic
-qualities continue to use the executable piecewise coefficients.
+Build `2026.07.25.5` replaces these historical piecewise approximations with
+quartic inventory-specific curves fitted across item levels 10–300 of the
+`RandPropPoints.dbc` Good (uncommon), Superior (rare), and Epic columns. The
+exact uncommon rows remain embedded as a validation reference, but production
+calculation uses the continuous curves. This preserves interpolation and
+controlled extrapolation while staying calibrated to Blizzard's client data.
+The rows below remain as historical methodology.
 
 | quality | ilvl |  mult |   base |
 |---------|------|-------|--------|
@@ -472,7 +478,7 @@ a separately validated spell-based model is selected in a future phase.
 
 ## Sell Value Calculation
 
-Build `2026.07.25.2` uses empirical, inventory/subclass-specific anchors for
+Build `2026.07.25.5` uses empirical, inventory/subclass-specific anchors for
 uncommon random-enchantment weapons and a normalized armor base curve. The
 quality formulas below remain the fallback outside those observed uncommon
 series.

@@ -189,6 +189,7 @@ function evaluateLevelCases(cases) {
       clean: auditCase.clean_stat_model,
       itemClass: auditCase.item_class,
       inventoryType: auditCase.inventory_type,
+      quality: auditCase.quality,
       expectedLevel: auditCase.expected_level,
       predictedLevel,
       error: predictedLevel === null
@@ -236,6 +237,7 @@ function evaluateDamage(cases) {
   const firstByEntry = new Map();
   for (const auditCase of cases) {
     if (auditCase.item_class === 2 &&
+        auditCase.quality === 2 &&
         auditCase.clean_stat_model &&
         auditCase.damage_min > 0 &&
         auditCase.damage_max > 0 &&
@@ -291,7 +293,9 @@ function main() {
   const cases = JSON.parse(fs.readFileSync(inputPath, 'utf8'));
   const levels = evaluateLevelCases(cases);
   const clean = levels.filter(row => row.clean);
-  const prices = evaluatePrices(cases);
+  const prices = evaluatePrices(cases.filter(
+    auditCase => auditCase.quality === 2
+  ));
   const damage = evaluateDamage(cases);
   const report = {
     input: inputPath,
@@ -299,6 +303,15 @@ function main() {
       all: levelMetrics(levels),
       clean: levelMetrics(clean),
       cleanByKind: groupMetrics(clean, row => row.enchantmentKind),
+      cleanByQuality: groupMetrics(clean, row => String(row.quality)),
+      cleanByQualityAndKind: groupMetrics(
+        clean,
+        row => `${row.quality}:${row.enchantmentKind}`
+      ),
+      cleanByQualityAndLevelBand: groupMetrics(
+        clean,
+        row => `${row.quality}:${levelBand(row.expectedLevel)}`
+      ),
       cleanByLevelBand: groupMetrics(
         clean,
         row => levelBand(row.expectedLevel)

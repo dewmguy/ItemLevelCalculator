@@ -2,9 +2,10 @@
 """Build reproducible random-enchantment calculator audit cases.
 
 The source data is fetched from AzerothCore's world database and the
-wowgaming/client-data DBC-to-SQL release.  Only the Python standard library is
-used.  Downloaded inputs and generated reports belong in an ignored directory
-such as ``Test/random-enchantment-audit``.
+wowgaming/client-data DBC-to-SQL release. Uncommon, rare, and epic items are
+included because RandPropPoints contains all three quality families. Only the
+Python standard library is used. Downloaded inputs and generated reports
+belong in an ignored directory such as ``Test/random-enchantment-audit``.
 
 Examples:
 
@@ -308,8 +309,8 @@ def load_items(path: Path) -> tuple[list[Item], Counter[str]]:
         random_property_group = integer(row.get("RandomProperty"))
         random_suffix_group = integer(row.get("RandomSuffix"))
 
-        if quality != 2:
-            dispositions["not_uncommon"] += 1
+        if quality not in (2, 3, 4):
+            dispositions["unsupported_quality"] += 1
             continue
         if not (1 <= level <= 300):
             dispositions["level_out_of_range"] += 1
@@ -470,7 +471,8 @@ def build_cases(
                     dispositions["missing_suffix_source"] += 1
                     continue
                 # RandPropPoints is ID, five epic, five rare, five uncommon.
-                suffix_points = integer(points_row[11 + point_group])
+                quality_offset = {2: 11, 3: 6, 4: 1}[item.quality]
+                suffix_points = integer(points_row[quality_offset + point_group])
                 enchant_ids = [integer(value) for value in suffix[-10:-5]]
                 allocations = [integer(value) for value in suffix[-5:]]
                 valid = True
@@ -571,6 +573,9 @@ def summarize_cases(cases: Sequence[AuditCase]) -> dict[str, Any]:
         "level_median": statistics.median(levels) if levels else None,
         "by_kind": dict(sorted(Counter(
             case.enchantment_kind for case in cases
+        ).items())),
+        "by_quality": dict(sorted(Counter(
+            str(case.quality) for case in cases
         ).items())),
         "clean_stat_cases": sum(case.clean_stat_model for case in cases),
         "by_class": dict(sorted(Counter(

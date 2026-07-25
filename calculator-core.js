@@ -52,11 +52,15 @@
       level,
       exponent
     });
+    const dbcReference = budgetModel.dbcReferenceCapacityAtLevel({
+      ...common,
+      level
+    });
     return {
       level,
       value,
-      source: common.quality === 2
-        ? 'RandPropPoints.dbc'
+      source: [2, 3, 4].includes(common.quality)
+        ? 'quartic fit to RandPropPoints.dbc'
         : 'quality-and-slot model',
       qualityMod: budgetModel.qualityMod(common.quality, level),
       slotMod: budgetModel.slotMod(
@@ -67,7 +71,12 @@
       ),
       thresholdBudget: modelMath.isFinitePositive(value)
         ? Math.pow(value, exponent)
-        : null
+        : null,
+      dbcReference,
+      fitResidual: Number.isFinite(dbcReference) &&
+        Number.isFinite(value)
+          ? value - dbcReference
+          : null
     };
   }
 

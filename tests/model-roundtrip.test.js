@@ -9,7 +9,7 @@ test('single-stat generation never recalculates above its target level', () => {
   const inventoryTypes = [17, 10, 11, 13, 26];
   for (const inventoryType of inventoryTypes) {
     for (let level = 10; level <= 300; level += 1) {
-      if (points.uncommonPoints(level, inventoryType) <= 0) {
+      if ((points.formulaPoints(2, level, inventoryType) ?? 0) < 1) {
         continue;
       }
       const generated = calculator.calculate({
@@ -28,12 +28,12 @@ test('single-stat generation never recalculates above its target level', () => {
         `slot ${inventoryType}, target ${level}, result ` +
           `${generated.result.recalculatedLevel}`
       );
-      assert.equal(
-        points.uncommonPoints(
+      assert.ok(
+        points.formulaPoints(
+          2,
           generated.result.recalculatedLevel,
           inventoryType
-        ),
-        points.uncommonPoints(level, inventoryType)
+        ) <= points.formulaPoints(2, level, inventoryType)
       );
     }
   }
