@@ -22,15 +22,11 @@ A prime example of these outliers is the [Shining Buckle Gauntlets](https://www.
 The calculator's current stat-budget coefficients and equations live in
 [`budget-model.js`](budget-model.js), with reusable power-law transforms in
 [`model-math.js`](model-math.js). The identifier boundary is frozen in
-[`item-identifiers.js`](item-identifiers.js) and documented in
-[`IDENTIFIER_CONTRACT.md`](IDENTIFIER_CONTRACT.md). Those tested modules are the
-source of truth when prose or an older research table disagrees.
+[`item-identifiers.js`](item-identifiers.js). These modules are the source of
+truth when prose or an older research table disagrees.
 
 The coefficient tables below describe the executable model unless a section is
-explicitly marked as historical methodology. The formula comparison and
-acceptance protocol are documented in
-[`FORMULA_VALIDATION.md`](FORMULA_VALIDATION.md); benchmark conclusions are not
-treated as production changes until they satisfy those gates.
+explicitly marked as historical methodology.
 
 ## Fundamentals of Item Level Calculation
 
@@ -209,8 +205,7 @@ The values in this table are found to be dynamic and frequently very between ite
 > rounded graph inputs. They are useful for provenance, but they are not an
 > exact executable specification. The higher-precision functions in
 > [`script.js`](script.js) govern current tooltip output. These effect models
-> remain scheduled for isolated corpus validation in Phases 3–5 of
-> [`MODEL_RESEARCH.md`](MODEL_RESEARCH.md).
+> remain candidates for further isolated corpus validation.
 
 Base Armor is calculated by item level and Bonus Armor is applied to an item as an additional stat. I hypothesize that the base armor of an item actually consumes an amount of the item's overall stat budget in whatever formula blizzard invented. I believe this is true due to how bonus armor affects an items level. This can be a thought experiment for another time (or person).
 

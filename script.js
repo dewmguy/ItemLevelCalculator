@@ -20,11 +20,6 @@ $(document).ready(function() {
     })[character]);
   }
 
-  function showCalculationError(message) {
-    $('#output').show();
-    $('#output .tooltip').html(`<div class="error">${escapeHTML(message)}</div>`);
-  }
-
   const armorClass = {
     1: { name: "Head", sellMod: 12 / 16, armorMod: 13 / 16, itemClass: 4, subClass: [1, 2, 3, 4] },
     2: { name: "Neck", sellMod: 8 / 16, armorMod: 0, itemClass: 4, subClass: [0] },
@@ -503,7 +498,8 @@ const coefficient = (() => {
     if (!modelMath.isFinitePositive(baseDps) ||
         !modelMath.isFinitePositive(coefficient) ||
         !modelMath.isFinitePositive(attackSpeed)) {
-      return '<div class="error">No validated damage model exists for this weapon configuration and item level.</div>';
+      console.warn('No damage model exists for this weapon configuration and item level.');
+      return '';
     }
 
     // Calculate damage
@@ -557,7 +553,8 @@ const coefficient = (() => {
       const armorTypeName = armorSubClass[armorSubclassId]?.name;
       const armorFormula = armorData[quality]?.[armorTypeName];
       if (typeof armorFormula !== 'function') {
-        return '<div class="error">No validated armor model exists for this item configuration.</div>';
+        console.warn('No armor model exists for this item configuration.');
+        return '';
       }
       const baseValue = armorFormula(level);
       const totalArmor = Math.max(Math.ceil(baseValue * slotMod), 0) + parseFloat(bonus);
@@ -899,7 +896,7 @@ const coefficient = (() => {
 
     if (!IDs.isSupportedQuality(itemQuality) ||
         !IDs.isSupportedItemTuple(itemClass, itemSlot, itemTypeKey)) {
-      showCalculationError('This AzerothCore class, inventory type, subclass, or quality combination is not supported by the calculator.');
+      $("#output").hide();
       return;
     }
     const qualityName = budgetModel.QUALITY_NAMES[itemQuality];
@@ -907,14 +904,14 @@ const coefficient = (() => {
     if (calcMethod === 'level') { // level calc
       itemLevel = calculateLevel(itemClass, itemSlot, itemQuality);
       if (itemLevel === null) {
-        showCalculationError(`The entered stats exceed the validated item-level range of 1-${maximumSupportedItemLevel}.`);
+        $("#output").hide();
         return;
       }
     }
     else if (calcMethod === 'stats') { // stat calc
       const statValues = calculateStats(itemClass, itemLevel, itemSlot, itemQuality);
       if (statValues === null) {
-        showCalculationError('This item level or socket allocation is outside the validated range of the selected quality model.');
+        $("#output").hide();
         return;
       }
       $('#stats .group').each(function() {
@@ -977,9 +974,17 @@ const coefficient = (() => {
     let slotName = $('#item-slot option:selected').text();
     let itemName = escapeHTML($("#item-name").val() || `${qualityName} ${slotName}`);
 
-    let requiredLevel = parseFloat($('#item-reqlvl').val());
-    requiredLevel = requiredLevel == 0 ? '' : requiredLevel >= 1 ? requiredLevel : itemLevel-5 >= 1 ? itemLevel-5 : 0;
-    let requiredLevelHTML = requiredLevel >= 1 ? `<div>Requires Level ${requiredLevel}</div>` : '';
+    const requiredLevelInput = String($('#item-reqlvl').val() ?? '').trim();
+    const parsedRequiredLevel = Number(requiredLevelInput);
+    const requiredLevel =
+      requiredLevelInput !== '' &&
+      Number.isFinite(parsedRequiredLevel) &&
+      parsedRequiredLevel >= 1
+        ? parsedRequiredLevel
+        : null;
+    const requiredLevelHTML = requiredLevel === null
+      ? ''
+      : `<div>Requires Level ${requiredLevel}</div>`;
 
     let itemType = $('#item-subclass option:selected').text();
     if (itemClass == 2) { // weapon properties
