@@ -207,7 +207,8 @@ The values in this table are found to be dynamic and frequently very between ite
 |-----------|--------------------|---------------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
 |  X_socket | Sockets            | 2, 11, 14, 23 |      5/1 |      5/1 |      5/1 |     10/1 |     10/1 |     10/1 |     10/1 |     10/1 |     24/1 |
 |  X_socket | Sockets            |          else |     10/1 |     10/1 |     10/1 |     20/1 |     20/1 |     20/1 |     20/1 |     10/1 |     24/1 |
-|     armor | Bonus Armor        |           all |     3/32 |     3/32 |     3/32 |     3/32 |     2/32 |     2/32 |     2/32 |     2/32 |     2/32 |
+|     armor | Bonus Armor        |         armor |     3/32 |     3/32 |     3/32 |     3/32 |     2/32 |     2/32 |     2/32 |     2/32 |     2/32 |
+|     armor | Armor              |        weapon |     3/32 |     3/32 |     3/32 |     4/32 |     2/32 |     2/32 |     3/32 |     2/32 |     2/32 |
 |         7 | Stamina            |           all |    16/16 |      2/3 |      2/3 |    16/16 |      2/3 |      2/3 |    16/16 |      2/3 |      2/3 |
 |        43 | Mana Regen Per 5   | 2, 11, 12, 23 |    48/16 |    48/16 |    48/16 |    48/16 |    32/16 |    32/16 |    32/16 |    32/16 |    24/16 |
 |        43 | Mana Regen Per 5   |          else |    92/32 |    92/32 |    92/32 |    92/32 |    32/16 |    32/16 |    32/16 |    32/16 |    32/16 |
@@ -217,6 +218,17 @@ The values in this table are found to be dynamic and frequently very between ite
 |        46 | Health Regen Per 5 |          else |    64/16 |    64/16 |    64/16 |    64/16 |    64/16 |    64/16 |    32/16 |    16/16 |     8/16 |
 |        48 | Block Value        | 2, 11, 12, 14 |    16/16 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |     4/64 |
 |        48 | Block Value        |          else |    16/16 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |
+
+Build `2026.07.25.8` makes Armor available as a rendered weapon stat and
+calibrates its pre-item-level-80 rare and pre-item-level-90 epic costs against
+the supplied Classic-era weapon references. The later rare and epic value
+remains `2/32`, which keeps the supplied Burning Crusade and Wrath-era examples
+within the observed residual range of the broader budget model.
+
+The benchmark preserves a source discrepancy rather than rewriting either
+source: the local emulator spell data describes Bloodlord's Defender spell
+`7517` as +6 Defense, while the supplied Wowhead Classic tooltip shows +4.
+The reference test follows the supplied tooltip's +4 value.
 
 Build `2026.07.25.6` supersedes the static rare socket cells above with a
 continuous level-scaled model. Through item level 130, accessory sockets retain

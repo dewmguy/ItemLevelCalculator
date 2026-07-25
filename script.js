@@ -56,7 +56,7 @@ $(document).ready(function() {
   };
 
   const itemStats = {
-    armor: { name: "Bonus Armor", type: 3 },
+    armor: { name: "Bonus Armor", weaponName: "Armor", type: 3 },
     3: { name: "Agility", type: 0 },
     4: { name: "Strength", type: 0 },
     5: { name: "Intellect", type: 0 },
@@ -537,6 +537,13 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
     else { return ''; }
   }
 
+  function calculateWeaponArmor(value) {
+    const armor = Number(value);
+    return Number.isInteger(armor) && armor > 0
+      ? `<div>${armor} Armor</div>`
+      : '';
+  }
+
   function calculateShieldBlock(level, quality) {
     const calculateBlock = shieldBlockCoefficients[quality];
     const baseBlock = calculateBlock(level);
@@ -592,7 +599,9 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
   function createStatDropdown(id) {
     let options = '<option value="">Select a Stat</option>';
     $.each(itemStats, function(key, data) {
-      if (data.type !== 2) { options += `<option value="${key}">${data.name}</option>`; }
+      if (data.type !== 2) {
+        options += `<option value="${key}">${statDisplayName(key, data)}</option>`;
+      }
     });
     return `<select id="stat-type-${id}" class="stat-type stat" data-id="${id}">${options}</select>`;
   }
@@ -614,10 +623,27 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
       selectObj.empty();
       selectObj.append('<option value="">Select a Stat</option>');
       $.each(itemStats, function(key, data) {
-        if (data.type !== 2 && (selectedStats.indexOf(key) === -1 || key === statValue)) { selectObj.append(`<option value="${key}">${data.name}</option>`); }
+        if (data.type !== 2 &&
+            (selectedStats.indexOf(key) === -1 || key === statValue)) {
+          selectObj.append(
+            `<option value="${key}">${statDisplayName(key, data)}</option>`
+          );
+        }
       });
       selectObj.val(statValue);
     });
+  }
+
+  function statDisplayName(statKey, stat) {
+    const slotItemClass = Number(
+      $('#item-slot option:selected').data('class')
+    );
+    const selectedItemClass = [2, 4].includes(slotItemClass)
+      ? slotItemClass
+      : Number($('input[name="itemClass"]:checked').val());
+    return statKey === 'armor' && selectedItemClass === 2
+      ? stat.weaponName
+      : stat.name;
   }
 
   function updateSocketDropdowns() {
@@ -979,6 +1005,7 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
       const delay = parseFloat($("#weaponSpeed").val()*1000 || getWeaponDelay(itemSlot, itemTypeKey));
       const weaponMethod = $('input[name="weaponMethod"]:checked').val();
       weaponDamageHTML = calculateDamage(itemLevel, itemQuality, itemSlot, itemTypeKey, delay, weaponMethod, getBonusDamage());
+      itemArmor = calculateWeaponArmor(bonusArmor);
       // calculate dps reduction
       // add feral attack power or spell power
     }
@@ -1116,6 +1143,7 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
 
     let itemClass = $('input[name="itemClass"]:checked').val();
     populateItemSlots(itemClass);
+    updateStatDropdowns();
     $('.itemSlot').show();
     $(".itemType").hide();
     if (currentSelection == 4) {

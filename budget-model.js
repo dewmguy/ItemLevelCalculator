@@ -310,12 +310,24 @@
 
     switch (String(statType)) {
       case 'armor':
-        return firstMatchingRule(quality, level, [
-          { quality: 4, min: 1, mod: 2 / 32 },
-          { quality: 3, min: 80, mod: 2 / 32 },
-          { quality: 3, min: 1, mod: 3 / 32 },
-          { quality: 2, min: 1, mod: 3 / 32 }
-        ]);
+        return firstMatchingRule(
+          quality,
+          level,
+          effectiveItemClass(itemClass, inventoryType) === 2
+            ? [
+                { quality: 4, min: 90, mod: 2 / 32 },
+                { quality: 4, min: 1, mod: 3 / 32 },
+                { quality: 3, min: 80, mod: 2 / 32 },
+                { quality: 3, min: 1, mod: 4 / 32 },
+                { quality: 2, min: 1, mod: 3 / 32 }
+              ]
+            : [
+                { quality: 4, min: 1, mod: 2 / 32 },
+                { quality: 3, min: 80, mod: 2 / 32 },
+                { quality: 3, min: 1, mod: 3 / 32 },
+                { quality: 2, min: 1, mod: 3 / 32 }
+              ]
+        );
       case '7':
         return firstMatchingRule(quality, level, [
           { quality: 4, min: 90, mod: 2 / 3 },
