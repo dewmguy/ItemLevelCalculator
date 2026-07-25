@@ -211,7 +211,8 @@ The values in this table are found to be dynamic and frequently very between ite
 |         7 | Stamina            |           all |    16/16 |      2/3 |      2/3 |    16/16 |      2/3 |      2/3 |    16/16 |      2/3 |      2/3 |
 |        43 | Mana Regen Per 5   | 2, 11, 12, 23 |    48/16 |    48/16 |    48/16 |    48/16 |    32/16 |    32/16 |    32/16 |    32/16 |    24/16 |
 |        43 | Mana Regen Per 5   |          else |    92/32 |    92/32 |    92/32 |    92/32 |    32/16 |    32/16 |    32/16 |    32/16 |    32/16 |
-|        45 | Spell Power        |           all |    45/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |    45/64 |    45/64 |
+|        45 | Spell Power        |         armor |    45/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |
+|        45 | Spell Power        |        weapon |    45/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |    45/64 |    45/64 |
 |        46 | Health Regen Per 5 | 2, 11, 12, 23 |    32/16 |    32/16 |    32/16 |    32/16 |    32/16 |    32/16 |    16/16 |     8/16 |     4/16 |
 |        46 | Health Regen Per 5 |          else |    64/16 |    64/16 |    64/16 |    64/16 |    64/16 |    64/16 |    32/16 |    16/16 |     8/16 |
 |        48 | Block Value        | 2, 11, 12, 14 |    16/16 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |     4/64 |
@@ -229,6 +230,14 @@ rare other socket     = 20 + 2(itemLevel - 130) / 7
 This produces costs of 33.33 and 40 respectively at item level 200. See
 [`docs/SOCKET_BUDGET_AUDIT.md`](docs/SOCKET_BUDGET_AUDIT.md) for corpus
 coverage, held-out results, and limitations.
+
+Build `2026.07.25.7` applies the same continuous socket calibration to epics
+through ilvl 200. Above 200, weapon sockets remain 40, ordinary armor sockets
+scale to 48 at ilvl 277, and meta armor sockets scale to 80. Epic armor retains
+the `55/64` spell-power coefficient while weapons retain `45/64`. The
+DBC-derived capacity curves and stamina coefficient are unchanged. See
+[`docs/EPIC_BUDGET_AUDIT.md`](docs/EPIC_BUDGET_AUDIT.md) for the complete
+corpus results and equations.
 
 ## Base Armor Calculation
 

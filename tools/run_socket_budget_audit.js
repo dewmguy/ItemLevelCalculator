@@ -65,7 +65,8 @@ function baseStatBudget(auditCase, level, exponent = DEFAULT_EXPONENT) {
       stat.type,
       auditCase.inventory_type,
       auditCase.quality,
-      level
+      level,
+      auditCase.item_class
     );
     if (!modelMath.isFinitePositive(statMod) ||
         !modelMath.isFinitePositive(stat.amount)) {

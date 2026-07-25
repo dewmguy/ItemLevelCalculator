@@ -168,7 +168,8 @@
         stat.type,
         common.inventoryType,
         common.quality,
-        level
+        level,
+        common.itemClass
       );
       if (!modelMath.isFinitePositive(statMod)) {
         return error(mode, `Unsupported stat type: ${stat.type}.`);
@@ -271,7 +272,8 @@
         stat.type,
         common.inventoryType,
         common.quality,
-        level
+        level,
+        common.itemClass
       );
       if (!modelMath.isFinitePositive(statMod)) {
         return null;
