@@ -2,17 +2,28 @@
   const api = factory(
     typeof module === 'object' && module.exports
       ? require('./model-math.js')
-      : root.ItemModelMath
+      : root.ItemModelMath,
+    typeof module === 'object' && module.exports
+      ? require('./random-property-points.js')
+      : root.ItemRandomPropertyPoints
   );
   if (typeof module === 'object' && module.exports) {
     module.exports = api;
   }
   root.ItemBudgetModel = api;
-})(typeof globalThis !== 'undefined' ? globalThis : this, function (modelMath) {
+})(typeof globalThis !== 'undefined' ? globalThis : this, function (
+  modelMath,
+  randomPropertyPoints
+) {
   'use strict';
 
   if (!modelMath) {
     throw new Error('ItemModelMath is required by ItemBudgetModel.');
+  }
+  if (!randomPropertyPoints) {
+    throw new Error(
+      'ItemRandomPropertyPoints is required by ItemBudgetModel.'
+    );
   }
 
   const MAXIMUM_ITEM_LEVEL = 300;
@@ -179,6 +190,9 @@
   });
 
   function qualityMod(quality, level) {
+    if (quality === 2) {
+      return randomPropertyPoints.uncommonPoints(level, 17);
+    }
     const rule = QUALITY_RULES[quality]?.find(candidate => level >= candidate.min);
     return rule ? rule.multiplier * level + rule.base : null;
   }
@@ -246,6 +260,11 @@
       case '38':
         return 8 / 16;
       case '43':
+        if (quality === 2) {
+          // Random-suffix allocations price MP5 at 2.5 common-cost points:
+          // the single-stat "of Concentration" allocation is 4000/10000.
+          return 40 / 16;
+        }
         return firstMatchingRule(quality, level, accessorySlot(inventoryType)
           ? [
               { quality: 4, min: 200, mod: 24 / 16 },
@@ -269,6 +288,11 @@
           { quality: 2, min: 1, mod: 45 / 64 }
         ]);
       case '46':
+        if (quality === 2) {
+          // The single-stat "of Regeneration" suffix uses the same
+          // 4000/10000 allocation as MP5.
+          return 40 / 16;
+        }
         return firstMatchingRule(quality, level, accessorySlot(inventoryType)
           ? [
               { quality: 4, min: 200, mod: 4 / 16 },
@@ -306,6 +330,34 @@
     }
   }
 
+  function budgetCapacityAtLevel({
+    itemClass,
+    inventoryType,
+    quality,
+    level,
+    exponent = modelMath.DEFAULT_EXPONENT
+  }) {
+    if (quality === 2) {
+      const capacity = randomPropertyPoints.uncommonPoints(
+        level,
+        inventoryType
+      );
+      return modelMath.isFinitePositive(capacity) ? capacity : null;
+    }
+
+    const effectiveQualityMod = qualityMod(quality, level);
+    const effectiveSlotMod = slotMod(itemClass, inventoryType, quality, level);
+    if (!modelMath.isFinitePositive(effectiveQualityMod) ||
+        !modelMath.isFinitePositive(effectiveSlotMod) ||
+        !modelMath.isFinitePositive(exponent)) {
+      return null;
+    }
+    return effectiveQualityMod * Math.pow(
+      effectiveSlotMod,
+      1 - 1 / exponent
+    );
+  }
+
   function itemBudgetAtLevel({
     itemClass,
     inventoryType,
@@ -314,15 +366,18 @@
     socketTypes = [],
     exponent = modelMath.DEFAULT_EXPONENT
   }) {
-    const effectiveQualityMod = qualityMod(quality, level);
-    const effectiveSlotMod = slotMod(itemClass, inventoryType, quality, level);
-    if (!modelMath.isFinitePositive(effectiveQualityMod) ||
-        !modelMath.isFinitePositive(effectiveSlotMod)) {
+    const capacity = budgetCapacityAtLevel({
+      itemClass,
+      inventoryType,
+      quality,
+      level,
+      exponent
+    });
+    if (!modelMath.isFinitePositive(capacity)) {
       return null;
     }
 
-    let budget = Math.pow(effectiveQualityMod * effectiveSlotMod, exponent) /
-      effectiveSlotMod;
+    let budget = Math.pow(capacity, exponent);
     for (const socketType of socketTypes) {
       const effectiveSocketMod = statMod(
         socketType,
@@ -347,15 +402,14 @@
     maximumLevel = MAXIMUM_ITEM_LEVEL
   }) {
     for (let level = 1; level <= maximumLevel; level++) {
-      const effectiveQualityMod = qualityMod(quality, level);
-      const effectiveSlotMod = slotMod(
+      const capacity = budgetCapacityAtLevel({
         itemClass,
         inventoryType,
         quality,
-        level
-      );
-      if (!modelMath.isFinitePositive(effectiveQualityMod) ||
-          !modelMath.isFinitePositive(effectiveSlotMod)) {
+        level,
+        exponent
+      });
+      if (!modelMath.isFinitePositive(capacity)) {
         continue;
       }
 
@@ -383,12 +437,8 @@
         return null;
       }
 
-      const itemBudget = totalStatBudget * effectiveSlotMod;
-      const threshold = Math.pow(
-        effectiveQualityMod * effectiveSlotMod,
-        exponent
-      );
-      if (threshold >= itemBudget) {
+      const threshold = Math.pow(capacity, exponent);
+      if (threshold >= totalStatBudget) {
         return level;
       }
     }
@@ -405,6 +455,7 @@
     slotMod,
     statMod,
     socketMod,
+    budgetCapacityAtLevel,
     itemBudgetAtLevel,
     calculateLevel
   });

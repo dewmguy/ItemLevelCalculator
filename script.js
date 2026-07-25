@@ -3,7 +3,11 @@ $(document).ready(function() {
   const IDs = window.ItemIdentifiers;
   const modelMath = window.ItemModelMath;
   const budgetModel = window.ItemBudgetModel;
-  if (!IDs || !modelMath || !budgetModel) {
+  const pricingModel = window.ItemPricingModel;
+  const uncommonWeaponModel = window.ItemUncommonWeaponModel;
+  const calculatorCore = window.ItemCalculatorCore;
+  if (!IDs || !modelMath || !budgetModel ||
+      !pricingModel || !uncommonWeaponModel || !calculatorCore) {
     throw new Error('Item identifier and model dependencies failed to load.');
   }
 
@@ -351,7 +355,8 @@ $(document).ready(function() {
       });
     });
 
-    return budgetModel.calculateLevel({
+    const calculation = calculatorCore.calculate({
+      mode: 'level',
       itemClass,
       inventoryType: slot,
       quality,
@@ -359,99 +364,55 @@ $(document).ready(function() {
       exponent,
       maximumLevel: maximumSupportedItemLevel
     });
+    if (!calculation.ok) {
+      console.warn(calculation.errors.join(' '));
+      return null;
+    }
+    console.log('Level equation:', calculation.equations);
+    return calculation.result.level;
   }
 
   function calculateStats(itemClass, level, slot, quality) {
     console.info(`calculating stats from level`);
 
     const statValues = {};
-    let socketBudgetTotal = 0;
-
     const socketTypes = [];
     $('#stats .group.socket').each(function() {
       const socketType = $(this).find('.stat-type.socket').val();
-      const socketName = itemStats[socketType]?.name;
-      const effectiveSocketMod = budgetModel.statMod(
-        socketType,
-        slot,
-        quality,
-        level
-      );
-      const socketBudget = Math.pow(effectiveSocketMod, exponent);
-      socketBudgetTotal += socketBudget;
       socketTypes.push(socketType);
       statValues[socketType] = 1;
-      console.log(`socketType: ${socketName}(${socketType}), socketValue: 1, socketMod: ${effectiveSocketMod}, socketBudget: ${socketBudget}`);
     });
 
-    const itemBudget = budgetModel.itemBudgetAtLevel({
+    const stats = [];
+    $('#stats .group.stat').each(function() {
+      const statType = $(this).find('.stat-type').val();
+      stats.push({
+        type: statType,
+        percent: parseFloat($(this).find('.stat-amount').val())
+      });
+    });
+
+    const calculation = calculatorCore.calculate({
+      mode: 'stats',
       itemClass,
       inventoryType: slot,
       quality,
       level,
-      socketTypes,
+      stats,
+      sockets: socketTypes,
       exponent
     });
-    if (itemBudget === null) {
-      return null;
-    }
-
-    const allocations = [];
-    $('#stats .group.stat').each(function() {
-      const statType = $(this).find('.stat-type').val();
-      const statName = itemStats[statType]?.name;
-      const statPercent = parseFloat($(this).find('.stat-amount').val()) / 100;
-      const effectiveStatMod = budgetModel.statMod(
-        statType,
-        slot,
-        quality,
-        level
-      );
-      const allocatedBudget = itemBudget * statPercent;
-      if (!modelMath.isFinitePositive(effectiveStatMod) ||
-          !Number.isFinite(allocatedBudget) ||
-          allocatedBudget < 0) {
-        allocations.push(null);
-        return;
-      }
-      const exactAmount = modelMath.statAmountFromBudget(
-        allocatedBudget,
-        effectiveStatMod,
-        exponent
-      );
-      allocations.push({
-        statType,
-        statName,
-        exactAmount,
-        statMod: effectiveStatMod,
-        allocatedBudget
-      });
-    });
-
-    const reconciled = allocations.some(allocation => allocation === null)
-      ? null
-      : modelMath.reconcileIntegerStatAmounts(
-          allocations,
-          itemBudget,
-          exponent
-        );
-    if (reconciled) {
-      allocations.forEach((allocation, index) => {
-        statValues[allocation.statType] = reconciled.amounts[index];
-        console.log(`statType: ${allocation.statName}(${allocation.statType}), exactValue: ${allocation.exactAmount}, roundedValue: ${reconciled.amounts[index]}, statMod: ${allocation.statMod}, statBudget: ${allocation.allocatedBudget}`);
-      });
-    }
-
-    if(!Number.isFinite(itemBudget) ||
-       itemBudget <= 0 ||
-       reconciled === null ||
-       Object.values(statValues).some(value => !Number.isFinite(value))) {
+    if (!calculation.ok) {
+      console.warn(calculation.errors.join(' '));
       $('#output').hide();
       $('#item-level').addClass('error');
       return null;
     }
 
-    console.log(`qualityMod: ${budgetModel.qualityMod(quality, level)}, usedStatBudget: ${reconciled.usedBudget}, unusedStatBudget: ${reconciled.unusedBudget}, slotMod: ${budgetModel.slotMod(itemClass, slot, quality, level)}, itemBudget: ${parseFloat(socketBudgetTotal) + parseFloat(itemBudget)}, itemLevel: ${level}`);
+    calculation.result.stats.forEach(stat => {
+      statValues[stat.type] = stat.amount;
+    });
+    console.log('Stat equation:', calculation.equations);
     return statValues;
   }
 
@@ -462,8 +423,18 @@ $(document).ready(function() {
   function calculateDamage(lvl, quality, type, sub, delay = null, method = null, bonus = null) {
     console.warn(`calculating weapon damage`);
 
+    const uncommonDamage = quality === 2
+      ? uncommonWeaponModel.calculate({
+          level: lvl,
+          inventoryType: type,
+          subclass: sub,
+          profile: method,
+          delay
+        })
+      : null;
+
     // Retrieve base DPS
-    const baseDps = (() => {
+    const baseDps = uncommonDamage?.dps ?? (() => {
       const array = weaponDPS[quality];
       const data = array[type];
       if (!Array.isArray(data)) {
@@ -479,7 +450,7 @@ $(document).ready(function() {
     console.log(`Base DPS: ${baseDps}`);
 
     // Retrieve weapon modifier
-const coefficient = (() => {
+const coefficient = uncommonDamage?.coefficient ?? (() => {
   // Later entries are more specific and override the broad defaults above.
   const matchingEntry = [...weaponDamageMod].reverse().find(entry =>
     (Array.isArray(entry.type) ? entry.type.includes(type) : entry.type === type) &&
@@ -492,7 +463,8 @@ const coefficient = (() => {
     console.log(`Coefficient (Modifier): ${coefficient}`);
 
     // Determine attack speed
-    const attackSpeed = delay ? delay : weaponSubClass[sub].delay(type);
+    const attackSpeed = uncommonDamage?.delay ??
+      (delay ? delay : weaponSubClass[sub].delay(type));
     console.log(`Attack Speed: ${attackSpeed}`);
 
     if (!modelMath.isFinitePositive(baseDps) ||
@@ -802,13 +774,27 @@ const coefficient = (() => {
 
   function calculateSellValue(itemClass, level, quality, slot, type) {
     console.warn(`generating monetary values`);
-    const array = itemClass == '4' ? armorClass : weaponClass;
-    const invType = array[slot];
-    const sellMod = invType.sellMod;
-    const subClassSellMod = itemClass == '4' ? armorSubClass[type].sellMod : 1;
-    const totalCopper = qualityCoefficients[quality].sellValue(level) * sellMod * subClassSellMod;
-    const sellValue = calculateDenomination(totalCopper);
-    const buyValue = calculateBuyValue(totalCopper, itemClass, slot);
+    const prices = pricingModel.prices({
+      itemClass: Number(itemClass),
+      inventoryType: Number(slot),
+      subclass: Number(type),
+      quality: Number(quality),
+      level: Number(level)
+    });
+    if (!prices) {
+      return { buyValue: [0, 0, 0], sellValue: [0, 0, 0] };
+    }
+    console.log(`priceSource: ${prices.source}, sellCopper: ${prices.sell.totalCopper}, buyCopper: ${prices.buy.totalCopper}`);
+    const sellValue = [
+      prices.sell.gold,
+      prices.sell.silver,
+      prices.sell.copper
+    ];
+    const buyValue = [
+      prices.buy.gold,
+      prices.buy.silver,
+      prices.buy.copper
+    ];
     return { buyValue, sellValue };
   }
 
