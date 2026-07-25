@@ -1060,6 +1060,55 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
 
   // ui/ux
 
+  const statAmountEditKeys = new Set([
+    'Backspace',
+    'Delete',
+    'Tab',
+    'Escape',
+    'Enter',
+    'ArrowLeft',
+    'ArrowRight',
+    'ArrowUp',
+    'ArrowDown',
+    'Home',
+    'End'
+  ]);
+
+  $(document).on('keydown', '#stats .stat-amount', function(event) {
+    const modifierShortcut = (event.ctrlKey || event.metaKey) &&
+      !event.altKey &&
+      ['a', 'c', 'v', 'x', 'y', 'z'].includes(event.key.toLowerCase());
+    if (modifierShortcut ||
+        statAmountEditKeys.has(event.key) ||
+        /^[0-9]$/.test(event.key)) {
+      return;
+    }
+
+    const leadingNegative = event.key === '-' &&
+      $("#selectLevel").is(":checked") &&
+      (this.value === '' || this.value === '0');
+    if (leadingNegative && this.value === '0') {
+      this.value = '';
+    }
+    if (!leadingNegative) {
+      event.preventDefault();
+    }
+  });
+
+  $(document).on('paste', '#stats .stat-amount', function(event) {
+    const clipboard = event.originalEvent?.clipboardData;
+    const pastedText = clipboard?.getData('text') ?? '';
+    const validText = $("#selectLevel").is(":checked")
+      ? /^-?[0-9]+$/.test(pastedText)
+      : /^[0-9]+$/.test(pastedText);
+    const addsLeadingNegative = pastedText.startsWith('-') &&
+      this.value !== '';
+
+    if (!validText || addsLeadingNegative) {
+      event.preventDefault();
+    }
+  });
+
   $(document).on('click', '#stats .group .delete', function() {
     var parentGroup = $(this).parent();
     if(parentGroup.hasClass('socket')) { updateStatGroup('socket','delete'); }
