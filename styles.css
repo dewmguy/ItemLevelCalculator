@@ -350,14 +350,14 @@ button:focus-visible {
 }
 
 #reset {
-  background: linear-gradient(180deg, #555, #3D3D3D);
-  border-color: rgba(255, 255, 255, .12);
-  color: #FFF;
+  font-size: 1.75em;
+  color: #B0B0B0;
+  transition: color .15s ease, transform .2s ease-in-out;
 }
 
 #reset:hover {
-  background: linear-gradient(180deg, #666, #474747);
-  color: #FFF;
+  color: #EFD213;
+  cursor: pointer;
 }
 
 #sockets {

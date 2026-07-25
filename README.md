@@ -217,6 +217,19 @@ The values in this table are found to be dynamic and frequently very between ite
 |        48 | Block Value        | 2, 11, 12, 14 |    16/16 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |     4/64 |
 |        48 | Block Value        |          else |    16/16 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |
 
+Build `2026.07.25.6` supersedes the static rare socket cells above with a
+continuous level-scaled model. Through item level 130, accessory sockets retain
+a cost of 10 and other sockets retain 20. Above 130:
+
+```text
+rare accessory socket = 10 + (itemLevel - 130) / 3
+rare other socket     = 20 + 2(itemLevel - 130) / 7
+```
+
+This produces costs of 33.33 and 40 respectively at item level 200. See
+[`docs/SOCKET_BUDGET_AUDIT.md`](docs/SOCKET_BUDGET_AUDIT.md) for corpus
+coverage, held-out results, and limitations.
+
 ## Base Armor Calculation
 
 > **Historical regression reference:** The armor, block, weapon-damage, and

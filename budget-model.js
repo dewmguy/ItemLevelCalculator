@@ -214,18 +214,22 @@
   }
 
   function socketMod(inventoryType, quality, level) {
-    const rules = socketAccessorySlot(inventoryType)
+    const accessory = socketAccessorySlot(inventoryType);
+    if (quality === 3) {
+      const base = accessory ? 10 : 20;
+      const slope = accessory ? 1 / 3 : 2 / 7;
+      return base + Math.max(0, level - 130) * slope;
+    }
+    const rules = accessory
       ? [
           { quality: 4, min: 200, mod: 24 },
           { quality: 4, min: 1, mod: 10 },
-          { quality: 3, min: 1, mod: 10 },
           { quality: 2, min: 1, mod: 5 }
         ]
       : [
           { quality: 4, min: 200, mod: 24 },
           { quality: 4, min: 90, mod: 10 },
           { quality: 4, min: 1, mod: 20 },
-          { quality: 3, min: 1, mod: 20 },
           { quality: 2, min: 1, mod: 10 }
         ];
     return firstMatchingRule(quality, level, rules);
