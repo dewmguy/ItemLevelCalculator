@@ -540,6 +540,7 @@ input.artifact:not(:placeholder-shown) { color: #E6B453 !important }
 .tooltip .item-level, .flavor { color: #FFD100 }
 .tooltip .stat { color: #FFF }
 .tooltip .stat.green, .green { color: #1EFF00 }
+.tooltip .druid-attack-power { color: #9D9D9D }
 .tooltip .specialstat { color: #1eff00 }
 
 #remove-stat { display: none }

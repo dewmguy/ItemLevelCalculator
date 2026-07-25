@@ -30,6 +30,8 @@ uncommon reference rows from `RandPropPoints.dbc` and contains continuous
 inventory-specific capacity curves fitted to all uncommon, rare, and epic
 columns in the WotLK table. The calculator uses the fitted curves so it can
 interpolate and extrapolate instead of becoming a rigid table lookup.
+[`weapon-specialization-model.js`](weapon-specialization-model.js) owns caster
+eligibility, locked base spell power, and the passive druid DPS conversion.
 [`calculator-core.js`](calculator-core.js) exposes the stat, item-level,
 weapon-damage, and price calculations as JSON-compatible functions without
 requiring the browser UI. See
@@ -482,44 +484,89 @@ Based on the calculated `DPS` and the `Mode Average Attack Speed`, the minimum a
 |            26 |       18 |      2900 | ranged - crossbow |
 |            26 |       19 |      1700 | ranged - wand     |
 
-## Druid/Caster Weapon DPS Adjustment (old methodology)
+## Default, Druid, and Caster Weapons
 
-This section records an earlier spell-power hypothesis and is not used to
-invent hidden caster spell power. The application now generates feral attack
-power with AzerothCore's runtime DPS conversion shown below.
+Build `2026.07.25.13` separates presentation rules from weapon damage.
+**Default** is selected automatically and uses the ordinary weapon model.
+**Druid** uses exactly the same damage as Default; it only adds the gray
+class-context tooltip line when the passive conversion produces attack power.
+**Caster** selects the lower empirical caster-DPS series and adds a locked base
+spell-power amount. Any Spell Power added through the normal stat editor still
+uses the ordinary stat budget and is summed into the displayed spell-power
+line.
 
-Because weapon damage is not an effective mechanic of damage for druids and casters, caster and druid weapons sacrifice a portion of their DPS to either gain a base amount of spell power or feral attack power, or increase the stat budget ceiling to accomodate more spellpower or feral attack power. The amount of Spell Power or Feral Attack Power gained is proportional to the amount of DPS reduction on the item.
+### Druid passive attack power
 
-One-hand caster weapons from tbc and below have the full allotment of spellpower attributed as a stat. Feral Druids do not use one-handed weapons.
-
-One-Hand and Two-Hand caster weapons may or may not have spellpower attributed as a stat, and will come with a base quantity by default.
-
-items with a base spellpower figure built-in contain a spellid_1 of `46749`
-
-The typical damage coefficient on a two handed weapon is 0.65, for caster weapons this is reduced to 0.54.
-
-The estimated calculation for adjusted spell power or feral attack power applicable for item level 0 to 165:
+AzerothCore applies the druid bonus at runtime to weapon InventoryTypes 13, 17,
+21, and 22. It is not an item stat and does not consume or refund item budget:
 
 ```math
-Sacrificed DPS = Weapon DPS - 41.5
-Spell Power = Sacrificed DPS * 4
-Feral Attack Power = Sacrificed DPS * 18.37 - 12.4843
+FeralAP =
+\max\left(0,\operatorname{trunc}\left((DPS + ExtraDPS)\times14\right)-767\right)
 ```
 
-For AzerothCore WotLK, the server's effective feral attack power calculation is
-instead:
+The calculator suppresses the line when the result is zero, so it first
+appears at displayed DPS of approximately `54.9`. See AzerothCore's
+[`ItemTemplate::getFeralBonus`](https://www.azerothcore.org/doxygen/d4/d69/structItemTemplate.html)
+and the player item-mod application path in
+[`Player`](https://www.azerothcore.org/doxygen/d2/d4b/classPlayer.html).
+
+### Caster DPS trade and locked spell power
+
+The local 3.3.5 item corpus contains 559 uncommon, rare, or epic one-hand,
+main-hand, and staff records with spell power. Early items are irregular:
+spell power on a low-level caster weapon is not automatically free. For
+Vanilla/TBC item levels, only the amount supported by the observed DPS
+sacrifice is granted without stat-budget cost:
 
 ```math
-Feral Attack Power = max(0, floor((Weapon DPS + Extra DPS) * 14) - 767)
+DPS_{sacrificed} =
+\max(0,DPS_{default\ weapon}-DPS_{caster\ weapon})
 ```
 
-It applies to eligible weapons in InventoryTypes 13, 17, 21, and 22. Caster
-base spell power has no equivalent generic AzerothCore DPS conversion and
-requires a separately validated empirical model.
+```math
+SP_{credit} = \operatorname{round}(4\times DPS_{sacrificed})
+```
 
-The current calculator displays this derived feral attack power for supported
-feral weapon profiles. Caster spell power remains an explicit item stat unless
-a separately validated spell-based model is selected in a future phase.
+The four-to-one exchange is the historical weapon-DPS trade documented by the
+[archived item-level research](https://classic-wow-archive.fandom.com/wiki/Item_level).
+To stop polynomial noise from creating excess free power, that credit is
+capped by the standard full-weapon spell-power series:
+
+```math
+SP_{ceiling} =
+\operatorname{round}\left(\frac{12}{5}\times
+RandPropPoints_{full}(Quality,ItemLevel)\right)
+```
+
+```math
+SP_{base} =
+\begin{cases}
+\min(SP_{credit},SP_{ceiling}), & ItemLevel \le 165 \\
+SP_{ceiling}, & ItemLevel > 165
+\end{cases}
+```
+
+The pre-Wrath comparison stays within the selected weapon family: staves are
+compared with ordinary staves, while main-hand and one-hand caster weapons are
+compared with the ordinary one-hand curve. This prevents the caster-heavy
+main-hand sample from becoming its own counterfactual and lets low-level
+caster staves receive credit from the staff DPS they actually give up. The
+`12/5` multiplier is fitted from the repeated spell-power series shared by
+caster staves and one-hand weapons in the local WotLK corpus. Representative
+epic outputs are 405 at item level 200 versus 408 observed, 518 at item level
+226 versus 520 observed, and 836 at item level 277 versus 836 observed. The
+small residuals reflect the continuous `RandPropPoints` fit rather than a
+hard-coded tier lookup.
+
+Caster mode is available for staves and for observed caster one-hand families
+(maces, swords, and daggers). In the standardized WotLK range, one-hand and
+two-hand caster weapons receive the same locked base spell power at the same
+quality and item level; their damage curves remain slot-specific. AzerothCore's
+[`item_template`](https://www.azerothcore.org/wiki/item_template) documentation
+distinguishes ordinary Spell Power stat `45` from older on-equip spell fields,
+which is why the calculator treats the locked base and editable additional
+spell power separately.
 
 ## Sell Value Calculation
 

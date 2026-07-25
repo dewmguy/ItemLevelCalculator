@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="application-version" content="2026.07.25.11">
+    <meta name="application-version" content="2026.07.25.13">
     <title>Warcraft Item Level Calculator</title>
-    <link rel="stylesheet" href="styles.css?v=2026.07.25.6">
+    <link rel="stylesheet" href="styles.css?v=2026.07.25.7">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://kit.fontawesome.com/666b0b7246.js" crossorigin="anonymous"></script>
-    <script src="item-identifiers.js?v=2026.07.25.1"></script>
-    <script src="model-math.js?v=2026.07.25.9"></script>
+    <script src="item-identifiers.js?v=2026.07.25.2"></script>
+    <script src="model-math.js?v=2026.07.25.10"></script>
     <script src="random-property-points.js?v=2026.07.25.5"></script>
     <script src="budget-model.js?v=2026.07.25.9"></script>
     <script src="pricing-model.js?v=2026.07.25.2"></script>
-    <script src="uncommon-weapon-model.js?v=2026.07.25.2"></script>
+    <script src="uncommon-weapon-model.js?v=2026.07.25.3"></script>
+    <script src="weapon-specialization-model.js?v=2026.07.25.1"></script>
     <script src="calculator-core.js?v=2026.07.25.9"></script>
-    <script src="script.js?v=2026.07.25.11"></script>
+    <script src="script.js?v=2026.07.25.13"></script>
 </head>
 <body>
     <div id="float">
@@ -23,7 +24,7 @@
             <header>
                 <h1>WoW Item Level Calculator</h1>
                 <div class="github">
-                    <span class="build-version" title="Hosted build version">build 2026.07.25.11</span>
+                    <span class="build-version" title="Hosted build version">build 2026.07.25.13</span>
                     <a class="github-link" href="https://github.com/dewmguy/ItemLevelCalculator" target="_blank" rel="noopener" aria-label="View source on GitHub">
                         <i class="fa-brands fa-github" aria-hidden="true"></i>
                         <span>GitHub Repo</span>
@@ -58,9 +59,9 @@
                         <select class="itemType" id="item-subclass" name="itemType" required></select>
                     </div>
                     <div class="group pill weaponMethod">
-                        <div class="item weaponMelee"><input class="full" type="radio" id="weaponMelee" name="weaponMethod" value="melee" required checked /> <label for="weaponMelee">Melee</label></div>
-                        <div class="item weaponDruid"><input class="full" type="radio" id="weaponDruid" name="weaponMethod" value="druid" required /> <label for="weaponDruid">Druid</label></div>
-                        <div class="item"><input class="full" type="radio" id="weaponCaster" name="weaponMethod" value="caster" required /> <label for="weaponCaster">Caster</label></div>
+                        <div class="item weaponDefault"><input class="full" type="radio" id="weaponDefault" name="weaponMethod" value="default" required checked /> <label for="weaponDefault" title="Use the standard weapon damage model.">Default</label></div>
+                        <div class="item weaponDruid"><input class="full" type="radio" id="weaponDruid" name="weaponMethod" value="druid" required /> <label for="weaponDruid" title="Use standard damage and show the passive druid attack-power conversion.">Druid</label></div>
+                        <div class="item weaponCaster"><input class="full" type="radio" id="weaponCaster" name="weaponMethod" value="caster" required /> <label for="weaponCaster" title="Trade weapon DPS for locked base spell power.">Caster</label></div>
                     </div>
                     <div class="group weaponDamage">
                         <div class="item"><input type="number" id="weaponSpeed" name="weaponSpeed" min="1" max="6" step="0.1" placeholder="Weapon Speed (1.0 to 6.0)" /></div>

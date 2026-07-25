@@ -5,9 +5,11 @@ $(document).ready(function() {
   const budgetModel = window.ItemBudgetModel;
   const pricingModel = window.ItemPricingModel;
   const uncommonWeaponModel = window.ItemUncommonWeaponModel;
+  const weaponSpecializationModel = window.ItemWeaponSpecializationModel;
   const calculatorCore = window.ItemCalculatorCore;
   if (!IDs || !modelMath || !budgetModel ||
-      !pricingModel || !uncommonWeaponModel || !calculatorCore) {
+      !pricingModel || !uncommonWeaponModel || !weaponSpecializationModel ||
+      !calculatorCore) {
     throw new Error('Item identifier and model dependencies failed to load.');
   }
 
@@ -169,7 +171,7 @@ $(document).ready(function() {
   const weaponDamageMod = [
     { type: [13, 15, 22, 25, 26], sub: null, quality: [2, 3, 4], min: 1, max: 300, mod: 0.54 }, // Default for types 13, 15, 22, 25, 26
     { type: 17, sub: [1, 5, 6, 8, 10], quality: [2, 3, 4], min: 1, max: 300, mod: 0.65 }, // Default two-hand for type 17
-    { type: 17, sub: 10, quality: [2, 3, 4], min: 101, max: 300, mod: 0.54 }, // Default caster staff for type 17
+    { type: 17, sub: 10, quality: [2, 3, 4], profile: 'caster', min: 101, max: 300, mod: 0.54 }, // Caster staff
     { type: 21, sub: null, quality: [2, 3, 4], min: 1, max: 100, mod: 0.54 }, // Default main-hand for type 21 (1 to 100)
     { type: 21, sub: null, quality: [2, 3, 4], min: 101, max: 300, mod: 0.3125 }, // Default main-hand for type 21 (101 to 300)
     { type: 13, sub: 15, quality: 3, min: 101, max: 300, mod: 0.65 }, // Rare one-hand daggers
@@ -199,7 +201,7 @@ $(document).ready(function() {
       ],
       17: [ // Two-hand
         { type: 'caster', min: 1, max: 300, sub: 10, mod: lvl => -2.7137455672 + 1.2034848552 * lvl - 0.0078149234 * Math.pow(lvl, 2) + 0.0000237964 * Math.pow(lvl, 3) },
-        { type: 'druid', min: 1, max: 300, sub: 10, mod: lvl => -39.8477534594 + 2.2205407279 * lvl - 0.0111235858 * Math.pow(lvl, 2) + 0.0000284616 * Math.pow(lvl, 3) },
+        { type: 'default', min: 1, max: 300, sub: 10, mod: lvl => -39.8477534594 + 2.2205407279 * lvl - 0.0111235858 * Math.pow(lvl, 2) + 0.0000284616 * Math.pow(lvl, 3) },
         { type: null, min: 1, max: 90, sub: -10, mod: lvl => -0.7405045351583416 + 2.5291730790997162 * lvl - 0.06696995004352309 * Math.pow(lvl, 2) + 0.0009043795705405915 * Math.pow(lvl, 3) - 0.000003796542201089664 * Math.pow(lvl, 4) },
         { type: null, min: 91, max: 300, sub: -10, mod: lvl => 0.904817539290022 + 1.5822436006525589 * lvl - 0.007940579189201744 * Math.pow(lvl, 2) + 0.000023354465861457816 * Math.pow(lvl, 3) },
       ],
@@ -229,7 +231,7 @@ $(document).ready(function() {
         { min: 1, max: 300, sub: 2, mod: lvl => -0.743084783011632 + 0.7736504766853647 * lvl - 0.002608641911723087 * Math.pow(lvl, 2) + 0.000008555961584640232 * Math.pow(lvl, 3) }
       ],
       17: [ // Two-hand
-        { type: 'druid', min: 1, max: 300, sub: 10, mod: lvl => -1.5589456685719236 + 0.9962799588626463 * lvl - 0.002586859275705108 * Math.pow(lvl, 2) + 0.000009472522985824832 * Math.pow(lvl, 3) },
+        { type: 'default', min: 1, max: 300, sub: 10, mod: lvl => -1.5589456685719236 + 0.9962799588626463 * lvl - 0.002586859275705108 * Math.pow(lvl, 2) + 0.000009472522985824832 * Math.pow(lvl, 3) },
         { type: null, min: 1, max: 300, sub: -10, mod: lvl => -1.4407940637747765 + 0.9868570871805012 * lvl - 0.0023989071048527186 * Math.pow(lvl, 2) + 0.00000872913868341514 * Math.pow(lvl, 3) },
       ],
       21: [ // Main-hand
@@ -420,33 +422,126 @@ $(document).ready(function() {
     return weaponSubClass[sub].delay(type);
   }
 
-  function calculateDamage(lvl, quality, type, sub, delay = null, method = null, bonus = null) {
-    console.warn(`calculating weapon damage`);
-
+  function fittedWeaponDps(lvl, quality, type, sub, profile, delay = null) {
     const uncommonDamage = quality === 2
       ? uncommonWeaponModel.calculate({
           level: lvl,
           inventoryType: type,
           subclass: sub,
-          profile: method,
+          profile,
+          delay
+        })
+      : null;
+    if (uncommonDamage) {
+      return uncommonDamage.dps;
+    }
+
+    const lookupType =
+      profile === IDs.WeaponProfile.CASTER &&
+      type === IDs.InventoryType.WEAPON
+        ? IDs.InventoryType.WEAPON_MAIN_HAND
+        : type;
+    const rows = weaponDPS[quality]?.[lookupType];
+    if (!Array.isArray(rows)) {
+      return null;
+    }
+    const matchingRow = modelMath.findPiecewiseRow(rows, {
+      subclassId: sub,
+      profile,
+      level: lvl
+    });
+    if (matchingRow) {
+      return matchingRow.mod(lvl);
+    }
+    if (profile === IDs.WeaponProfile.CASTER &&
+        type === IDs.InventoryType.TWO_HAND_WEAPON &&
+        sub === IDs.WeaponSubclass.STAFF) {
+      const oneHandCasterDps = fittedWeaponDps(
+        lvl,
+        quality,
+        IDs.InventoryType.WEAPON_MAIN_HAND,
+        IDs.WeaponSubclass.ONE_HAND_MACE,
+        profile
+      );
+      return Number.isFinite(oneHandCasterDps)
+        ? oneHandCasterDps * 1.5
+        : null;
+    }
+    return null;
+  }
+
+  function casterBaseSpellPower(lvl, quality, type, sub, delay = null) {
+    // Main-hand rows are dominated by caster weapons, so their untagged
+    // curve is not a valid non-caster counterfactual. Compare eligible
+    // one-hands with the ordinary one-hand curve; compare staves with staves.
+    const defaultComparisonType =
+      type === IDs.InventoryType.TWO_HAND_WEAPON
+        ? type
+        : IDs.InventoryType.WEAPON;
+    return weaponSpecializationModel.casterBaseSpellPower({
+      level: lvl,
+      quality,
+      defaultWeaponDps: fittedWeaponDps(
+        lvl,
+        quality,
+        defaultComparisonType,
+        sub,
+        IDs.WeaponProfile.DEFAULT,
+        delay
+      ),
+      casterWeaponDps: fittedWeaponDps(
+        lvl,
+        quality,
+        type,
+        sub,
+        IDs.WeaponProfile.CASTER,
+        delay
+      )
+    });
+  }
+
+  function calculateDamage(lvl, quality, type, sub, delay = null, method = null, bonus = null) {
+    console.warn(`calculating weapon damage`);
+
+    const damageProfile = method === IDs.WeaponProfile.CASTER
+      ? IDs.WeaponProfile.CASTER
+      : IDs.WeaponProfile.DEFAULT;
+    const uncommonDamage = quality === 2
+      ? uncommonWeaponModel.calculate({
+          level: lvl,
+          inventoryType: type,
+          subclass: sub,
+          profile: damageProfile,
           delay
         })
       : null;
 
-    // Retrieve base DPS
-    const baseDps = uncommonDamage?.dps ?? (() => {
-      const array = weaponDPS[quality];
-      const data = array[type];
-      if (!Array.isArray(data)) {
-        return null;
+    // Retrieve base DPS. Sparse historical caster samples can make a fitted
+    // curve cross above the ordinary curve outside the observed range; a
+    // caster profile may never gain damage from that extrapolation.
+    let baseDps = uncommonDamage?.dps ?? fittedWeaponDps(
+      lvl,
+      quality,
+      type,
+      sub,
+      damageProfile,
+      delay
+    );
+    if (damageProfile === IDs.WeaponProfile.CASTER) {
+      const defaultDps = fittedWeaponDps(
+        lvl,
+        quality,
+        type,
+        sub,
+        IDs.WeaponProfile.DEFAULT,
+        delay
+      );
+      if (Number.isFinite(defaultDps) &&
+          Number.isFinite(baseDps) &&
+          baseDps > defaultDps) {
+        baseDps = defaultDps;
       }
-      const matchingRow = modelMath.findPiecewiseRow(data, {
-        subclassId: sub,
-        profile: method,
-        level: lvl
-      });
-      return matchingRow ? matchingRow.mod(lvl) : null;
-    })();
+    }
     console.log(`Base DPS: ${baseDps}`);
 
     // Retrieve weapon modifier
@@ -456,6 +551,7 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
     (Array.isArray(entry.type) ? entry.type.includes(type) : entry.type === type) &&
     (entry.sub === null || (Array.isArray(entry.sub) ? entry.sub.includes(sub) : entry.sub === sub)) &&
     (Array.isArray(entry.quality) ? entry.quality.includes(quality) : entry.quality === quality) &&
+    (entry.profile == null || entry.profile === damageProfile) &&
     lvl >= entry.min && lvl <= entry.max
   );
   return matchingEntry ? matchingEntry.mod : null;
@@ -471,7 +567,11 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
         !modelMath.isFinitePositive(coefficient) ||
         !modelMath.isFinitePositive(attackSpeed)) {
       console.warn('No damage model exists for this weapon configuration and item level.');
-      return '';
+      return {
+        html: '',
+        dps: null,
+        baseSpellPower: 0
+      };
     }
 
     // Calculate damage
@@ -496,26 +596,37 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
         (attackSpeed / 1000)
       : 0;
     const feralAttackPower =
-      method === IDs.WeaponProfile.FERAL &&
-      modelMath.isFeralWeaponInventoryType(type)
-        ? modelMath.feralAttackPowerFromDps(finalDPS, bonusDps)
-        : null;
-    const feralAttackPowerHTML = feralAttackPower === null
-      ? ''
-      : `<div class="green">Increases attack power by ${feralAttackPower} in Cat, Bear, Dire Bear, and Moonkin forms only.</div>`;
+      method === IDs.WeaponProfile.DRUID &&
+      weaponSpecializationModel.isDruidWeapon(type)
+        ? weaponSpecializationModel.feralAttackPower(finalDPS, bonusDps)
+        : 0;
+    const feralAttackPowerHTML = feralAttackPower > 0
+      ? `<div class="druid-attack-power">Increases attack power by ${feralAttackPower} in Cat, Bear, Dire Bear, and Moonkin forms only.</div>`
+      : '';
+    const baseSpellPower =
+      method === IDs.WeaponProfile.CASTER &&
+      weaponSpecializationModel.isCasterWeapon(type, sub)
+        ? casterBaseSpellPower(lvl, quality, type, sub, delay)
+        : 0;
     console.log(`Final DPS: ${finalDPS}`);
 
     console.log(`calculateDamage(${lvl}, ${quality}, ${type}, ${sub}, ${delay}, ${method}, ${bonus}) => min: ${minDamage}, max: ${maxDamage}`);
 
-    return `
-      <div class="group spread">
-        <div>${baseDamageText} Damage</div>
-        <div>Speed ${(attackSpeed / 1000).toFixed(2)}</div>
-      </div>
-      ${damageHTML}
-      <div>(${finalDPS.toFixed(2)} damage per second)</div>
-      ${feralAttackPowerHTML}
-    `;
+    return {
+      html: `
+        <div class="group spread">
+          <div>${baseDamageText} Damage</div>
+          <div>Speed ${(attackSpeed / 1000).toFixed(2)}</div>
+        </div>
+        ${damageHTML}
+        <div>(${finalDPS.toFixed(2)} damage per second)</div>
+        ${feralAttackPowerHTML}
+      `,
+      dps: finalDPS,
+      baseSpellPower: Number.isFinite(baseSpellPower)
+        ? baseSpellPower
+        : 0
+    };
   }
 
   function calculateArmor(slot, armorSubclassId, level, quality, bonus) {
@@ -948,6 +1059,8 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
     let weaponDamageHTML = '';
     let durabilityHTML = '';
     let sellPriceHTML = '';
+    let additionalSpellPower = 0;
+    let baseSpellPower = 0;
     let itemFlavorHTML = itemDescription ? `<div class="flavor">"${escapeHTML(itemDescription)}"</div>` : '';
 
     $('#stats .group').each(function() {
@@ -967,8 +1080,13 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
           whiteStatsHTML += `<div class="stat white">${sign}${statAmount} ${statTypeText}</div>`;
         }
         else if (stat.type === 1) {
-          let customPhrase = statPhrasing(statTypeKey, statAmount);
-          greenStatsHTML += `<div class="stat green">Equip: ${customPhrase}</div>`;
+          if (String(statTypeKey) === '45') {
+            additionalSpellPower += statAmount;
+          }
+          else {
+            let customPhrase = statPhrasing(statTypeKey, statAmount);
+            greenStatsHTML += `<div class="stat green">Equip: ${customPhrase}</div>`;
+          }
         }
         else if (stat.type === 2) {
           const socketColor = statTypeObj.data('color');
@@ -1009,10 +1127,18 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
       const damageMax = parseFloat($("#damageMax").val());
       const delay = parseFloat($("#weaponSpeed").val()*1000 || getWeaponDelay(itemSlot, itemTypeKey));
       const weaponMethod = $('input[name="weaponMethod"]:checked').val();
-      weaponDamageHTML = calculateDamage(itemLevel, itemQuality, itemSlot, itemTypeKey, delay, weaponMethod, getBonusDamage());
+      const weaponDamage = calculateDamage(
+        itemLevel,
+        itemQuality,
+        itemSlot,
+        itemTypeKey,
+        delay,
+        weaponMethod,
+        getBonusDamage()
+      );
+      weaponDamageHTML = weaponDamage.html;
+      baseSpellPower = weaponDamage.baseSpellPower;
       itemArmor = calculateWeaponArmor(bonusArmor);
-      // calculate dps reduction
-      // add feral attack power or spell power
     }
 
     if (itemClass == 4) { // armor properties
@@ -1028,6 +1154,11 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
         `;
       }
       else { socketsHTML = ''; }
+    }
+
+    const totalSpellPower = baseSpellPower + additionalSpellPower;
+    if (totalSpellPower !== 0) {
+      greenStatsHTML += `<div class="stat green">Equip: ${statPhrasing('45', totalSpellPower)}</div>`;
     }
 
     const { sellValue, buyValue } = calculateSellValue(itemClass, itemLevel, itemQuality, itemSlot, itemTypeKey);
@@ -1172,8 +1303,33 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
   $("#output, #sockets").hide();
   $(".itemType").hide();
   $(".weaponMethod").hide();
-  $(".weaponDruid").hide();
   let lastSelected = null;
+
+  function updateWeaponMethodOptions() {
+    const inventoryType = Number($('#item-slot').val());
+    const subclass = Number($('#item-subclass').val());
+    const isWeapon =
+      Number($('#item-slot option:selected').data('class')) ===
+      IDs.ItemClass.WEAPON;
+    const druidAvailable =
+      isWeapon &&
+      weaponSpecializationModel.isDruidWeapon(inventoryType);
+    const casterAvailable =
+      isWeapon &&
+      weaponSpecializationModel.isCasterWeapon(inventoryType, subclass);
+
+    $('.weaponDefault').show();
+    $('.weaponDruid').toggle(druidAvailable);
+    $('.weaponCaster').toggle(casterAvailable);
+    $('.weaponMethod').toggle(druidAvailable || casterAvailable);
+
+    const selectedMethod = $('input[name="weaponMethod"]:checked').val();
+    if ((selectedMethod === IDs.WeaponProfile.DRUID && !druidAvailable) ||
+        (selectedMethod === IDs.WeaponProfile.CASTER && !casterAvailable) ||
+        !isWeapon) {
+      $('#weaponDefault').prop('checked', true);
+    }
+  }
 
   $("#item-reqlvl").on('change input', function() {
     if ($(this).val() < 0) { $(this).val(''); }
@@ -1275,28 +1431,7 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
       populateWeaponDamageTypes();
       $(".weaponDamage").show();
       $("#weaponSpeed").val();
-
-      if ($("#item-subclass option:selected").val() == 10) { // staff
-        $(".weaponMethod").show();
-        $(".weaponMelee").hide();
-        $(".weaponDruid").show();
-        if ($("#weaponMelee").is(":checked")) { $("#weaponDruid").prop("checked", true); }
-      }
-      else {
-        $(".weaponMethod").hide();
-        $(".weaponMelee").show();
-        $(".weaponDruid").hide();
-        if ($("#item-slot option:selected").val() != 21) {
-          $("#weaponMelee").prop("checked", true);
-        }
-      }
-
-      if ($("#item-slot option:selected").val() == 21) { // main-hand
-        $(".weaponMethod").show();
-        $(".weaponMelee").show();
-        $(".weaponDruid").hide();
-        if ($("#weaponDruid").is(":checked")) { $("#weaponMelee").prop("checked", true); }
-      }
+      updateWeaponMethodOptions();
 
       if ($("#item-slot option:selected").val() == 26) {
         $('.weaponDamageExtra input').val('');
@@ -1325,6 +1460,7 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
     if (itemSlot) { populateSubClass(array[itemSlot].subClass, itemClass); }
     $(".itemType").show();
     $(".weaponMethod, .weaponDamage").hide();
+    $('#weaponDefault').prop('checked', true);
     if(itemSlot == 15 || itemSlot == 25) {
       $(".weaponDamage").show();
       $('.weaponDamage input').val('');

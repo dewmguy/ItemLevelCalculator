@@ -130,9 +130,10 @@
       return profileMatch;
     }
 
-    // Named caster/feral profiles require their own validated regression.
-    // Only the melee profile may intentionally use an untagged default row.
-    if (profile != null && profile !== 'melee') {
+    // Caster damage requires its own validated regression. Default/druid
+    // presentation profiles intentionally share the untagged physical row.
+    if (profile != null &&
+        !['default', 'druid', 'melee'].includes(profile)) {
       return null;
     }
 

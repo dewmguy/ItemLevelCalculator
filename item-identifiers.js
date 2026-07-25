@@ -83,8 +83,11 @@
 
   // A calculator profile is deliberately separate from AzerothCore identity.
   const WeaponProfile = Object.freeze({
-    MELEE: 'melee',
+    DEFAULT: 'default',
     CASTER: 'caster',
+    DRUID: 'druid',
+    // Compatibility aliases for older callers.
+    MELEE: 'default',
     FERAL: 'druid'
   });
 

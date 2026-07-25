@@ -96,11 +96,11 @@
         calculate: DPS_RULES['17:caster']
       };
     }
-    if (inventoryType === 21 &&
+    if ([13, 21].includes(inventoryType) &&
         [4, 7, 15].includes(subclass) &&
         profile === 'caster') {
       return {
-        name: 'uncommon caster main-hand polynomial',
+        name: 'uncommon caster one-hand polynomial',
         calculate: DPS_RULES['21:caster']
       };
     }
