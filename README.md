@@ -15,7 +15,7 @@ It also calculates armor, shield block, weapon damage, attack speed, caster weap
 
 ## Using the calculator
 
-Choose armor or weapon, then select the quality, slot, and subtype. In **Calculate Level** mode, enter the actual amount of each stat. In **Calculate Stats** mode, enter each stat's share to the nearest hundredth of a percent. The shares do not need to total 100% before calculation: each row except the bottom one snaps to the nearest whole stat point, and the bottom stat receives the remaining balance. In a percentage field, the Up and Down arrow keys move to the percentage for the next or previous whole stat point at the selected item level.
+Choose armor or weapon, then select the quality, slot, and subtype. In **Calculate Level** mode, enter the actual amount of each stat. In **Calculate Stats** mode, enter each stat's share to the nearest hundredth of a percent. The shares do not need to total 100% before calculation. Rows left at zero divide the percentage remaining after nonzero entries evenly, then each row except the bottom one snaps to the nearest whole stat point and the bottom stat receives the final balance. In a percentage field, the Up and Down arrow keys move to the percentage for the next or previous whole stat point at the selected item level.
 
 A negative stat is treated as a sacrifice. Its cost is subtracted from the item, leaving more room for positive stats. For example, a negative allocation above the bottom row increases the balance available to the bottom stat.
 

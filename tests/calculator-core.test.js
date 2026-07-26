@@ -102,6 +102,53 @@ test('percentage totals are normalized instead of rejected', () => {
   assert.equal(result.equations.allocations[0].balancing, true);
 });
 
+test('a zero stat receives the percentage left by assigned stats', () => {
+  const result = calculator.calculate({
+    mode: 'stats',
+    itemClass: 4,
+    inventoryType: 5,
+    quality: 2,
+    level: 100,
+    stats: [
+      { type: 7, percent: 30 },
+      { type: 5, percent: 0 }
+    ]
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.equations.allocations[1].enteredPercent, 0);
+  assert.equal(result.equations.allocations[1].requestedPercent, 70);
+  assert.equal(result.equations.allocations[1].autoPopulated, true);
+  assert.ok(result.result.stats[1].amount > 0);
+});
+
+test('multiple zero stats divide the remaining percentage evenly', () => {
+  const result = calculator.calculate({
+    mode: 'stats',
+    itemClass: 4,
+    inventoryType: 5,
+    quality: 2,
+    level: 100,
+    stats: [
+      { type: 7, percent: 50 },
+      { type: 5, percent: 0 },
+      { type: 6, percent: 0 }
+    ]
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.equations.allocations[1].requestedPercent, 25);
+  assert.equal(result.equations.allocations[2].requestedPercent, 25);
+  assert.equal(result.equations.allocations[1].autoPopulated, true);
+  assert.equal(result.equations.allocations[2].autoPopulated, true);
+  assert.ok(result.result.stats[1].amount > 0);
+  assert.ok(result.result.stats[2].amount > 0);
+  assert.equal(
+    result.result.stats.reduce((sum, stat) => sum + stat.percent, 0),
+    100
+  );
+});
+
 test('non-bottom percentages snap to whole stat points and bottom balances', () => {
   const result = calculator.calculate({
     mode: 'stats',

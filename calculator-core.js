@@ -113,6 +113,29 @@
     return Math.sign(value) * Math.round(Math.abs(value));
   }
 
+  function populateUnassignedPercentages(stats) {
+    const unassignedCount = stats.filter(stat => stat.percent === 0).length;
+    if (unassignedCount === 0) {
+      return stats.map(stat => ({
+        ...stat,
+        enteredPercent: stat.percent,
+        autoPopulated: false
+      }));
+    }
+
+    const assignedTotal = stats.reduce(
+      (sum, stat) => stat.percent === 0 ? sum : sum + stat.percent,
+      0
+    );
+    const unassignedShare = (100 - assignedTotal) / unassignedCount;
+    return stats.map(stat => ({
+      ...stat,
+      enteredPercent: stat.percent,
+      percent: stat.percent === 0 ? unassignedShare : stat.percent,
+      autoPopulated: stat.percent === 0
+    }));
+  }
+
   function statCalculationContext(request, mode = 'stats') {
     const common = normalizeCommon(request);
     const level = finiteNumber(request.level);
@@ -212,7 +235,9 @@
 
       allocations.push({
         type: stat.type,
+        enteredPercent: stat.enteredPercent,
         requestedPercent: stat.percent,
+        autoPopulated: stat.autoPopulated,
         percent: allocatedBudget / distributableBudget * 100,
         statMod,
         allocatedBudget,
@@ -336,8 +361,9 @@
       return error(mode, 'Every stat requires a type and finite percent.');
     }
 
+    const populatedStats = populateUnassignedPercentages(stats);
     const normalized = normalizeStatAllocations(
-      stats,
+      populatedStats,
       context.common,
       context.level,
       context.distributableBudget,

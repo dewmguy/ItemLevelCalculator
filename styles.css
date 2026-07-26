@@ -498,7 +498,7 @@ input.artifact:not(:placeholder-shown) { color: #E6B453 !important }
 }
 
 .stat-amount {
-  width: 10ch;
+  width: 11ch;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
 }
