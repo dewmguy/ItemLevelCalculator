@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="application-version" content="2026.07.25.13">
+    <meta name="application-version" content="2026.07.25.15">
     <title>Warcraft Item Level Calculator</title>
-    <link rel="stylesheet" href="styles.css?v=2026.07.25.7">
+    <link rel="stylesheet" href="styles.css?v=2026.07.25.8">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://kit.fontawesome.com/666b0b7246.js" crossorigin="anonymous"></script>
     <script src="item-identifiers.js?v=2026.07.25.2"></script>
@@ -13,10 +13,10 @@
     <script src="random-property-points.js?v=2026.07.25.5"></script>
     <script src="budget-model.js?v=2026.07.25.9"></script>
     <script src="pricing-model.js?v=2026.07.25.2"></script>
-    <script src="uncommon-weapon-model.js?v=2026.07.25.3"></script>
-    <script src="weapon-specialization-model.js?v=2026.07.25.1"></script>
+    <script src="uncommon-weapon-model.js?v=2026.07.25.4"></script>
+    <script src="weapon-specialization-model.js?v=2026.07.25.3"></script>
     <script src="calculator-core.js?v=2026.07.25.9"></script>
-    <script src="script.js?v=2026.07.25.13"></script>
+    <script src="script.js?v=2026.07.25.14"></script>
 </head>
 <body>
     <div id="float">
@@ -24,7 +24,7 @@
             <header>
                 <h1>WoW Item Level Calculator</h1>
                 <div class="github">
-                    <span class="build-version" title="Hosted build version">build 2026.07.25.13</span>
+                    <span class="build-version" title="Hosted build version">build 2026.07.25.15</span>
                     <a class="github-link" href="https://github.com/dewmguy/ItemLevelCalculator" target="_blank" rel="noopener" aria-label="View source on GitHub">
                         <i class="fa-brands fa-github" aria-hidden="true"></i>
                         <span>GitHub Repo</span>
@@ -86,6 +86,10 @@
                     <div class="group">
                         <input type="text" id="item-name" value="" class="uncommon" placeholder="Item Name (Optional)" />
                         <input class="quarter" type="number" id="item-reqlvl" name="itemReqLevel" min="0" placeholder="Level" />
+                        <div class="item heroic-toggle">
+                            <input type="checkbox" id="item-heroic" name="itemHeroic" />
+                            <label for="item-heroic" title="Mark this item as Heroic">Heroic</label>
+                        </div>
                     </div>
                     <div class="group">
                         <input type="text" id="item-description" value="" placeholder="Flavor Text" />

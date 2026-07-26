@@ -34,10 +34,22 @@ test('pre-Wrath caster spell power is a capped four-to-one DPS credit', () => {
     casterWeaponDps: 41.49020179014268
   });
 
-  assert.equal(baseSpellPower, 184);
+  assert.equal(baseSpellPower, 185);
   assert.equal(
     baseSpellPower,
-    Math.round((87.5949377067159 - 41.49020179014268) * 4)
+    Math.ceil((87.5949377067159 - 41.49020179014268) * 4)
+  );
+});
+
+test('floating point noise does not create free pre-Wrath spell power', () => {
+  assert.equal(
+    specialization.casterBaseSpellPower({
+      level: 20,
+      quality: 2,
+      defaultWeaponDps: 12.9545450001,
+      casterWeaponDps: 12.954545
+    }),
+    0
   );
 });
 
@@ -75,7 +87,21 @@ test('low-level uncommon caster staff receives credit from its own DPS trade', (
   });
 
   assert.ok(casterStaff.dps < defaultStaff.dps);
-  assert.equal(baseSpellPower, 2);
+  assert.ok(Math.abs(casterStaff.dps - 12.954545) < 1e-9);
+  assert.equal(baseSpellPower, 4);
+});
+
+test('epic caster staff anchors reproduce both Dying Light versions', () => {
+  assert.equal(specialization.epicCasterStaffDps(264), 219.047619);
+  assert.equal(specialization.epicCasterStaffDps(277), 250);
+  assert.ok(specialization.epicCasterStaffDps(276) < 250);
+  assert.ok(specialization.epicCasterStaffDps(278) > 250);
+  for (let level = 191; level <= 300; level++) {
+    assert.ok(
+      specialization.epicCasterStaffDps(level) >
+        specialization.epicCasterStaffDps(level - 1)
+    );
+  }
 });
 
 test('Wrath caster spell power follows the standardized corpus series', () => {

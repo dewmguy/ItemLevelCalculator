@@ -383,6 +383,12 @@ and maximum damage; it is not the DPS itself.
 
 Based on the calculated `DPS` and the `Mode Average Attack Speed`, the minimum and maximum attack values (`Min Damage`, `Max Damage`) for the weapon can be derived:
 
+> **Caster-staff exception:** build `2026.07.25.15` supersedes the caster-staff
+> polynomial rows in the historical table below. Uncommon caster staves use
+> the empirical anchors exported by `uncommon-weapon-model.js`; epic caster
+> staves use the original polynomial through item level 189 and the empirical
+> item-level 190–300 anchors exported by `weapon-specialization-model.js`.
+
 | epic weapons             | quality | InventoryType | item level range | subclass | purpose | formula     | link |
 |--------------------------|---------|---------------|------------------|----------|---------|-------------|------|
 | one-hand                 | 4       | 13            | 1 to 99          | any      | general | `y = -0.46373319610341757 + 1.948435650742608x - 0.05134655549435444x^2 + 0.0006882333623959314x^3 - 0.000002864536021471839x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-0.46373319610341757&b=1.948435650742608&c=-0.05134655549435444&d=0.0006882333623959314&e=-0.000002864536021471839&min-x=0&max-x=400&min-y=0&max-y=400&order=4&graph-title=Epic+-+Vanilla+-+One-Hand+%2813%29&plot=NobwRAHmBcAcCcAaMBPGB2AzAOgIwFYBfRcKOJVDTY0mBZNaLbABgDYbI6AWBmNttkzxOZWJj7Q2%2BIbFF0JlKTMxySXOIsbShHdWK38ZAJjW1NknZlzy4uS8ezjbse0raPXLt9s839dCyWuNjoxi5B7iFs6BHBTuEBTBTaLNj4ZhroKfxp6P7m2ZZp%2BCJJ6LCSpdjcmWQVVfA1dRiVStW1tg3tTZ3lbYwdLUwDMENdo9Ad3BONNTP9c9wLhZPVRIs96V3oVbA1eoW77fvCO3tC1OVsVeiyXTftd5gbhfhVgqpd7%2B2fh1m8doyXBlQqAwYmYZYKrcGqJQrGKo4bj%2Feo%2BMaOTCxcroqaOV5ZXH4fFdIn40GEqok8qRQYhYldWljELcK6FJlTFmojAc%2FDRRlVfk0wXYGIC9r0in1Xn0%2BFZGXYYwE6UisVJNg5KYlblSSbcJroZX8PUGlYaASSWqsM1kC1KK24HV2xjcO5edWPF37R22aSWu7GG1Gf2KuW2wzQbgydBBqQRqPpKX8eMqYYeS1GqQc1npWP4Y4ulnDfOWlm2fCemDcNIIcvgmDCdJhsYR1TYeBsjT4DmYQRJrWSLHW2yuwcqTtkKODnC1pKsweeHXcXHWGrY8y4Fgc1xCfscli2XE2AC6QA%3D%3D) |
@@ -486,14 +492,15 @@ Based on the calculated `DPS` and the `Mode Average Attack Speed`, the minimum a
 
 ## Default, Druid, and Caster Weapons
 
-Build `2026.07.25.13` separates presentation rules from weapon damage.
+Build `2026.07.25.15` separates presentation rules from weapon damage.
 **Default** is selected automatically and uses the ordinary weapon model.
 **Druid** uses exactly the same damage as Default; it only adds the gray
 class-context tooltip line when the passive conversion produces attack power.
 **Caster** selects the lower empirical caster-DPS series and adds a locked base
 spell-power amount. Any Spell Power added through the normal stat editor still
 uses the ordinary stat budget and is summed into the displayed spell-power
-line.
+line. The **Heroic** control is also presentation-only: it adds the green
+tooltip designation without changing item budget, damage, or spell power.
 
 ### Druid passive attack power
 
@@ -525,7 +532,7 @@ DPS_{sacrificed} =
 ```
 
 ```math
-SP_{credit} = \operatorname{round}(4\times DPS_{sacrificed})
+SP_{credit} = \operatorname{ceil}(4\times DPS_{sacrificed})
 ```
 
 The four-to-one exchange is the historical weapon-DPS trade documented by the
@@ -551,12 +558,25 @@ The pre-Wrath comparison stays within the selected weapon family: staves are
 compared with ordinary staves, while main-hand and one-hand caster weapons are
 compared with the ordinary one-hand curve. This prevents the caster-heavy
 main-hand sample from becoming its own counterfactual and lets low-level
-caster staves receive credit from the staff DPS they actually give up. The
-`12/5` multiplier is fitted from the repeated spell-power series shared by
+caster staves receive credit from the staff DPS they actually give up. Integer
+spell-power credit rounds upward, with a small floating-point tolerance so a
+zero trade cannot create one free point.
+
+Uncommon caster-staff DPS now interpolates representative corpus anchors
+instead of the former quadratic. These include Staff of the Hand at item level
+20 and `12.954545` DPS, plus observed leveling staves at item levels 25, 40,
+62, 81, 99, 114, 138, 146, 154, 158, and 174. Epic Wrath caster staves use a
+separate anchor series from item level 190 through 300. Dying Light is the
+clean ICC reference: its normal item-level 264 version anchors at `219.047619`
+DPS and its heroic item-level 277 version anchors at `250` DPS. Proc-bearing
+weapons such as Nibelung are not averaged into this base curve because their
+proc consumes damage independently of the ordinary caster-weapon exchange.
+
+The `12/5` multiplier is fitted from the repeated spell-power series shared by
 caster staves and one-hand weapons in the local WotLK corpus. Representative
 epic outputs are 405 at item level 200 versus 408 observed, 518 at item level
-226 versus 520 observed, and 836 at item level 277 versus 836 observed. The
-small residuals reflect the continuous `RandPropPoints` fit rather than a
+226 versus 520 observed, and 836 at item level 277 versus 837–838 observed.
+The small residuals reflect the continuous `RandPropPoints` fit rather than a
 hard-coded tier lookup.
 
 Caster mode is available for staves and for observed caster one-hand families

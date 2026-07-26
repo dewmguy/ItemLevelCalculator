@@ -197,6 +197,33 @@ input[type="radio"][disabled] + label {
   cursor: not-allowed;
 }
 
+#item-heroic { display: none }
+
+.heroic-toggle {
+  flex: 0 0 7em;
+  width: 7em;
+}
+
+#item-heroic + label {
+  display: block;
+  width: 100%;
+  cursor: pointer;
+  text-align: center;
+}
+
+#item-heroic:hover + label {
+  color: #C8C8C8;
+  background: #484848;
+}
+
+#item-heroic:checked + label {
+  color: #1EFF00;
+  background: linear-gradient(180deg, #4a4a4a, #414141);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .05),
+    inset 0 -2px 0 rgba(30, 255, 0, .55);
+}
+
 input[type="text"]:hover, input[type="number"]:hover {
   box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.2);
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
@@ -372,7 +399,6 @@ button:focus-visible {
   flex-direction: row;
   gap: 5px;
   color: #9D9D9D;
-  text-transform: capitalize;
   align-items: center;
 }
 #sockets img { height: 1em }
@@ -540,6 +566,7 @@ input.artifact:not(:placeholder-shown) { color: #E6B453 !important }
 .tooltip .item-level, .flavor { color: #FFD100 }
 .tooltip .stat { color: #FFF }
 .tooltip .stat.green, .green { color: #1EFF00 }
+.tooltip .heroic { color: #1EFF00 }
 .tooltip .druid-attack-power { color: #9D9D9D }
 .tooltip .specialstat { color: #1eff00 }
 

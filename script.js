@@ -200,7 +200,8 @@ $(document).ready(function() {
         { min: 1, max: 300, sub: 2, mod: lvl => -1.8160185143165526 + 0.8176011515936384 * lvl + 0.00004631966853788777 * Math.pow(lvl, 2) - 0.00002190693147532568 * Math.pow(lvl, 3) + 9.05587408850838e-8 * Math.pow(lvl, 4) }
       ],
       17: [ // Two-hand
-        { type: 'caster', min: 1, max: 300, sub: 10, mod: lvl => -2.7137455672 + 1.2034848552 * lvl - 0.0078149234 * Math.pow(lvl, 2) + 0.0000237964 * Math.pow(lvl, 3) },
+        { type: 'caster', min: 1, max: 189, sub: 10, mod: lvl => -2.7137455672 + 1.2034848552 * lvl - 0.0078149234 * Math.pow(lvl, 2) + 0.0000237964 * Math.pow(lvl, 3) },
+        { type: 'caster', min: 190, max: 300, sub: 10, mod: lvl => weaponSpecializationModel.epicCasterStaffDps(lvl) },
         { type: 'default', min: 1, max: 300, sub: 10, mod: lvl => -39.8477534594 + 2.2205407279 * lvl - 0.0111235858 * Math.pow(lvl, 2) + 0.0000284616 * Math.pow(lvl, 3) },
         { type: null, min: 1, max: 90, sub: -10, mod: lvl => -0.7405045351583416 + 2.5291730790997162 * lvl - 0.06696995004352309 * Math.pow(lvl, 2) + 0.0009043795705405915 * Math.pow(lvl, 3) - 0.000003796542201089664 * Math.pow(lvl, 4) },
         { type: null, min: 91, max: 300, sub: -10, mod: lvl => 0.904817539290022 + 1.5822436006525589 * lvl - 0.007940579189201744 * Math.pow(lvl, 2) + 0.000023354465861457816 * Math.pow(lvl, 3) },
@@ -837,9 +838,10 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
     return subClassName ? `<div class="item-subclass">${subClassName}</div>` : subClassName;
   }
 
-  function createTooltipHTML(itemQuality, itemName, itemLevel, durabilityHTML, requiredLevelHTML, moneyHTML, bindHTML, uniqueHTML, slotHTML, typeHTML, weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, socketsHTML, greenStatsHTML, itemFlavorHTML) {
+  function createTooltipHTML(itemQuality, itemName, heroicHTML, itemLevel, durabilityHTML, requiredLevelHTML, moneyHTML, bindHTML, uniqueHTML, slotHTML, typeHTML, weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, socketsHTML, greenStatsHTML, itemFlavorHTML) {
     return `
       <div class="item-name ${itemQuality}">${itemName}</div>
+      ${heroicHTML}
       <div class="item-level">Item Level ${itemLevel}</div>
       ${bindHTML}
       ${uniqueHTML}
@@ -1090,7 +1092,7 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
         }
         else if (stat.type === 2) {
           const socketColor = statTypeObj.data('color');
-          socketsHTML += `<div class="socket"><img src="item-display/socket/${socketColor}.png" />${socketColor} Socket</div>`;
+          socketsHTML += `<div class="socket"><img src="item-display/socket/${socketColor}.png" alt="" />${escapeHTML(statTypeText)}</div>`;
         }
         else if (stat.type === 3) {
           bonusArmor = statAmount;
@@ -1108,6 +1110,9 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
 
     let slotName = $('#item-slot option:selected').text();
     let itemName = escapeHTML($("#item-name").val() || `${qualityName} ${slotName}`);
+    const heroicHTML = $('#item-heroic').is(':checked')
+      ? '<div class="heroic">Heroic</div>'
+      : '';
 
     const requiredLevelInput = String($('#item-reqlvl').val() ?? '').trim();
     const parsedRequiredLevel = Number(requiredLevelInput);
@@ -1146,14 +1151,14 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
       if(itemSlot == 14) {
         blockValue = calculateShieldBlock(itemLevel, itemQuality);
       }
-      if(socketsHTML) {
-        socketsHTML = `
-          <div id="sockets">
-            ${socketsHTML}
-          </div>
-        `;
-      }
-      else { socketsHTML = ''; }
+    }
+
+    if(socketsHTML) {
+      socketsHTML = `
+        <div id="sockets">
+          ${socketsHTML}
+        </div>
+      `;
     }
 
     const totalSpellPower = baseSpellPower + additionalSpellPower;
@@ -1185,7 +1190,7 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
 
     const moneyHTML = sellPriceHTML + buyPriceHTML;
 
-    let tooltipHtml = createTooltipHTML(qualityName, itemName, itemLevel, durabilityHTML, requiredLevelHTML, moneyHTML, bindHTML, uniqueHTML, slotName, subClassHTML(), weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, socketsHTML, greenStatsHTML, itemFlavorHTML);
+    let tooltipHtml = createTooltipHTML(qualityName, itemName, heroicHTML, itemLevel, durabilityHTML, requiredLevelHTML, moneyHTML, bindHTML, uniqueHTML, slotName, subClassHTML(), weaponDamageHTML, itemArmor, blockValue, whiteStatsHTML, socketsHTML, greenStatsHTML, itemFlavorHTML);
     $('#output .tooltip').html(tooltipHtml);
   }
 

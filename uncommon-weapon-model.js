@@ -51,10 +51,6 @@
       0.7595359183093786 * level -
       0.00052 * Math.pow(level, 2) +
       0.0000031790771502211193 * Math.pow(level, 3),
-    '17:caster': level =>
-      0.5878275909223474 +
-      0.6486638702862207 * level -
-      0.0008183156661210863 * Math.pow(level, 2),
     21: level =>
       0.1888986564358558 +
       0.514467630955437 * level +
@@ -87,13 +83,52 @@
       0.000014078423351119631 * Math.pow(level, 3)
   });
 
+  // Representative uncommon caster-staff observations. A single quadratic
+  // flattened the low-level series too aggressively, missing Staff of the
+  // Hand at ilvl 20 and the WotLK leveling-staff series at ilvl 138+.
+  const CASTER_STAFF_DPS_ANCHORS = Object.freeze([
+    [1, 1.235672],
+    [20, 12.954545],
+    [25, 16.842105],
+    [40, 28.888889],
+    [62, 48.235294],
+    [81, 54.852941],
+    [99, 56.774194],
+    [114, 60],
+    [138, 74.5],
+    [146, 77.333333],
+    [154, 80.5],
+    [158, 82.413793],
+    [174, 89.333333]
+  ].map(anchor => Object.freeze(anchor)));
+
+  function interpolateAnchors(anchors, level) {
+    if (!Array.isArray(anchors) || anchors.length < 2 ||
+        !Number.isFinite(level)) {
+      return null;
+    }
+    const upperIndex = anchors.findIndex(anchor => anchor[0] >= level);
+    const index = upperIndex < 0
+      ? anchors.length - 1
+      : Math.max(1, upperIndex);
+    const lower = anchors[index - 1];
+    const upper = anchors[index];
+    const span = upper[0] - lower[0];
+    return lower[1] + (
+      (level - lower[0]) / span
+    ) * (upper[1] - lower[1]);
+  }
+
   function dpsRule(inventoryType, subclass, profile) {
     if (inventoryType === 17 &&
         subclass === 10 &&
         profile === 'caster') {
       return {
-        name: 'uncommon caster-staff polynomial',
-        calculate: DPS_RULES['17:caster']
+        name: 'uncommon caster-staff empirical anchors',
+        calculate: level => interpolateAnchors(
+          CASTER_STAFF_DPS_ANCHORS,
+          level
+        )
       };
     }
     if ([13, 21].includes(inventoryType) &&
@@ -188,6 +223,8 @@
   return Object.freeze({
     DEFAULT_DELAYS,
     DPS_RULES,
+    CASTER_STAFF_DPS_ANCHORS,
+    interpolateAnchors,
     damageCoefficient,
     calculate
   });

@@ -30,6 +30,24 @@
   const CASTER_ONE_HAND_SUBCLASSES = Object.freeze(
     [4, 7, 15]
   );
+  const EPIC_CASTER_STAFF_DPS_ANCHORS = Object.freeze([
+    [190, 107.04915],
+    [200, 120.238],
+    [213, 133.925],
+    [219, 143.095],
+    [232, 156.667],
+    [239, 165],
+    [245, 172.419],
+    [251, 180.385],
+    [258, 190],
+    // Dying Light is the clean ICC caster-staff reference. Proc-bearing
+    // weapons such as Nibelung trade part of this damage independently.
+    [264, 219.047619],
+    [271, 235.714286],
+    [277, 250],
+    [284, 266.666667],
+    [300, 304.761905]
+  ].map(anchor => Object.freeze(anchor)));
 
   function isDruidWeapon(inventoryType) {
     return FERAL_WEAPON_INVENTORY_TYPES.includes(inventoryType);
@@ -74,6 +92,32 @@
     );
   }
 
+  function epicCasterStaffDps(level) {
+    const lastAnchor =
+      EPIC_CASTER_STAFF_DPS_ANCHORS[
+        EPIC_CASTER_STAFF_DPS_ANCHORS.length - 1
+      ];
+    if (!Number.isFinite(level) ||
+        level < EPIC_CASTER_STAFF_DPS_ANCHORS[0][0] ||
+        level > lastAnchor[0]) {
+      return null;
+    }
+    const exact = EPIC_CASTER_STAFF_DPS_ANCHORS.find(
+      anchor => anchor[0] === level
+    );
+    if (exact) {
+      return exact[1];
+    }
+    const upperIndex = EPIC_CASTER_STAFF_DPS_ANCHORS.findIndex(
+      anchor => anchor[0] > level
+    );
+    const lower = EPIC_CASTER_STAFF_DPS_ANCHORS[upperIndex - 1];
+    const upper = EPIC_CASTER_STAFF_DPS_ANCHORS[upperIndex];
+    return lower[1] + (
+      (level - lower[0]) / (upper[0] - lower[0])
+    ) * (upper[1] - lower[1]);
+  }
+
   function casterBaseSpellPower({
     level,
     quality,
@@ -106,9 +150,11 @@
       0,
       defaultWeaponDps - casterWeaponDps
     );
-    const dpsCredit = Math.round(
-      sacrificedDps * PRE_WRATH_SPELL_POWER_PER_SACRIFICED_DPS
-    );
+    const rawDpsCredit =
+      sacrificedDps * PRE_WRATH_SPELL_POWER_PER_SACRIFICED_DPS;
+    const dpsCredit = rawDpsCredit <= 1e-9
+      ? 0
+      : Math.ceil(rawDpsCredit);
     return Math.min(dpsCredit, ceiling);
   }
 
@@ -120,10 +166,12 @@
     FERAL_ATTACK_POWER_OFFSET,
     FERAL_WEAPON_INVENTORY_TYPES,
     CASTER_ONE_HAND_SUBCLASSES,
+    EPIC_CASTER_STAFF_DPS_ANCHORS,
     isDruidWeapon,
     isCasterWeapon,
     feralAttackPower,
     standardSpellPowerCeiling,
+    epicCasterStaffDps,
     casterBaseSpellPower
   });
 });
