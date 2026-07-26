@@ -41,7 +41,7 @@ The cost of one stat is:
 
 $$
 B_i =
-\operatorname{sgn}(a_i)
+\mathrm{sgn}(a_i)
 \left(\lvert a_i\rvert m_i\right)^p
 $$
 
@@ -133,7 +133,7 @@ L_{\text{result}} =
 \min \left\{
 L :
 \sum_i
-\operatorname{sgn}(a_i)
+\mathrm{sgn}(a_i)
 \left(\lvert a_i\rvert m_i(L)\right)^p
 \leq
 C(q,s,L)^p
@@ -154,7 +154,7 @@ The amount of that stat is the reverse of the cost equation:
 
 $$
 a_i =
-\operatorname{sgn}(B_i)
+\mathrm{sgn}(B_i)
 \frac{\lvert B_i\rvert^{1/p}}{m_i}
 $$
 
@@ -235,7 +235,7 @@ Caster staves, maces, swords, and daggers use a caster damage profile that canno
 
 $$
 \text{BaseSpellPower} =
-\operatorname{round}\left(
+\mathrm{round}\left(
 \frac{12}{5}C(q,\text{two-hand},L)
 \right)
 \quad\text{for } L > 165
@@ -249,7 +249,7 @@ $$
 \left\lceil
 4\max(D_{\text{default}}-D_{\text{caster}},0)
 \right\rceil,
-\operatorname{round}\left(
+\mathrm{round}\left(
 \frac{12}{5}C(q,\text{two-hand},L)
 \right)
 \right)
