@@ -1,662 +1,343 @@
-# ItemLevelCalculator [🔗](https://dewmguy.github.io/ItemLevelCalculator/)
+# Item Level Calculator
 
-![Screenshot](screenshot.png?raw=true "Screenshot of Item Calculator Interface")
-[Item in the screenshot - Vest of Jotunheim](https://www.wowhead.com/wotlk/item=43912/vest-of-jotunheim)
+[Open the calculator](https://dewmguy.github.io/ItemLevelCalculator/) · [View the changelog](CHANGELOG.md)
 
-This web application is currently in development. The Item Level Calculator is designed to assist in the creation, modification, and validation of item-level balanced armor and weapons for World of Warcraft emulators, with support for Vanilla, The Burning Crusade, and Wrath of the Lich King. It is most effective for validating or creating items within the intended item level range of blizzlike items. Items with levels extending beyond the existing in-game ranges may yield undesirable or unpredictable results.
+![Screenshot of the Item Level Calculator](screenshot.png?raw=true)
 
-In researching this concept, I discovered numerous values and coefficients scattered throughout the community, each employing different mathematical approaches. While many in the community describe these calculations as "good enough," I found them often constrained by linear functions, lacking the dynamic scaling needed to accommodate variations introduced by Blizzard throughout the expansions. Many stats vary based on Inventory Type, Quality, and Item Level. 
+Item Level Calculator is a browser-based tool for creating and checking armor and weapons for World of Warcraft emulator projects. It covers the item ranges used by Vanilla, The Burning Crusade, and Wrath of the Lich King, and it produces a familiar in-game tooltip so the calculated result is easy to inspect.
 
-Improving the accuracy of these calculations hinges on enhancing the quality of the equations. As a first step to the conceptualization of this calculator, I immediately found the need for a method to more easily plot and graph data. So I developed a graphing tool called [Polynomial Visualizer](https://github.com/dewmguy/PolynomialVisualizer). I used it to draft many of the formulas the calculator uses, the formulas and the links to their data are scattered around down below.
+The calculator works in two directions:
 
-Stat and item level calculation accuracy significantly improved by introducing polynomial regression and categorizing formulas and coefficients by item quality and slot according to their appropriate item level ranges. The enhanced equations integrated into this calculator provide significantly more reliable outputs, closely reflecting in-game values. Though it is far from perfect, testing reveals that the calculator typically deviates by one or two item levels from actual values.
+- **Calculate Level** estimates the lowest item level that can hold the stats entered.
+- **Calculate Stats** starts with an item level and divides its available power among the selected stats.
 
-However, there are significant outliers Blizzard created either accidentally in the form of a typo, mixing up a stat value, or using the wrong calculations for a stat altogether; or intentionally as cleverly disguised treats, hidden gem rewards, raid or dungeon boss loot, or just flattening the curve to be more easily digestable to players. Blizzard did create and use a formula to calculate item levels and aid their process of creating items in a very general way, this is most notably evidenced in their items that include randomized stats. These items were very helpful in validating the stat coefficients used in the functions, and sanity checking certain outliers. Many times I would be researching the more significant outliers on wowhead and the comments would often validate the finding. It is pretty much impossible to account for these outliers; instead, the calculator indicates the more likely item level of these anomalies.
+It also calculates armor, shield block, weapon damage, attack speed, caster weapon spell power, druid form attack power, and vendor prices when the selected item type supports them.
 
-For instance, consider item level 277 gear dropped in Icecrown Citadel (ICC). These items are among the best in the game and vary with heroic and non-heroic items, they display a huge variance in stat combinations. Balancing stat coefficients across all items within this range is not possible; very few items labeled as level 277 truly fit the designation. This is ubiquitous among all of the common blanket item level tiers (213, 226, 245, etc.).
+## Using the calculator
 
-A prime example of these outliers is the [Shining Buckle Gauntlets](https://www.wowhead.com/wotlk/item=39183/shining-buckle-gauntlets) and the [Discoverer's Mitts](https://www.wowhead.com/wotlk/item=39013/discoverers-mitts). Both are item level 154 leather items with identical stats despite differing qualities, an impossibility under standard calculations.
+Choose armor or weapon, then select the quality, slot, and subtype. In **Calculate Level** mode, enter the actual amount of each stat. In **Calculate Stats** mode, enter the share of the item assigned to each stat; the shares must total 100%.
 
-### Executable model and research status
+A negative stat is treated as a sacrifice. Its cost is subtracted from the item, leaving more room for positive stats. Negative and positive percentages must still add up to 100%. For example, `-20%` assigned to one stat allows the positive allocations to total `120%`.
 
-The calculator's current stat-budget coefficients and equations live in
-[`budget-model.js`](budget-model.js), with reusable power-law transforms in
-[`model-math.js`](model-math.js). The identifier boundary is frozen in
-[`item-identifiers.js`](item-identifiers.js). These modules are the source of
-truth when prose or an older research table disagrees.
+Sockets use part of the same available power as ordinary stats. Optional tooltip fields, such as item name, required level, flavor text, bonus armor, and bonus elemental damage, affect the display only when they are provided. Leaving Required Level blank leaves that line out of the tooltip.
 
-[`random-property-points.js`](random-property-points.js) retains the exact
-uncommon reference rows from `RandPropPoints.dbc` and contains continuous
-inventory-specific capacity curves fitted to all uncommon, rare, and epic
-columns in the WotLK table. The calculator uses the fitted curves so it can
-interpolate and extrapolate instead of becoming a rigid table lookup.
-[`weapon-specialization-model.js`](weapon-specialization-model.js) owns caster
-eligibility, locked base spell power, and the passive druid DPS conversion.
-[`calculator-core.js`](calculator-core.js) exposes the stat, item-level,
-weapon-damage, and price calculations as JSON-compatible functions without
-requiring the browser UI. See
-[`docs/UNCOMMON_RANDOM_ENCHANTMENT_AUDIT.md`](docs/UNCOMMON_RANDOM_ENCHANTMENT_AUDIT.md)
-for batch commands, corpus coverage, measured error, and known exclusions.
+The supported item-level range is 1 through 300. Results are most dependable inside the ranges represented by game data. Values beyond ordinary item patterns should be treated as estimates.
 
-The coefficient tables below describe the executable model unless a section is
-explicitly marked as historical methodology.
+## What an item budget means
 
-## Fundamentals of Item Level Calculation
+An item budget is a common unit used to compare different stats. One point of Strength does not always cost the same amount of item power as one point of mana regeneration, spell power, armor, or a socket. The calculator therefore gives each stat a cost multiplier.
 
-#### Terms and Definitions
+Let:
 
-- **StatMod**: The weight coefficient or "cost" of a given Stat. Stamina is often less expensive than strength.
-- **Exponent**: $p=\log(2)/\log(1.5)\approx 1.7095$ is applied to inflate the expense of a stat into a StatValue. This makes a lone stat of higher quantity more expensive than multiple lower quantity stats while maintaining a relatively similar overall expense. (For example, 100 strength is approximately equivalent to 53 strength + 53 agility + 53 crit when all three stats have the same StatMod.)
-- **StatValue**: The inflated expense of the Stat on an item.
-- **StatBudget**: The sum of all of the StatValues on an item.
-- **SlotMod**: The weight coefficient of an item based on its slot. A chest will have a lower item level than gloves with the same stats.
-- **ItemBudget**: The StatBudget of an item multiplied by the SlotMod coefficient of the item's slot type.
-- **QualityMod**: The weight coefficient of an item based on its quality. An epic shield will have a lower item level than an uncommon shield with the same stats.
-- **ItemLevel**: The effective level of an item.
-
-#### Calculating StatBudget
+- \(a_i\) be the amount of stat \(i\);
+- \(m_i\) be that stat's cost multiplier;
+- \(p\) be the shared power, defined as:
 
 $$
-StatBudget = \sum_i \operatorname{sgn}(StatAmount_i)
-\left(\lvert StatAmount_i\rvert \times StatMod_i\right)^p
+p = \frac{\log(2)}{\log(1.5)} \approx 1.7095
 $$
 
-Build `2026.07.25.9` treats negative stat amounts as budget credits. The
-magnitude of a penalty uses the same modifier and exponent as the equivalent
-positive stat, then subtracts from the item's used budget. Applying the power
-to the absolute amount before restoring its sign keeps fractional exponents
-real-valued and makes equal positive and negative amounts cancel exactly.
-
-In Calculate Stats mode, percentage allocations may also be negative but their
-signed total must remain 100%. For example, `-20%` assigned to a sacrificed
-stat permits `120%` to be assigned across positive stats.
-
-#### Calculating ItemBudget
+The cost of one stat is:
 
 $$
-ItemBudget = StatBudget \times SlotMod
+B_i =
+\operatorname{sgn}(a_i)
+\left(\lvert a_i\rvert m_i\right)^p
 $$
 
-For stat generation, the inverse of the forward transform is:
+The item's used budget is the sum of those costs:
 
 $$
-StatAmount_i = \frac{AllocatedBudget_i^{1/p}}{StatMod_i}
+B_{\text{used}} = \sum_i B_i
 $$
 
-Placing `StatMod` inside the root is not algebraically equivalent and was
-corrected in build `2026.07.24.1`.
-
-#### Calculating QualityMod
-
-The QualityMod is calculated by multiplying a given item level by a predetermined coefficient, the product of which is added to a base integer.
+The power \(p\) makes a large amount of one stat cost more than spreading similar power across several stats. With equal multipliers, the following two sides are close:
 
 $$
-QualityMod(i) = qualityMult \times i_{ItemLevel} + qualityBase
-$$
-
-#### Calculating ItemLevel
-
-The QualityMod is multiplied by the SlotMod and the product is raised to the exponent power. This is performed in a loop with $i$ increasing by the value of 1 each iteration until the product meets or exceeds the value of the ItemBudget. The item level is the number of iterations required to meet the criteria.
-
-$$
-(\text{QualityMod}(i) \times \text{SlotMod})^{\frac{\log(2)}{\log(1.5)}} \geq \text{ItemBudget}
-$$
-
-Equivalently:
-
-$$
-\sum_i(StatAmount_i \times StatMod_i)^p
-\leq QualityMod(i)^p \times SlotMod^{p-1}
-$$
-
-This is a power-law model, not an exponential model. The production exponent
-is not $\log(3)/\log(2)$. Alternative exponents, including $p=3/2$, are being
-evaluated against a held-out item corpus before any production change.
-
-## Stat & Slot Coefficients
-
-### Item Quality Modifiers
-
-These coefficients control the ceiling for stats on an item based on its quality.
-
-Build `2026.07.25.5` replaces these historical piecewise approximations with
-quartic inventory-specific curves fitted across item levels 10–300 of the
-`RandPropPoints.dbc` Good (uncommon), Superior (rare), and Epic columns. The
-exact uncommon rows remain embedded as a validation reference, but production
-calculation uses the continuous curves. This preserves interpolation and
-controlled extrapolation while staying calibrated to Blizzard's client data.
-The rows below remain as historical methodology.
-
-| quality | ilvl |  mult |   base |
-|---------|------|-------|--------|
-|       4 | 200+ | 1.320 |   -120 |
-|       4 | 100+ | 0.700 |     -2 |
-|       4 |   1+ | 0.689 |     +1 |
-|       3 | 136+ | 0.880 | -39.25 |
-|       3 |  80+ | 0.674 |   -8.0 |
-|       3 |   1+ | 0.641 |   -4.0 |
-|       2 | 130+ | 0.801 |  -38.3 |
-|       2 |  80+ | 0.505 |   -4.5 |
-|       2 |   1+ | 0.495 |  -2.85 |
-
-### Item Slot Modifiers (Armor)
-
-This coefficient (SlotMod) controls the ceiling for stats on an item based on the slot.
-
-The values in this table are found to be static and do not change within any item level range. You'll notice that tabards, shirts, and relics are included in the table. Assuming these item slots were ever even considered to have stats in any capacity, I'd assume they'd have a very low stat budget. All of the tabards that have any spell abilities at all were toys for the GMs to have fun with while testing the game, they have no baseline from which to assume any amount of power, and are there just for grins.
-
-| InventoryType | Item Name     | defaults |
-|---------------|---------------|----------|
-|             5 | Chest         |    16/16 |
-|            20 | Chest (Robe)  |    16/16 |
-|            23 | Held Off-hand |     3/16 |
-|            28 | Relic         |     1/32 |
-|             4 | Shirt         |     1/32 |
-|            19 | Tabard        |     1/32 |
-
-The values in this table are found to be dynamic and potentially very between item level ranges. As better methods for determining the accuracy of these coefficients is developed, these figures may change or be found to be static, and will be moved into the table above.
-
-| InventoryType | Item Name     | [2]   1+ | [2]  80+ | [2] 130+ | [3]   1+ | [3]  80+ | [3] 136+ | [4]   1+ | [4]  90+ | [4] 200+ |
-|---------------|---------------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
-|             1 | Head          |    16/16 |      ... |      ... |      ... |      ... |      ... |      ... |    11/16 |    16/16 |
-|             2 | Neck          |     4/16 |      ... |      ... |      ... |      ... |      ... |      ... |     3/16 |     4/16 |
-|             3 | Shoulder      |     8/16 |      ... |      ... |      ... |      ... |      ... |      ... |     6/16 |     8/16 |
-|             6 | Waist         |     8/16 |      ... |      ... |      ... |      ... |      ... |      ... |     6/16 |     8/16 |
-|             7 | Legs          |    16/16 |      ... |      ... |      ... |      ... |      ... |      ... |    12/16 |    16/16 |
-|             8 | Feet          |     8/16 |      ... |      ... |      ... |      ... |      ... |      ... |     6/16 |     8/16 |
-|             9 | Wrists        |     4/16 |      ... |      ... |      ... |      ... |      ... |      ... |     3/16 |     4/16 |
-|            10 | Hands         |     8/16 |      ... |      ... |      ... |      ... |      ... |      ... |     6/16 |     8/16 |
-|            11 | Finger        |     4/16 |      ... |      ... |      ... |      ... |      ... |      ... |     3/16 |     4/16 |
-|            12 | Trinket       |     8/16 |      ... |      ... |      ... |    11/16 |    11/16 |     8/16 |     6/16 |     6/16 |
-|            14 | Shield        |     4/16 |      ... |      ... |      ... |      ... |      ... |      ... |     3/16 |     3/16 |
-|            16 | Back          |     3/16 |     4/16 |     4/16 |     4/16 |     4/16 |     4/16 |     4/16 |     3/16 |     3/16 |
-
-### Item Slot Modifiers (Weapons)
-
-This coefficient (SlotMod) controls the ceiling for stats on an item based on the slot.
-
-| Item Name       | InventoryType | uncommon |
-|-----------------|---------------|----------|
-| One Hand Weapon |            13 |     7/16 |
-| Bow             |            15 |    16/16 |
-| Two Hand Weapon |            17 |    16/16 |
-| Main-Hand       |            21 |     7/16 |
-| Off-Hand        |            22 |     7/16 |
-| Thrown          |            25 |     5/16 |
-| Ranged          |            26 |     5/16 |
-
-### Item Stat Modifiers
-
-This coefficient (StatMod) controls the ceiling for stats on an item based on the stat type.
-
-The values in this table are found to be static and do not change within any item level range.
-
-| stat_type | Stat Name          | InventoryType | defaults |
-|-----------|--------------------|---------------|----------|
-|         0 | Mana               |           all |        ? |
-|         1 | Health             |           all |        ? |
-|         3 | Agility            |           all |    16/16 |
-|         4 | Strength           |           all |    16/16 |
-|         5 | Intellect          |           all |    16/16 |
-|         6 | Spirit             |           all |    16/16 |
-|        12 | Defense Rating     |           all |    16/16 |
-|        13 | Dodge Rating       |           all |    16/16 |
-|        14 | Parry Rating       |           all |    16/16 |
-|        15 | Block Rating       |           all |    16/16 |
-|        21 | Spell Crit Rating  |           all |    16/16 |
-|        31 | Hit Rating         |           all |    16/16 |
-|        32 | Crit Rating        |           all |    16/16 |
-|        35 | Resiliance Rating  |           all |    16/16 |
-|        36 | Haste Rating       |           all |    16/16 |
-|        37 | Expertise          |           all |    16/16 |
-|        38 | Attack Power       |           all |     8/16 |
-|        44 | Armor Penetration  |           all |    16/16 |
-|        47 | Spell Penetration  |           all |    12/16 |
-|     X_res | Resistances        |           all |    16/16 |
-
-The values in this table are found to be dynamic and frequently very between item level ranges. As better methods for determining the accuracy of these coefficients is developed, these figures may change or be found to be static, and will be moved into the table above.
-
-| stat_type | Stat Name          | InventoryType | [2]   1+ | [2]  80+ | [2] 130+ | [3]   1+ | [3]  80+ | [3] 136+ | [4]   1+ | [4]  90+ | [4] 200+ |
-|-----------|--------------------|---------------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
-|  X_socket | Sockets            | 2, 11, 14, 23 |      5/1 |      5/1 |      5/1 |     10/1 |     10/1 |     10/1 |     10/1 |     10/1 |     24/1 |
-|  X_socket | Sockets            |          else |     10/1 |     10/1 |     10/1 |     20/1 |     20/1 |     20/1 |     20/1 |     10/1 |     24/1 |
-|     armor | Bonus Armor        |         armor |     3/32 |     3/32 |     3/32 |     3/32 |     2/32 |     2/32 |     2/32 |     2/32 |     2/32 |
-|     armor | Armor              |        weapon |     3/32 |     3/32 |     3/32 |     4/32 |     2/32 |     2/32 |     3/32 |     2/32 |     2/32 |
-|         7 | Stamina            |           all |    16/16 |      2/3 |      2/3 |    16/16 |      2/3 |      2/3 |    16/16 |      2/3 |      2/3 |
-|        43 | Mana Regen Per 5   | 2, 11, 12, 23 |    48/16 |    48/16 |    48/16 |    48/16 |    32/16 |    32/16 |    32/16 |    32/16 |    24/16 |
-|        43 | Mana Regen Per 5   |          else |    92/32 |    92/32 |    92/32 |    92/32 |    32/16 |    32/16 |    32/16 |    32/16 |    32/16 |
-|        45 | Spell Power        |         armor |    45/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |
-|        45 | Spell Power        |        weapon |    45/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |    55/64 |    45/64 |    45/64 |
-|        46 | Health Regen Per 5 | 2, 11, 12, 23 |    32/16 |    32/16 |    32/16 |    32/16 |    32/16 |    32/16 |    16/16 |     8/16 |     4/16 |
-|        46 | Health Regen Per 5 |          else |    64/16 |    64/16 |    64/16 |    64/16 |    64/16 |    64/16 |    32/16 |    16/16 |     8/16 |
-|        48 | Block Value        | 2, 11, 12, 14 |    16/16 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |     4/64 |
-|        48 | Block Value        |          else |    16/16 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |    21/64 |
-
-Build `2026.07.25.8` makes Armor available as a rendered weapon stat and
-calibrates its pre-item-level-80 rare and pre-item-level-90 epic costs against
-the supplied Classic-era weapon references. The later rare and epic value
-remains `2/32`, which keeps the supplied Burning Crusade and Wrath-era examples
-within the observed residual range of the broader budget model.
-
-The benchmark preserves a source discrepancy rather than rewriting either
-source: the local emulator spell data describes Bloodlord's Defender spell
-`7517` as +6 Defense, while the supplied Wowhead Classic tooltip shows +4.
-The reference test follows the supplied tooltip's +4 value.
-
-Build `2026.07.25.6` supersedes the static rare socket cells above with a
-continuous level-scaled model. Through item level 130, accessory sockets retain
-a cost of 10 and other sockets retain 20. Above 130:
-
-```text
-rare accessory socket = 10 + (itemLevel - 130) / 3
-rare other socket     = 20 + 2(itemLevel - 130) / 7
-```
-
-This produces costs of 33.33 and 40 respectively at item level 200. See
-[`docs/SOCKET_BUDGET_AUDIT.md`](docs/SOCKET_BUDGET_AUDIT.md) for corpus
-coverage, held-out results, and limitations.
-
-Build `2026.07.25.7` applies the same continuous socket calibration to epics
-through ilvl 200. Above 200, weapon sockets remain 40, ordinary armor sockets
-scale to 48 at ilvl 277, and meta armor sockets scale to 80. Epic armor retains
-the `55/64` spell-power coefficient while weapons retain `45/64`. The
-DBC-derived capacity curves and stamina coefficient are unchanged. See
-[`docs/EPIC_BUDGET_AUDIT.md`](docs/EPIC_BUDGET_AUDIT.md) for the complete
-corpus results and equations.
-
-## Base Armor Calculation
-
-> **Historical regression reference:** The armor, block, weapon-damage, and
-> sell-value tables from this point preserve the original research notes and
-> rounded graph inputs. They are useful for provenance, but they are not an
-> exact executable specification. The higher-precision functions in
-> [`script.js`](script.js) govern current tooltip output. These effect models
-> remain candidates for further isolated corpus validation.
-
-Base Armor is calculated by item level and Bonus Armor is applied to an item as an additional stat. I hypothesize that the base armor of an item actually consumes an amount of the item's overall stat budget in whatever formula blizzard invented. I believe this is true due to how bonus armor affects an items level. This can be a thought experiment for another time (or person).
-
-### Base Armor Modifiers
-
-These values are derived by dividing the armor value each type of armor of equivalent item level by that of the chest piece. The chest piece is assumed to have 100% of the armor assigned by its item level. The cloak armor value is derived by dividing against a cloth chestpiece of equivalent item level.
-
-| Item Name    | InventoryType | armorMod |
-|--------------|---------------|----------|
-| Chest        |             5 |    16/16 |
-| Chest (Robe) |            20 |    16/16 |
-| Legs         |             7 |    14/16 |
-| Head         |             1 |    13/16 |
-| Shoulder     |             3 |    12/16 |
-| Feet         |             8 |    11/16 |
-| Hands        |            10 |    10/16 |
-| Waist        |             6 |     9/16 |
-| Shield       |            14 |    16/16 |
-| Back         |            16 |     8/16 |
-| Wrists       |             9 |     7/16 |
-
-### Cloth
-
-| Quality | Formula | Link |
-|---------|---------|------|
-|       2 | `y = 8.5 + 1.135x + 0.00018x^2` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=8.5&b=1.135&c=0.00018&min-x=0&max-x=400&min-y=0&max-y=4000&order=2&graph-title=Uncommon+-+Armor+-+Cloth&plot=NobwRAHmBcCMA0YCeNYF97itArIlcADBlqofqgJwmSoLIwBM6mtcjF0jAzDdrN06McfVABYhANlFw8DLgA4ZsSUOqt%2BAdk7diG1Ap2NllHb31dy87mJnMdIi4w7XpTwdc12J1pU7kE3OqkXKryYnohjNrhLFGGsXam4cYWupxi5iHc9ARitmkueQXZHnmO2T55btkBMGI1bNxheX7ZMXnBTQkEOJFNyb2pIRGcOFlsYrkwOCWTRTMVk2UzXhb5Y22Tdbhd2A2ckv37HTCScZM9ZxP7g2dz2H2HS4%2FT0JKNjwvvW48r73sZlUYJpjotOJoLo8WiCbqsIQ8ZldoJoXjM7ijPmcrARNGsQucIYD3t8FGD3v8FFD7pwFMM2JIdgo4dAqZxYIR6dgFMCiFjWaciMTKDi6CzKP9YCoZJQYexyZQMbAeMpOezGPyOTsBOSOciBCypW8BPi2FLebApspYILLYj5eyxL9UOl5CpdTZ2ZJ7QJ9ZJiZbvjafQc3ZpnbJRXBmcpZuyFBHYDh9RLlJIg5RTfwPkJOcpQbms6hNLzmFzi8jmJq6UJmGgALpAA%3D) |
-|       3 | `y = 0 + 2.2x - 0.02345x^2 + 0.0002057x^3 - 5.34e-7x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0&b=2.2&c=-0.02345&d=0.0002057&e=-5.34e-7&min-x=0&max-x=300&min-y=0&max-y=1000&order=4&graph-title=Rare+-+Armor+-+Cloth&plot=NobwRAHmBcCMA0YCeNYF97inAHIl0AzAKwZYwBMF%2BMALAAxmSWE3S3qbPQW1u0Um2CsX6EhlAGz9aEngE5%2BkuYQTI6OFX3XRijLtkIB2NsVkGYhPDuKkL7eqc32Op%2BXNraCk8%2BXaidSTs%2FWhNA5z9iNQIjcXtiah0jYO5bNiMI1LCCHE4%2FSUcdHBTsSWiYHCM5SUSczNLWIvd7ILZ5QRbpHXk4%2FOsCeWV7I0KB%2Bora1FhfbmK2WFhx6Bx%2B1Co5eS815r9YelHUQiHd%2BkaCaf0TrvPPOT3FHWmlhYO4Wh3uBcm4BLvp%2BdsfwC52Ix0%2BVjYFHoVXssD0kIoMN2xFWPAYd2IDwIvDyn0k10oxF6eOyhJm2FgRnKPDKdyMWMoRnJqBwZ0ZSM%2BlUhOEu3Chrwo8kYAF0gA%3D%3D%3D) |
-|       4 | `y = 2.5 + 1.33x + 0.00944x^2 - 0.0000684x^3 + 1.235e-7x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=2.5&b=1.33&c=0.00944&d=-0.0000684&e=1.235e-7&min-x=0&max-x=300&min-y=0&max-y=1000&order=4&graph-title=Epic+-+Armor+-+Cloth&plot=NobwRAHmBcCMA0YCeNYF97itALAdkRWgA4cMsYBWSwmATmPMhgDYAGWuNlp7FgJk6w2dXqxZDYPTM2h4EyVPzIzseGorgBmdKph4Jm2Fv5i5BI1pUUSHS6L0kNRWPjPFiQyrpt1BRykZHYTsXPDYzYWdUPCCbWFhouDprWVh%2BUJgM02D%2BLU4MvEj%2BJP5hYs9NMspIrXyqvNrDIn5%2BOLStSpadSJwFbul4nGasnFTsRP6syi1IyhwCyiLgyjoClkHZDMzoLTYIxzL6oj327DK1zR0fLf4R3dczPP8T2GWbZSS6m%2FPvTjqztMXjA6g4PoF%2Fm5DiwFld5k9wv8WD8sngLCcWKIALpAA) |
-
-### Leather
-
-| Quality | Formula | Link |
-|---------|---------|------|
-|       2 | `y = 39 + 1.8x + 0.00148x^2` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=39&b=1.8&c=0.00148&min-x=0&max-x=400&min-y=0&max-y=4000&order=2&graph-title=Uncommon+-+Armor+-+Leather&plot=NobwRAHmBcCMAMAaMBPGBWdBfR4p1mTWnQA4c8ZYAmImANmosioGY7p7tcW50OA7PGb5Y9QbBFUBg1lLilBAFnmwAnIPrzqSVDAHke%2BaoT3QBa7bTOlJRmNXY2m96NX42tr6uJsDtMjaW3opmasLeGmEulNCsusRqKq6sponcsazWif4pTomGmUocCBGZHsQIMbysvpXwcimB9Rk1ofVemVH1wbFKCVQI8kppg4192YOt%2BEr5g7l9xWY0ZbxKFVQmw3WbyX3Nm51r7Zu9a91sdrHoA3BZ8uijd9MYk3cLvOhzd2f46EuVJTVP4bOBKPafHZgo5%2FA5gwqfE58VZ%2FC58YEMW6wf7yehPbEwhhvbEI%2FD0b5iFEMAFUcm40FiF7mNHqca8WwlNQffCkGluBryUhwnS%2FGDhDgmCH4NTfag6eRqKFyplqNGOK68KoS1jcqjwUHUWaqeBI9xUghPdy6gh8nxs0SwYVCVQ6CUCa2weIS1WqVh8%2BKkthI1IeoEcLKE6Hh1hM7G3P1Sqj%2FcNfVRkcOMVSMcMCDWiehQ1ikc2O%2BOkQNwAT%2BrmqAwcfqR2CkN4jbAAXSAA%3D%3D) |
-|       3 | `y = 0 + 5.22x - 0.06638x^2 + 0.0005313x^3 - 0.000001305x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0&b=5.22&c=-0.06638&d=0.0005313&e=-0.000001305&min-x=0&max-x=400&min-y=0&max-y=4000&order=4&graph-title=Rare+-+Armor+-+Leather&plot=NobwRAHmBcCMA0YCeNYF97itATDxK0AHAJwZYw4DMBMJ6mklALLdCTuU7gKxsnMu2Kn2SpYnRsIBsbWLCpCYVEnJwAGJdGaqxcZoKkwe6uc2laeCPbGZFL%2BG1cs0nio9B6jCsHvY88AOxy0u4UnkQhPFrSpjbSZB7S1j6BkuHSjqmGGa6pFkneqEQM4URZlLCJZUW4ONEeRJF61Onc9GzU%2FuECnQZasOpxhPUN4YN5lKED6rItgZoeg7ojgd3c8hW4RGMbtp0ki%2BO%2BB23YCsPKONUbXmwGpbfNhMwmAzwrMK9hG9JzL4Ecr9gnpmIFAgMFvciBCloEUl9DpDaiYzsVJp4NAMYWweDhYeENJdPK80ABdIA%3D%3D%3D) |
-|       4 | `y = 0 + 3.05x + 0.01044x^2 - 0.00009593x^3 + 1.8476e-7x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0&b=3.05&c=0.01044&d=-0.00009593&e=1.8476e-7&min-x=0&max-x=400&min-y=0&max-y=4000&order=4&graph-title=Epic+-+Armor+-+Leather&plot=NobwRAHmBcCMA0YCeNYF97itAbABkRWgCZZ1NIYdjCZSB2DLKgVlpOJactx3eOIAObtnoJkdACwBmETHp8JJFowqjB%2FanOiCCS4jlXMdG%2FYICc28zX3nLa1LDZLpOSdtjE9RafXvHPaXZpCw8hdkk8dwc4aSClSVh%2FHlhXCKEPRIjJaIDJRSJJFmTsJ3FC%2BlyU4oi7bS9vGBY3etT2FWEY0nN2wS4ug3bzcmNiaRsiYpx66R6lfBKpZyJqWS6WcqpXepZTFZZierd2HBx%2B0fpG3HpOi83cQRGeYnp6E%2FN3AF0gA%3D) |
-
-### Mail
-
-| Quality | Formula | Link |
-|---------|---------|------|
-|       2 | `y = 74 + 3.9x + 0.004366x^2` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=74&b=3.9&c=0.004366&min-x=0&max-x=400&min-y=0&max-y=4000&order=2&graph-title=Uncommon+-+Armor+-+Mail&plot=NobwRAHmBcCMAMAaMBPGCAcBfR4p1mTQIFYc90BmI9AJgE5zJ0Sa4AWdp%2FWANjdglY3dBgG9aI6LSSp0vbLmbTCcuAHZhS%2FLVoD1XbTFrU1sdeqm12AjPCuszGSlf5qZiitPW3GR6WJm9JL%2BDAL0ZP6UssSw9J7KlKrEMlpelHru8IbppinwllE27ghSlI4psC5RbpW8ZT4lfumBKSZl9Gy6hV7sMcZJUuzJAznK7JkplAn47HnGE0PFKeyRvRULMzDstcYkY7ONKSRb0OytxrzVvZ3uClIk%2Fd7XykJd6qckk8bOD%2FMBn2WxnoL3wJA20niD120GioJgJCOMGiPVeF1hVQet2ISVR%2BF4TwyIS8vBGsNoeJgEjYlAyUl4QNhi38vAhlHYlOg6hhfWJygwZImnIwjM4aX5SLOJHq%2FnoTw59ll%2F3Oa2U9B59GaauxCNgB3Q8G%2B0C%2BpwQEP28Lg8HR4NNsDJiMt9sZJztkoJfJ4MjYpM5VSevF4fvZPowMq8VXR6ng4eUeqN6losZ4OzYBmTLCe3NVPH2aYwOZY6Lshbg1LUGFopb4MJF1ejbDD%2Bo0jIwIqk5nRcubsErbGCXAAukA%3D%3D) |
-|       3 | `y = 31 + 8.05x - 0.08529x^2 + 0.0007948x^3 - 0.000002107x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=31&b=8.05&c=-0.08529&d=0.0007948&e=-0.000002107&min-x=0&max-x=400&min-y=0&max-y=4000&order=4&graph-title=Rare+-+Armor+-+Mail&plot=NobwRAHmBcBMCsAaMBPGsAMBGAvo8UcAbMmnBgCx4HoAcp6Wu%2Bk6AnA3FlS4QMwZOsLLWqtofLEOFj%2BSVOj7xZMPvQVwKy3qo4aEGFdAqwhRWEYoUhAdkM7j6srDb2a0eFI0CiR%2BKe8mP2tvWAsHeHkyPlgbPxtOPjU%2FJ1UrIyIvaKI3cXNEom13Ij5Euwyo1VpmYtSJNlEHWgCyChsi8VpK4zYazrr4DDiHXs5%2FPiM2ELJ4PjYjLAxBDXhyh0W9Mkz59awWmBKOwiZpg4pfXe7C8PcseDrF7AWiEg1FyIW7TkXaCfWbLIwH47W42U7QJiLT6bIHcP63X7fO6NBEJN5YAFGTDLMh7PY4AC6QA%3D%3D%3D) |
-|       4 | `y = 7.5 + 5.76x + 0.036x^2 - 0.0002668x^3 + 4.828e-7x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=7.5&b=5.76&c=0.036&d=-2.668e-4&e=4.8280e-7&min-x=0&max-x=400&min-y=0&max-y=4000&order=4&graph-title=Epic+-+Armor+-+Mail&plot=NobwRAHmBcCMA0YCeNYF97itALDxK0AzEQGwZYwCsA7ATDgEzqaQykAM9uOLl0pKtxw0qFNgNLCAHI3HZS04QE5yrbDUbcqjIvJg18yakRr7oNKcehUqfCdK7Xa089KXXSRe9mVbPVK7qqBxC1oY45rAcdOG0UdHcNDRB%2FLCwYYTSsHLBcIxOWThqabrc0qQlEjmZMNI0ylGMsVnKenk5HoTKHBxRJNxtkR1kg1TDabyD7lHF3NGMuWl286FiHVTK8%2Bl9eQWFqIzj5sxE84wVJ7Bb1jnKjXuMVoSw3hMSuv4vREcnOLVwIjSd7YI4IW68dr8I5dVB4VIfUhGF4iMx7GgHOBUGInZLzcZyAC6QA%3D%3D) |
-
-### Plate
-
-| Quality | Formula | Link |
-|---------|---------|------|
-|       2 | `y = 0 + 9.74x - 0.003686x^2` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0&b=9.74&c=-0.003686&min-x=0&max-x=400&min-y=0&max-y=4000&order=2&graph-title=Uncommon+-+Armor+-+Plate&plot=NobwRAHmBcCMA0YCeNYF97itALA5MAzAAzEZYw4BMiK0hhAnOZJYbUQBxUvY44dcVTr0oBWQTkIB2UbgBsknPLk5pksTlWdJ8wqsaTp6TK2hjikzmVPYx%2BOjk7NbMMTQK5Gs1%2BfaeLFV9NQXsxOTEJAKotYMUAwliKc3UAqQidAPcIwwD5E2T5SwDpG0KHN2kXQo86MU4RXz1Q7zl5KLp88N9OCuhperlOAU9pTm7kzlS6Xp5fRmKZwkbkxn8Z%2BSSzRniZxgLt3Lp9n2TYYlqYRnTfc46r0rlzzOOdp9g%2B86p9W9gRujuZTMH2mqGI0iCZyoi1Q5x%2BZxIgg%2B%2ByeiSRVCokOBy3R8jmZ2o6Nat2USIY%2BOBFjJ8hWlP%2BqBwxHhlJeDOWTzxSLUW2wsHku1QFmqwNKSM0ExF9Lg9SBvLGSK6T24CvsaAAukA%3D%3D%3D) |
-|       3 | `y = 0 + 16.2x - 0.16567x^2 + 0.001442x^3 - 0.00000373x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0&b=16.2&c=-0.16567&d=0.0014420&e=-0.00000373&min-x=0&max-x=400&min-y=0&max-y=4000&order=4&graph-title=Rare+-+Armor+-+Plate&plot=NobwRAHmBcCMA0YCeNYF97itALAJkRWgGYB2YjLGHATkJgFZYbLJGd7oGA2U17Bg04NSfTGy6lhNMVS51kMbrFkTuABk7c8q7Mq1l%2BS4lpFHo3ABydS67uds2898dksFF0SzhznLQz0tyP2tPGnU8cxoEMOJI1xgaDjDlc1h1TU902Es09RMs9RxchLg7TnTRPIUiWHSXOTqPWthiBjTYZJaGX1K6gJbuXsbBCtIGCj6GUNrSSxY%2B7m4Ky0sGiVheFZoSxtIamDwiycbLAqIjqzSgziOaE4kjzIvN%2BwBdIA%3D) |
-|       4 | `y = 0 + 9.5x + 0.07993x^2 - 0.0005654x^3 + 0.000001018x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0&b=9.5&c=0.07993&d=-0.0005654&e=0.000001018&min-x=0&max-x=400&min-y=0&max-y=4000&order=4&graph-title=Epic+-+Armor+-+Plate&plot=NobwRAHmBcCMA0YCeNYF97itAbABkRWgHYAOdTSGHAJkJlLxwy2oFZ7pSAWGlq3Dk6k2bftmJ1kMAJw0Z4mMQDMnGdwqsS3NW26KSQ6dBlkDxYmpl4DjTrDw1itjsYelnlbKVL3YNfS9ZKSJYWEkDBwI3GhxSSLxXUOV5BMs3ZTZlSNgk1G42GyC4GmjQtgdImlU3PU8tfzy4NmJNAX908pkxYv9fN3x69uUa0Jw4yOUjUOI8QIblfpmaeN6Ne2IcHobuadRSGm32ivsfZl62GXsZUmzi0rKYGgC27BpYUaf5Va13q%2BNqs8DM89tBqtwfgJAZxqjgFPdlP8iAFSsCCjDuCpgScAWxYtilk82D5gTgdACya8nrMYXD5lCLDDiGxmABdIA) |
-
-### Shield
-
-| Quality | Formula | Link |
-|---------|---------|------|
-|       2 | `y = 82 + 29.9x - 0.01284x^2 + 0.00007097x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=82&b=29.9&c=-0.01284&d=0.00007097&min-x=0&max-x=300&min-y=0&max-y=12000&order=3&graph-title=Uncommon+-+Armor+-+Shield&plot=NobwRAHmBcCMA0YCeNYF97inByYCYAGAdgy1X0RWnwGYBOMyVAViplvwA4ntYAWdtFqx0mZnFpD8xfr1RchtYj3F8AbEv4t5cYkvVjyNQkP6jd%2BXNX7ddsekvo61BKXmj9Dlyh%2F7bLQT8VSzY%2FZ0tNDxYLVxp9aLs47iEWALjaU2iQ5Mdo7wzfakMjCRFUiIyg4vTjWndipLqo4py6sOKCuoTiyrrFD2JYurzqYiaJfizqenVaXXMhUUJS7FslgVVjfgaKFlI4%2FyXaLkIFjtQprcmWy9p1BZ7L9RdtgeoBennD0dYrXRY01YgIB1lYbQkLCKqHUhAecRYuzgc1ekOqMLmAIuyPoqxgLFueiIAKeen412wLHeqGIxHhxhYvzgp1R2FhSy49V0hg5XQk6mhzPoZzicyWuIpMHU6Lg9C83OxDmIrJgXDBNFskugXBl%2BBi32MXFJevoWuF0nUnN0X2kdLNhO4iOtTPwXy1sEIgsydHshGxIkI7sDSgcBokonVnAhfAESnuYZjpNo%2FndRCUiITqEySjV9PDyacrvsJzMdEYcQEgp2VPsXjM%2FDp9kBZkZeb4aTMQxVcCpZk5meRVec%2BHs6kJgKG9mIQOgMWFU5liMI5eMsBUqVsB1XXEFLDSDwAukA) |
-|       3 | `y = -44 + 60.15x - 4.546x^2 + 0.192134x^3 - 0.00357196x^4 + 0.000034529x^5 - 1.8099e-7x^6 + 4.8879e-10x^7 - 5.3407e-13x^8` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-44&b=60.15&c=-4.5460&d=0.192134&e=-0.00357196&f=0.000034529&g=-1.8099e-7&h=4.8879e-10&i=-5.3407e-13&min-x=0&max-x=300&min-y=0&max-y=12000&order=8&graph-title=Rare+-+Shield+-+Armor&plot=NobwRAHmBcCMA0YCeNYF97itATABkRWgBYB2dTSGHYwmAVjIy2vrunoDZPmrcAOdpxwBmXthwBOIcRziYIgshjkKLaCITLonfnnkbO7UqXoGRpY5LOVsIwdv6xi56Y5FjbMYkqKw8pPwGsuywOPykwbTasIxBXiRGMZxhwQ5%2BnKQ8CfS%2BqKQikgb0OKGSeJ7q9CKh%2FCI2VdF%2B%2FJnFbDH8kvFVSX6SisXp%2BVnFbkT4ONnqnHm4ePSRCSns%2BJ0GwithanycNdo4sZU7Q7iacgmSWkSKxEfYkpbaIqIuCf6zHlIG%2FmMKKQ18WBhdgWIHfWIgvRTQGKdiyOrfRjsej8YhFN4ooR4MEY346ebndSwbhCDyLInkISMbbYWCkJowbi7b6mISkCrfCLGCqEvj4WakHCBNAAXSAA%3D) |
-|       4 | `y = 0 + 52x - 0.2633x^2 + 0.003241x^3 - 0.0000173x^4 + 2.948e-8x^5` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0&b=52&c=-0.2633&d=0.003241&e=-0.0000173&f=2.948e-8&min-x=0&max-x=300&min-y=0&max-y=12000&order=5&graph-title=Epic+-+Shield+-+Armor&plot=NobwRAHmBcCMA0YCeNYF97itALA5qArAAwDsGWMOAbIitAEyzUDMFkMJdMDv172QgE5ujYW0wdo1QqIZDmAmDLkAOFv0nYVBRus2VppOQtVLpqk8PPVLu%2Bda0xSxUS2I5i50jjcMP3rK6LAw4ON7GwSGE3nb0LBoGUqRxMAnUSdikIsGe5E7QqvjxOKpmBepuhC7mQq7BQkLhBUIMbkIa5rDEQfRhMl3dojS2g71UqqQMXQwsooSwQvmGsAzj0IQM2TOpG55eBbAa81PLUrB48x0HKzSi1EfThwv36V2EvrrUOI4rwvcZJ6Gfz1eikQjucxMOa6UhTIFSJg5MGqYgI7B8UQpOpQkJYoTUG6IljImBFSEFULrdTEIRQl66VSlM4Ywi7VTUIQxSnfURlUgSYEuUR1BZQuEihjUaYAXSAA%3D) |
-|       5 | `y = 331 + 52x - 0.2633x^2 + 0.003241x^3 - 0.0000173x^4 + 2.948e-8x^5` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=331&b=52&c=-0.2633&d=0.003241&e=-0.0000173&f=2.948e-8&min-x=0&max-x=300&min-y=0&max-y=12000&order=5&graph-title=Legendary+-+Shield+-+Armor&plot=NobwRAHmBcCMA0YCeNYF97itALA5qArAAwDsGWMOAbIitAEyzUDMFkMJdMDv172QgE5ujYW0wdo1QqIZDmAmDLkAOFv0nYVBRus2VppOQtVLpqk8PPVLu%2Bda0xSxUS2I5i50jjcMP3rK6LAw4ON7GwSGE3nb0LBoGUqRxMAnUSdikIsGe5E7QqvjxOKpmBepuhC7mQq7BQkLhBUIMbkIa5rDEQfRhMl3dojS2g71UqqQMXQwsooSwQvmGsAzj0IQM2TOpG55eBbAa81PLUrB48x0HKzSi1EfThwv36V2EvrrUOI4rwvcZJ6Gfz1eikQjucxMOa6UhTIFSJg5MGqYgI7B8UQpOpQkJYoTUG6IljImBFSEFULrdTEIRQl66VSlM4Ywi7VTUIQxSnfURlUgSYEuUR1BZQuEihjUaYAXSAA%3D) |
-
-The legendary curve is a copy of the Epic curve with a greater y intercept, set to match the legendary [Phaseshift Bulwark](https://www.wowhead.com/wotlk/item=30314/phaseshift-bulwark) shield from the Kael'thas fight in Tempest Keep.
-
-## Shield Block Value Calculation
-
-Each segment of calculation between vanilla, tbc, and wotlk is drastically different. Getting blizzlike results required the use of multiple expressions split by item level ranges.
-
-| Quality | Item Level Range | Formula | Link |
-|---------|------------------|---------|------|
-|       2 |          1 to 78 | `y = 0 + 0.505x - 0.01644x^2 + 0.0004899x^3 - 0.000003353x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0&b=0.505&c=-0.01644&d=0.0004899&e=-0.000003353&min-x=0&max-x=400&min-y=0&max-y=400&order=4&graph-title=Uncommon+Shield+-+Block+Value+-+Vanilla&plot=NobwRAHmBcCMAcB2ANGAnjB8C%2BzxTngCZUNCBWXfTReUzYqyGgFnrkQDYmDZEAGdn349MnTkPGi4nEujEi8zOOTryVLabHJt12xdRWC9LTUt4sJegMw5zmFnLKxr1rbaFE7hl7uf8DZRdjMgBObns4InJ2UNgtIhCYeAifPnZ4N0jYWD9kwN4c9kRELX41MkQzH34Y9UR47P4nGE5vZVDQ9k5KSPDuomlQ63ZyUKGk6HJU5SRR6tm8qcbDeFh2FnHInvZbaU4l61LtkfVrGYJZXYvW9bPew05J6wWCMd2sw1VdwcjyFDOK2U012BRg5DqZCIWy%2BSy80nIpyhxy%2BLWgRBuy3Y0QRkyIrxgm2xn2ULAqMCIJIILABUN%2Bhks2KB1MhFLB0FM2PZLCRmBhpLRCGkLDuzhRpMmfGk1i6ekxHj0D2URyESoI5yEBOg1lZcC1LyEVJgrkN0sF9OVoswFvVkuZFNlznt6PJcHZRFpmHdVjC0misT9S35BEpGT9aPaIat0HFIcmsb5xS0rsx6XUqZ9rS0urVDlG7nz2TRWqK6hLQmwAF0gA%3D%3D) |
-|       2 |        79 to 137 | `y = 0 + 0.3581x + 0.003094x^2 - 0.000001515x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0&b=0.3581&c=0.003094&d=-0.000001515&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Uncommon+Shield+-+Block+Value+-+TBC&plot=NobwRAHmBcCMDMAWANGAnjWAGLBfZ4Uc8WqG0AnAGz6GYBMArGTBbLZA6ejABw0FOcWAHYW0XvA5FYsFDwl5BM2eJEjpmLLzWJNcLMwUj2yrfXFVe%2BihUuMbVS%2FRvxxjCje7lGAuhLEFRj0zCXkfU39eWHFET1CqI3J4a1CYhUihWF5A8mzU%2F2yLDN4HNJEdEpdy8MwRPyyRbzqlQqonDPb9WCpivKpWrMZKvODu4PFYRkGZacnEEMLEDryU7sQ%2BzHgpBNroeA0EtwV4BqJe8VP9KnTksv8By8WhD0ud%2F2HL6o%2FcmHhMoi%2BS4zGCMJIwejxD57egFF7Hcj0Q4fTbQehnUG3CH3F7NNHPIhxcT0d5CRAjCGkwm%2FNHfMkrCEAmCIcFokHQBbE9mIBGYKFk1HZfSILFwZFkvGifTwOydaUUuA4ogHSZKv4MuAEv6suTSvYIaW84jSwV05Wi2Bmv6Splo2V5W2wybspHO%2FTo8T8ohMT3uvZeyniOHe1HBxlqd148Uye0waOYBUYsWWboapNTdzrTNpI1quCorXCWLdFKTWG4AC6QA%3D%3D%3D) |
-|       2 |       138 to 200 | `y = 1.38 - 0.3985x^1 + 0.01505x^2 - 0.0000403x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=1.38&b=-0.3985&c=0.01505&d=-0.0000403&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Uncommon+Shield+-+Block+Value+-+WOTLK&plot=NobwRAHmBcCMAcB2ANGAnjB8C%2BzxTngCZUNCBWXfTReUzYqyGgFnrkQDYmDZEAGdn349MnTkPGi4nEujEi8zOOTryVLabHJt12xdRWC9LTUt4sJegMw5zmFnLKxr1rbaFE7h2EPe7nfgNlF2MyAE5uezgicnZw2C0iMJh4KJ8%2Bdng3aNhYANTg3jz2REQtfjUyRDMffjj1RETc%2FicYTm9lcPD2TkpoyN6iaXDrdnJwkZTocnTlJHHa%2BYKZ5sN4X3UWSei%2B9ltpThXrct2x9Ws5gll9q%2FbNsmt%2Bw05p6yWCCf2cw1V94ei5BQFzWylm%2ByKMHIDTIRB2vxWXmk5HOsNOvza0CId1W7FiyOmRA%2BMG2eJ%2ByhYVRgRHJBBYwNhAMMljxoLpMOpkOgpjxXJYqMw8IpmIQ0hYDxoYumfGk1h6ehxHj0z2UJyEKoIlyExOgT21spWLllArgtJg1hFTNVEpisulbOp8ucDqxVLgXKIDMwHqsEWksXi%2FpWQoINKy%2FsxnVDNvRymSpS0Tpgsd4bpxmXU6d97S0HJmWhWGswJqLMXYOpKW2wAF0gA%3D%3D%3D) |
-|       3 |          1 to 89 | `y = 1.39 + 0.1027x + 0.01232x^2 - 0.00006735x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=1.39&b=0.1027&c=0.01232&d=-0.00006735&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Rare+Shield+-+Block+Value+-+Vanilla&plot=NobwRAHmBcCMA0YCeNYF97itATABkRWgE4MsYcAWQ1dTSCgVhrjvNwA4XYBmMh3MW5962HgWSpK%2FMQklxpomDwBs3AOwzl67hy3QeXebFJKDQ%2Bfn2UJRK2co4WOHNeqWR7SmsuNrRu00zRlsKU3ZGJ3keNgFGHhYeV2D3Ih5POOZoxQifNL9gizSg9hVQgz0zFTk0ytKotPCBFQT5G30VAJhKDOxiGpgVZPZiHXlO%2FVg8cvVY7CmimA48SdgGpd7aLKIOFUnxbjw51EZUk5KBWEYuuCHJxkXbnMuVPNR1Z%2FnZ3WO4D90CuxYOptqgOBd5uDuKN9PhyvhpABdIA%3D%3D) |
-|       3 |        90 to 153 | `y = -172 + 6.062x - 0.05626x^2 + 0.0001997x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-172&b=6.062&c=-0.05626&d=0.0001997&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Rare+Shield+-+Block+Value+-+TBC&plot=NobwRAHmBcBsAcAaMBPGAWAzAX0eK0AnAIzJpwBMu%2BMhA7GTAtZDMQAzuPR3EsEdC3eO35tiFYTjytoxYgFZhsMXMxdUbdnxkCF6borqqKG8oRMHNcnTWgUl1%2BSaRPpdikLer1h9D9Inf10YTFhDYxDoTAYneB9XcmILKMwvclNVdDMYTKj0SWsKKnyrDPdZdHCihSzE3Mi7BRz7FKbC8kxbWQVMbkwSprLQioIFR07gpurO2qiFdNDG2VgWzHio2EDOjbtYDtC2lb7rbNVFerl984XDWCnZYlgZtjoHgV5DeG6P4bl4OZ2Yh0CZseDLATgwz0EycbimfwAXSAA%3D) |
-|       3 |       154 to 200 | `y = -700 + 10.22x - 0.03629x^2 + 0.0000389x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-700&b=10.22&c=-0.03629&d=0.0000389&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Rare+Shield+-+Block+Value+-+WOTLK&plot=NobwRAHmBcCMDMAGANGAnjWjYF9nijgFYAWVDYgdjwMyIA5zMA2AJhsjoE4m5mSOhWM2a9YlAfk5xKsMfVxShE%2BUUGZKRedSWZ6lMVx21orRCnQwzkk2d5d1pspbiLbWl7DfTWjT%2FEdWHn9HJDEbaXg5TwjCeFFPY0iDT3pQvwpYB11oeGCKM0cSCwLEItZeVnYckmcCgJqEgrUajKskwiISq2yTIgqXKMcieF54ar66mHgGvo8KeFiYIibplr786Y6YZm7ctJzmaIWDkzYx3ulmUZdix2Y26BJZ6S5jnYnXlIoHxyw92R%2FRCbaD0Mo5LwDCj0F5CWDzGD0Zg4AC6QA%3D) |
-|       4 |         1 to 199 | `y = 0 + 0.7851x - 0.001735x^2 + 0.00006482x^3 - 2.466e-7x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0&b=0.7851&c=-0.001735&d=0.00006482&e=-2.466e-7&min-x=0&max-x=400&min-y=0&max-y=400&order=4&graph-title=Epic+Shield+-+Block+Value+-+Vanilla+%26+TBC&plot=NobwRAHmBcCMA0YCeNYF97inArATkRTgA4cMtUcAWQ1AdmPMkoWXqqe1ioDZa4edTqiqsisHgAZhcAMx82uAEwzYS4v27pMzOEpybZQnVyWzDHE6lgHFalVbixJmm6sm3xkxo7xL%2BeNK%2BLorExhTQxOaKDDLEYjB0ZI50BDGyMgz8dBkpdNnaEUn8PD5FNIqCmSFEPLkRpSWFuoIlQQ2eMDhluvj8OPW9NTCiMrz88mMJ0LLtukqSw9BKsM3YSnT5ivp4MhtL%2BoPrPBVESlQ9693850cw%2Bv7bspf3ONNm4fNUncuyDhFmDTbDZ7P43Mx7JQKM4rSE%2FJQLPawNJnWAvZawaKonhoAC6QA) |
-|       4 |       200 to 300 | `y = -327 + 6.8942x - 0.031x^2 + 0.00004965x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-327&b=6.8942&c=-0.031&d=0.00004965&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Epic+Shield+-+Block+Value+-+WOTLK&plot=NobwRAHmBcBMDs8A0YCeNYFYCcBfJ4Uc8ADCunJgMz6EYBsALORowBy2QaZstyM0CXSrD6wqHIUSwBGMVXidpjTPNhKMEsQg1wqotBnG7Ysetpkms2kiZnYxMyXTgyqj%2BiZJlDry1JgZHD4nTF0g5l8ZeGdhILko%2BEZwxnMo%2BkUA6BlGBIoZelsstzT8zHVi2F4o3PDrKIU69wbk4qCQ03CZH3yg8JJVKJJYomwDCmwil0m%2BNkyXNmaKGN02PJh4MKz4B194QRcYvn3dRGP%2FQ8GKehGNyOv54VI%2BegPhG5eL9%2BRfQt16K4wHi6YK%2BaggnowWpZVJ8KieGHraBUWwAXSAA%3D%3D%3D) |
-
-## Weapon DPS
-
-Weapon DPS is inherent to the item level of the weapon and varies based on item type, quality, and other factors.
-
-### Formula
-
-The calculator first selects a fitted DPS function using quality,
-InventoryType, weapon subclass, calculator profile, and item level:
-
-$$
-BaseDPS = f_{quality,InventoryType,subclass,profile}(ItemLevel)
-$$
-
-It then applies the weapon's attack delay and its min/max spread coefficient
-`c`:
-
-$$
-MinDamage = BaseDPS \times \frac{Delay}{1000} \times (1 - c/2)
+100^p \approx 2{,}624
 $$
 
 $$
-MaxDamage = BaseDPS \times \frac{Delay}{1000} \times (1 + c/2)
+53^p + 53^p + 53^p \approx 2{,}659
 $$
 
-The default delay is the modal delay for that weapon tuple, but the user may
-override it. The spread coefficient controls the difference between minimum
-and maximum damage; it is not the DPS itself.
+That is why roughly 100 points of one stat can occupy about the same budget as 53 points in each of three different stats. The exact result changes when the selected stats have different multipliers.
 
-#### Minimum and Maximum Attack Value Calculation
+Negative amounts use the same calculation and then subtract their result:
 
-Based on the calculated `DPS` and the `Mode Average Attack Speed`, the minimum and maximum attack values (`Min Damage`, `Max Damage`) for the weapon can be derived:
+$$
+B_i =
+-\left(\lvert a_i\rvert m_i\right)^p
+\quad\text{when } a_i < 0
+$$
 
-> **Caster-staff exception:** build `2026.07.25.15` supersedes the caster-staff
-> polynomial rows in the historical table below. Uncommon caster staves use
-> the empirical anchors exported by `uncommon-weapon-model.js`; epic caster
-> staves use the original polynomial through item level 189 and the empirical
-> item-level 190–300 anchors exported by `weapon-specialization-model.js`.
+This lets a penalty pay for part of the item's positive stats without changing the value assigned to either stat.
 
-| epic weapons             | quality | InventoryType | item level range | subclass | purpose | formula     | link |
-|--------------------------|---------|---------------|------------------|----------|---------|-------------|------|
-| one-hand                 | 4       | 13            | 1 to 99          | any      | general | `y = -0.46373319610341757 + 1.948435650742608x - 0.05134655549435444x^2 + 0.0006882333623959314x^3 - 0.000002864536021471839x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-0.46373319610341757&b=1.948435650742608&c=-0.05134655549435444&d=0.0006882333623959314&e=-0.000002864536021471839&min-x=0&max-x=400&min-y=0&max-y=400&order=4&graph-title=Epic+-+Vanilla+-+One-Hand+%2813%29&plot=NobwRAHmBcAcCcAaMBPGB2AzAOgIwFYBfRcKOJVDTY0mBZNaLbABgDYbI6AWBmNttkzxOZWJj7Q2%2BIbFF0JlKTMxySXOIsbShHdWK38ZAJjW1NknZlzy4uS8ezjbse0raPXLt9s839dCyWuNjoxi5B7iFs6BHBTuEBTBTaLNj4ZhroKfxp6P7m2ZZp%2BCJJ6LCSpdjcmWQVVfA1dRiVStW1tg3tTZ3lbYwdLUwDMENdo9Ad3BONNTP9c9wLhZPVRIs96V3oVbA1eoW77fvCO3tC1OVsVeiyXTftd5gbhfhVgqpd7%2B2fh1m8doyXBlQqAwYmYZYKrcGqJQrGKo4bj%2Feo%2BMaOTCxcroqaOV5ZXH4fFdIn40GEqok8qRQYhYldWljELcK6FJlTFmojAc%2FDRRlVfk0wXYGIC9r0in1Xn0%2BFZGXYYwE6UisVJNg5KYlblSSbcJroZX8PUGlYaASSWqsM1kC1KK24HV2xjcO5edWPF37R22aSWu7GG1Gf2KuW2wzQbgydBBqQRqPpKX8eMqYYeS1GqQc1npWP4Y4ulnDfOWlm2fCemDcNIIcvgmDCdJhsYR1TYeBsjT4DmYQRJrWSLHW2yuwcqTtkKODnC1pKsweeHXcXHWGrY8y4Fgc1xCfscli2XE2AC6QA%3D%3D) |
-| one-hand                 | 4       | 13            | 100 to 199       | any      | general | `y = -0.2769968450289057 + 1.5484937105463996x - 0.011645982924600652x^2 + 0.00004802296965314522x^3 - 5.273652941191476e-8x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-0.2769968450289057&b=1.5484937105463996&c=-0.011645982924600652&d=0.00004802296965314522&e=-5.273652941191476e-8&min-x=0&max-x=400&min-y=0&max-y=400&order=4&graph-title=Epic+-+TBC+-+One-Hand+%2813%29&plot=NobwRAHmBcBMAM8A0YCeMCMAWAzAOlgFYBfJcKaDANixXUuzwwHZTzNDa1N5m8AOfm0gcu9DLwFCyIypzo9p7OWJ59BwihnndKkjTK07x8JbO2q9%2FPPCqbRCvX2ZmjGRxKo2ShzFioe8Pim9pT%2BgcGufgG6EpGh2DEmwXa%2BYUk8KQlY7rGITACc2bkm8Hg4GMWBZRhFadglPDVRYY16ZTg4VXkdlfU51YXdpeWpyg2DsC0TPeVd%2FW0SZVPDTaMJOPyOBdZYWBsZ0AV8hHXjOIfHeD7nlydn5hfbJwfP16%2B6V1QPWk%2BfL%2FUcJYCl5OBtgV5mGNHhC8FhpkDtl4cD9MDhYNtCHgqKxARjPljCAj8fQClicRsSTAyddob8qUdCXTMERtrAmLAEqzPuyMJz6tzSfzxoLqRg8AV9gKcNtxdouTLPnK%2BiLFaS5TdzLA1WKmCqtTqjhqFbKCJqtNrTRh9RbkLp%2BAUBDbMNpHPwAeNXfb7gkvfR3e96n6YAHzS7CG6PeZg9AAxVfRHvYHPXb%2FViLgleG6sARmU5s7nM8wC5tM4n%2FfgcmW3fgwfV4OWQ5XnXpG7HK1Lxg2awQWxI2%2Fx8FQ%2B4g3crM6mQ8b65PY%2BOZ2OmGH2ouiBOx%2Bv7eKUZv%2FdvUbGCo5mPh5WlZ%2FAEh5iABdIA%3D) |
-| one-hand                 | 4       | 13            | 200 to 300       | any      | general | `y = -0.08289582596875844 + 1.1576083521398557x - 0.005540388894214148x^2 + 0.000016701140069482415x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-0.08289582596875844&b=1.1576083521398557&c=-0.005540388894214148&d=0.000016701140069482415&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Epic+-+WOTLK+-+One-Hand+%2813%29&plot=NobwRAHmBcBMAcAWANGAnjWA2RA6LsAvsuFHEqhnDvgJzGmYXqY0DsRJkmbblmAVgAM%2BNg25xe%2FOMNwD44srCksZIhIp59VsWfM2TtVXSP1clK43oXmt0k7gDMWA8qOD1NxofuyNtnx0%2FLwllAEZ7R1pcWEdXNgidKNwhFwDwyOjU%2BMTjZLCxdITM3ALXHHtsUXKUHSqBRBrKrDlG9Iq6lqxC72xa4yrups7W4YGWhrHMKsQe0I7x0fb%2B6Ym23oXVpY2VuHq0nebq5aOhk5G2enPFs8OR2%2Fnd2Bm49Pl7MK65pXedT%2B3Qr9jP8Hj94B81q4gZh%2FpM3uC%2FhMDoCEcDIfCIQCwZi4b1oXBYcjsYi5ETBKiYei8RSCS1EK9qZjQeTMfSoTTYCDviyScyZByuVDcpghAInAzAcK4KK5CEflLYDKzHiFTLYFcVfYlXLBKqxQIyTI9fgJfKtfqdUbzU5DbpjQbXIgBNIwrQqaEnS63cdep7VK73Uo%2FVQAz6Pc7%2Fd7ceGvYHMMGYKHo0GIyHvYhLbAE9Ak%2BsY5G43Bs7nHanE1HbcWK6XY7g2Kb42Wc96%2BVmm6HW1WvjWC2GU7WBD204W27XO%2B30w2ixPu%2Bku7g2XOZ33G7XF77l%2BO11PR72t72oq4oi74PAUpnj%2F7T6Ud5eQ9ehBfaCez4%2Bj8%2Br2fOe%2BX%2BKf5%2B%2F3SRxYBdNgz3gQcgJA%2F0wNwCCj2gkNYPgqDQPAjVQmAtC4Mg3osJgs82FwzDEMTZDiKUfCkLPVsqLI8CKMwOic1goiEOw%2BAMMo0iWIY9iCJw%2FjqME1CBJQvCeIKQjGLgZipJXWTJMuIT6JEiTsNopSaO5RSNJ02ItIUgy9JU3i1JI7C2NEpDojCTh1IEzSOK4pjDKcsSXN0jzTPk2hb0MvyfOQzzjIEwLrNUzigvQ6K4JCuTYPC3psFAsJSVcFKYLS5NVlS0owlcV0XSwRwYn0or%2FRKsrCo%2FEMqqzGrip3Cq6tK5RGsq0qwma2rE3q8repzeqCvSFq%2Bq6nqmo61rqtGwbPlKxxJsq2A4NtMahsW5aZqW6bxsKxwXQNOtmsO%2F1jvrA6jq6K7zqRW6Qwu07rvS0azsem63pe9b3sTY7W26l6coJX6c2Ow8vruhdnqhgHQbCf7yvh8GQqEIQXXpBdbTRjHSsQbH0f9TGGvSHGibavMlDJkNMcQSmRUJmm8YJ3GsdcanE1plnyYXenpUZzm8b5xUBZzLn2dFsJMd20nJfF2XWfxiXWZl3oObFrblZ51XQnVqXNYV7Wdz12nhZNg21bli3datuRjdtgR7dZ3QDE%2BXYwil0odKlEbvFFoRCAAXSAA%3D) |
-| bows                     | 4       | 15            | any              | 2        | general | `y = -1.8160185143165526 + 0.8176011515936384x + 0.00004631966853788777x^2 - 0.00002190693147532568x^3 + 9.05587408850838e-8x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-1.8160185143165526&b=0.8176011515936384&c=0.00004631966853788777&d=-0.00002190693147532568&e=9.05587408850838e-8&min-x=0&max-x=400&min-y=0&max-y=400&order=4&graph-title=Epic+-+All+-+Bow+%2815%29&plot=NobwRAHmBcBMDs8A0YCeNYA5MDp4FYBfJcKORFdOTATmNIwDYAWSjffHARk3sidZp2nLvD5lYLNnHywcNAMzj2mabGYAGHIzEl%2BMrmthE9E5vjVc5CpaYznL12MrgOhcKzgXO7cBTTUNLRsXWG9pHl0GP1gIzEZ5RlCuAPcuZngcZi5k1Kp0zOzciIyvW2jYLgUSrizy%2FUrqtOycEwqgiNgabWZQjrSu7Sj9LnxBKhpMkN9R8ZhJ1pdRw3caTkx6smXpNZwNpeZGHYVuYa3sna0dJfD3eLKl42kNnCwljQt3AkWZ%2Fqp4E4EFw0DTSfC8XwbaSMK50XzwVTuDh7TYwBFg9ao6DopGceC9eGfKj4E5vQlg0lnNFEmDME6TFyMPK03AE6KMRFUUoAxlHdyHLxtfQk6QKTKYHK%2BZixdwKLSKJYRQgAXSAA%3D%3D) |
-| two-hand: non-staff      | 4       | 17            | 1 to 100         | !10      | general | `y = -0.7405045351583416 + 2.5291730790997162x - 0.06696995004352309x^2 + 0.0009043795705405915x^3 - 0.000003796542201089664x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-0.7405045351583416&b=2.5291730790997162&c=-0.06696995004352309&d=0.0009043795705405915&e=-0.000003796542201089664&min-x=0&max-x=400&min-y=0&max-y=400&order=4&graph-title=Epic+-+Vanilla+-+Two+Hand+%2817%29+Non-Staff&plot=NobwRAHmBcCMAM8A0YCeMEFYB0A2AzAL5LhTQCcyaM5A7MaTABzkroU4BMuDkzubGvF5kmAFkHQmubJnok%2BU%2FJPHZpI5supTMGqbBWw1sPUwPazangtHn2lpk1N3mRs6ar342MURsxaJklaWmx8eUZoQODQ8L1o7RCwiMUE9iS4%2FyigxNiUsjSAvPic9OKswqjyyMqM%2FIDSouSSmOaK2mCZeCd24JxHeIFEsWxaEwrMYPwwnprJxOn8WdStdO8x%2BNWA9bF4l2hcJmxYPxr9w%2BxOXYrPGFx6qNuDh9on%2B%2Bx4F7eHw8lcEdw1kiv20%2F1G42BjQOAIhinuf2muF0WUBf04sh%2BQ3YuHRcj0qNB6Jx%2BKxd1xmLRsnx82xRjEyOBElB3iu%2BK20Ew5B8sLIBEknLCDLh7IF%2BCFvJFXN8bP5UuuwKemBk9z0cn50yY4pgmBp2vRsE4qs4kjEXLxWVNJtiQMUYiZ7F8YXIejET1dYXliiewiy%2BxMAF0gA) |
-| two-hand: non-staff      | 4       | 17            | 91 to 300        | !10      | general | `y = 0.904817539290022 + 1.5822436006525589x - 0.007940579189201744x^2 + 0.000023354465861457816x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0.904817539290022&b=1.5822436006525589&c=-0.007940579189201744&d=0.000023354465861457816&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Epic+-+TBC+%26+WOTLK+-+Two+Hand+%2817%29+Non-Staff&plot=NobwRAHmBcBMAcAWANGAnjAzIxA6AjAOwC%2By4UcSqG02eRp5Mshh1WsArLoYo5M1btaXXADYAnPwos26Dt0nTBcmplFKyAuEPkjuvZTtULxUrTN1qN5pjvzDM%2BAAy4JJC4Id6nr90ZZvNRc3DztYMRQ9WAk8QkwAyOEYuPxEqJoU3E54dOTYnjTPOCTogpy8srwK4oiM5gLCIvDSzMbm7Tr86tza1obUyraeoYHCgJzk%2BHxxMM7J6OnZifgpmbE5mQXMpY2VteXa7eZdzeZjynWzuAuEGc5rrlXF%2B8fb0%2F2X8VhPnfWfo7PP6HcKcILMDa4GITcElQgEWzzWEReHQo7IyFo0EY1EA7HJSGYTgwgnwokBRCcZKcRSImSU6m0ilU6I0szMxns2oM1lM7kszJszThHmCvkigXnbgPDm87KPUVS%2BWysXK%2FmcsTE9VyzUqpXCzqKm7ShWS41qiWcmW1TASZI4bK9cK2%2B0jG126IOpoBF2et3Oj2ZB01AOux0%2B2DJdTiPg2yPRaNa53xzKJx7qKOwGMRzPZuO5yI5hNZwv54vZIuprPW5O5mudDPlwxlqs8WO18tJhsp5jR0sd1tdmSN1v97t19M9uBpyu96uPCLJWBZ2IBfCB5j4LNYzrr5JbqF0zcbuAHncyPfRM943cn2AH9dru9no%2Bn5%2Fb1%2F399QjoX7%2FnzdMGSZxMHEJ1dyA6IQPEX9AOA0CxFg09IMyaCxHAi8UOYNCkPvLC4Bwtd8NgaDvVqfBiMI8jKIQjC4KghDcOcZxhHweAxFwRBHmY1j2OyBJah4vQ2I4%2BsZCEmgRM47iWOEvjOAE8IJJgKSxBvcTZMk%2BTFM6ZToCksTsM0lTtICPSDPUozeNEyz9P6fTEHgMCjHwTh6gc1wEBctzWMQTy6P0nzhL8zidIoVz3PwELKW8yKQq84pXNhCiAqisRWOwAhrjSjL220HLhOwFzEHSwr6GykrctwZxXwKyTMoYRLEGSzBXGa4qWtcW0OoytqwpU5res42yUtYhBcEwVLMFKySIlweBaumsaONXRKluEub%2FDWmaVM2vLwvW2bssO3aOPgEaTv0vaXMurcVv2lTsDG6UHv0kddrwJwXK4Vj13msRvrNfA%2FvYwHfokf6weEv74m%2B%2FDgacxC4d%2BxGh12%2BG2Jg5HoacmlsckzG0aujGnPaxLYBJrHycppHyeM%2FT8DO2rXN%2B17gaBqLqtSlnobZ5wTH0mrslq%2FnWKF2m7BcAWXAhkN8ucIHnFx%2FrBcV0nUoVsX1ZczXhKVi15fplwTR1o2FfEFWXDN8VDbFxQVYkemtrsennBc1jiAAXSAA%3D%3D) |
-| two-hand: caster staff   | 4       | 17            | any              | 10       | caster  | `y = - 2.7137455672 + 1.2034848552x - 0.0078149234x^2 + 0.0000237964x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-2.7137455672&b=1.2034848552&c=-0.0078149234&d=0.0000237964&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=All+-+Two+Hand+%2817%29+Caster+Staff&plot=NobwRAHmBcBMAcAWANGAnjWj4DoDMeAvsuFHAOzmoZx4AMxpml1mArAyZM1epnohzk2jbhV41YAnLBFcysFn1qDZohUsnS185gEZWcPWxmJ1%2Bw7D0BOGUV1wAbCmU3bdOUycvJNnB%2FNvSz09HE8xWGdg0PCFKOUrGMDIn0wQsOT4yTpyHHh4TNToN39YzCyYErp7L1l4Qxs6U2S2etdrJqwWtppG7oaO%2FvamsrhWgc5a8eGWg1d4JrxYWYaFoT0V%2BcWChyw2BvJYIVG9g6PhZMR910Pjy%2Bve24vdq7OcRGWXh8rbvTMvt4fe5vP7JPDWBqOExdXbgyEnOGuKFgiFIhGo3rI2GwBpschgnGuPEE3H47GkklExw4Rxk2pLXHU2mU3psJl0iIMqk0jkKLms3KRFmVNk84XFPEyRzi4zsmXE8lEvA4awbXY2BqIZVq2oa1xanA6iJ63oGhDJE2VM01Y0Yq3KqwWvANejvXlpZ2uPC5PA7XWe3quxDuowByre%2FB%2B41h4oRk56GMJ3LxxNxp0u5PJOh0F2hLVZnOuWCdf61bMNBPvUsRctFkzPMuF3qyO67WvN%2BsnduVFsNsR6CrQYRuwLGIrkZV9shjwzkUI6Lwz5RzmSjYxzGgTmRR6dsDcwLfmhx%2FRyzz6LxCn5fn%2FuIfdDvNG6d32eP0d4K%2Bbkbv8eLJ%2FhwkaEcWwkHfQCYGAvJq2nWRDEcXApx7GN4IyY9izg3BEGgypjDg3JHGlY9cOUWkaUIxdiKA%2FDyP7PQmwg3JqlHDw4OpQ5AngO1oEcZU2GsDjkPnUZ4EE1cOPvRwmmsbChy4vi8htMhyDkkDFIPHoYHkghAnIDToC0tSh2%2BfTbG0hxhEMAydOMw8dwPYz5NgG8lJsh07KMyzbFBczwP03B4J0%2B9JT0ZyD3o%2FTGJDWlLLlBwCJimR%2F24hyTFGKFLJMfJAnS5Q2Ey9y2CKPcZH4hxEHC8r3iS4twpCQRfQLCtVFKxsmsa1xvNajqZJqtrj3gCRKjoWxlNHAaKyaOdRws5RrFwKRpqKaxBRo6ceMMVV3lWypHF8zbhvfPT8kNQyEz05SFMO2dVNHSiIKOaxQuKO7uIep6QmM3aVXel6eNuz7Tt%2Bo5dv%2BuDgZ%2Bz63tBkjwehoCoaI3z5NGxHPKEFr%2B2GuC8224osZInHmK4xwYhDOjidCEHj3xoDCepvTJPWZiGcmpK6OQktmPC%2BS2Ce5a0YCBx4Acn13Jymg8ppNKUql7KHMEIE4pjNhlU47LleVZb1cszWoo1vIkt2nX%2FEMo3ctNpHtWyoKjk6sRJMsoTsu50IGril2qsCaYaEQWxnC9z8YGwZoHEKwxLzCAqYyuPJcZV8PMsM%2BPlBj%2BA4%2BjzK498q4vfvLD8Ce4Nw6kwzL2L95S5jX1DUCLVDGrpLyvrkxmQcREaGkKa28G6AlneJ6CEsXJyFxweEmH0ffMiMVdi4qRW1qHunILy5LCaLDV4Sb8XjXyNN%2ByfAesTP2QykAYyLBc%2BCOSXy%2FD0U%2F7z0XAzMXcgik4w0ZPv9%2BvLJt%2FDA%2Fi%2Ffs%2F9lCANOiAmgYDFoANMqdb2MB4DnFxieWcPpTpl2XGgq6y5BBrl9LOXBt0iiSWZpZXAat6azhMAOQI1g5JsRDNYQO%2BkmRJWsMrakT9aHKxMNYUY7CEo5A4j3Rmb9xKWUEMLa24dBTSJTlgsqekIxCjKswvA9YZJNwSOQjGZAtGSB0ZkA4ntdjGQHFBfeIoVS4ysC6JmbY7EHQcV6fwujMC1QemuPS6QRJjQrHkd6zC6L2MXEEkY70lpbXfAA9GzFZz%2BHxAAXSAA%3D%3D%3D) |
-| two-hand: druid staff    | 4       | 17            | any              | 10       | druid   | `y = - 39.8477534594 + 2.2205407279x - 0.0111235858x^2 + 0.0000284616x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-39.8477534594&b=2.2205407279&c=-0.0111235858&d=0.0000284616&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Epic+-+All+-+Two+Hand+%2817%29+Druid+Staff&plot=NobwRAHmBcBMDs8A0YCeMDMsCsA6AbBgL5LhRyIrrRZ7zYlkwICMVmLLuADACyORm%2BXuzgBOXrmwAOAeVjDRsCVLlCRaZiplq4MpdK698unNINGTpQXvOa4h1dfn77sR8dPY2b%2FPFzKprzYSth0DM7MwaF4vLBBIW5huHEJMSnxkXDRSbGZTHAYYkq8kjpZsEUlZaZYSlhOBZWw9bCNNs2tBLIVCkqwbWL5HSzFbixtLPwVo0oTuKOmLBhK3Bi49EsrbmsbEU3Lq%2BubM9vUsLv7HdzcoizS%2BClWTTd3D0%2Bmr%2Fb3j%2Fgsn7dvu8%2FroWNgNNQptwFvBQeC7rxoThQcY7hhpgUpvg0RibFMfJCMNCruRlhCYBM8CSKXVvrBJBhiFlOIlIVNQdxWRTuNJ2qSvpDOXyYPgudA%2FikmQV8C17DIUtToLw7NRjB8ALpAA) |
-| main-hand: caster        | 4       | 21            | 1 to 199         | 4, 7, 15 | caster  | `y = 0.33220409164479436 + 0.9289727447958701x - 0.0029446443452658348x^2 - 0.00004346568763260079x^3 + 2.2512744703653982e-7x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0.33220409164479436&b=0.9289727447958701&c=-0.0029446443452658348&d=-0.00004346568763260079&e=2.2512744703653982e-7&min-x=0&max-x=400&min-y=0&max-y=400&order=4&graph-title=Vanilla+%26+TBC+-+Main+Hand+%28Caster%29&plot=NobwRAHmBcBMAcAWANGAnjAjANngOngE4BfZcKOJVDaHfI08mWAdheqwFZE8XZHIzNh1qd8iRAIqt26Ljz5Shsmpm69%2BZQXGFzR4yVum7VYvBKU7MIzIgDMebJkutrezHfyZ4Llm9X2js5GQv5YnngADNgu2Cjudph4mMFMcHE2dpF4hKnasBkJSSmx8aqJyXnSheXFVcw14XWlmc0hcGI2sJwune7dvfBdPNgk7d1D%2FQosg109432qAwuTS%2FNpE3OzU45jG4tYsCN7%2BQe0y%2FthtN4EJ9KcVyn4cb2PN%2FD1HW%2F0d8wPNu9fl8AT8XIhOACHBZxuDIVEYjCIe4PPCwUjVCjomi4VjEXC7HZsciHASiRiHLiNrDiai8TSWOt8tTVJFCLsyVhMQiqejORTuUzedd%2BRzhbSeTZWey6eS8KTxnZCJLQQqle5IvgGS5Fcrbtq1SzNYzpHZYJKHB5tWb1STCQrrSzsJUrea5XaNqbXfKPQ6sJFbS71U6Svave78p6beZPrBIyyLeGTb7aP63YH42nQ1HvRHk5hUzmk2GXAURIQVRtS3py3rxpgDTBCDxMDM6w3oE3kq2NvWy83u%2Fle9WeJ4XEOaJ3R22%2B12x%2B3Oy25zPF9Ph7O63Yy9lOALpB4t3gd2PN9Xt7vmPvT3KY5eJ2fjwepz2TxPgzeX437xvHzHIpERPA%2BAFC4f4AbAvA%2BOMoF6PA4GQRs0E0LBh4gf%2BMHgSw8H5IhMDIZhqFgRBBHoURUFoUh4HGswOHQMh2ADtINHIVhjHkbh4H0ZYOBlDAiBJJx7TcSIfGOAx8jCUkR6CdwElykCag8dAiritoCkiMplKqTJegaeeoiKbpXHaTQERatJVyINk8CJlwFlWTZtCINgskXKpTkuVRjnOXoImuRQtjeTQvmeQFsmKlxfFhZoaS2BZSThYJkU%2BfF8lJUFKVcZ4UWZasvEZYJdiBXleB%2BeERXQMFmXlZVBWKZZBAOR4yY1TFcbFSGMXdLJAmdUKImRCFXXJaJXGxh5o0fhVSSleck0tapsBsVNclcWo2WCWtw0JTFA3CQ4uBcbtw1iIdfVJCwen5ktImmod11JIgLF%2BtdDicGJKb3c6gk0SJHWqT9bRpEQskne0VBbUC1l7Y4T20XN%2BVA3FOSWB8slICjSM9domGyYo7Q48N2B6QT6UaJYJPFZw0XY7ly2eRTdPk7TIn0yovHgYWMAXWFxPVQj2MWZR5OfU5wuyY9YvHdTFAsJ9WMy3L72jMJIwOcrw2i%2B0uC455RPjVrfXgbYljYGdyS62biBK5bSt1fzFDYPDyMALpAA) |
-| main-hand: caster        | 4       | 21            | 199 to 300       | 4, 7, 15 | caster  | `y = -1428.9508500081054 + 19.69433925384912x - 0.08717187138547562x^2 + 0.0001325134232926368x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-1428.9508500081054&b=19.69433925384912&c=-0.08717187138547562&d=0.0001325134232926368&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=WOTLK+-+Main+Hand+%28Caster%29&plot=NobwRAHmBcBMAcAWANGAnjAjANngOngE4BfZcKOJVDaHfI08mWAdheqwFZE8XZHIzNh1qd8iRAIqt26Ljz5Shsmpm69%2BZQXGFzR4yVum7VYvBKU7MIzIgDMebJkutrezHfyZ4Llm9X2js5GQv5YnngADNgu2Cjudph4mMFMcHE2dpF4hKnasBkJSSmx8aqJyXnSheXFVcw14XWlmc0hcGI2sJwune7dvfBdPNgk7d1D%2FQosg109432qAwuTS%2FNpE3OzU45jG4tYsCN7%2BQe0y%2FthtN4EJ9KcVyn4cb2PN%2FD1HW%2F0d8wPNu9fl8AT8XIhOACHBZxuDIVEYjCIe4PPCwUjVCjomi4VjEXC7HZsciHASiRiHLiNrDiai8TSWOt8tTVJFCLsyVhMQiqejORTuUzedd%2BRzhbSeTZWey6eS8KTxnZCJLQQqle5IvgGS5Fcrbtq1SzNYzpHZYJKHB5tWb1STCQrrSzsJUrea5XaNqbXfKPQ6sJFbS71U6Svave78p6beZPrBIyyLeGTb7aP63YH42nQ1HvRHk5hUzmk2GXAURIQVRtS3py3rxpgDTBCDxMDM6w3oE3kq2NvWy83u%2Fle9WeJ4XEOaJ3R22%2B12x%2B3Oy25zPF9Ph7O63Yy9lOALpB4t3gd2PN9Xt7vmPvT3KY5eJ2fjwepz2TxPgzeX437xvHzHIpERPA%2BAFC4f4AbAvA%2BOMoF6PA4GQRs0E0LBh4gf%2BMHgSw8H5IhMDIZhqFgRBBHoURUFoUh4HGswOHQMh2ADtINHIVhjHkbh4H0ZYOBlDAiBJJx7TcSIfGOAx8jCUkR6CdwElykCag8dAiritoCkiMplKqTJegaeeoiKbpXHaTQERatJVyINk8CJlwFlWTZtCINgskXKpTkuVRjnOXoImuRQtjeTQvmeQFsmKlxfFhZoaS2BZSThYJkU%2BfF8lJUFKVcZ4UWZasvEZYJdiBXleB%2BeERXQMFmXlZVBWKZZBAOR4yY1TFcbFSGMXdLJAmdUKImRCFXXJaJXGxh5o0fhVSSleck0tapsBsVNclcWo2WCWtw0JTFA3CQ4uBcbtw1iIdfVJCwen5ktImmod11JIgLF%2BtdDicGJKb3c6gk0SJHWqT9bRpEQskne0VBbUC1l7Y4T20XN%2BVA3FOSWB8slICjSM9domGyYo7Q48N2B6QT6UaJYJPFZw0XY7ly2eRTdPk7TIn0yovHgYWMAXWFxPVQj2MWZR5OfU5wuyY9YvHdTFAsJ9WMy3L72jMJIwOcrw2i%2B0uC455RPjVrfXgbYljYGdyS62biBK5bSt1fzFDYPDyMALpAA) |
-| main-hand: melee         | 4       | 21            | any              | any      | general | `y = -0.5178790028826743 + 0.4607974744638549x + 0.0061377306628395585x^2 - 0.00006505628736448377x^3 + 2.70678156265153e-7x^4 - 3.427754270710267e-10x^5` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-0.5178790028826743&b=0.4607974744638549&c=0.0061377306628395585&d=-0.00006505628736448377&e=2.70678156265153e-7&f=-3.427754270710267e-10&min-x=0&max-x=400&min-y=0&max-y=400&order=5&graph-title=Epic+-+Main+Hand+%28Melee%29&plot=NobwRAHmBcBMDs8A0YCeNYFYAMA6TAHAL5LhRyIrpw77GmQbwCMVGAzAJy7YAsJZDADZebOLCH5%2BDchNFoMEqQMZwRY2EszTBNAhuaTtK2YQNGdqrKwVxsmOiYy9MY5pwtO4Ltx9zx2L1gfW3dJAKCuNwICXGZMSM5o2Ox6XVh2WDd4WIIEmQ4s0JzcAk5IoupmEryK7Nz89Ils5lx2RqtmdjdMTwK4Lp7wwP7YbGw3XnZcXiEg8cnp2fmJ0KncOdGFtaXN9O2q9cxYFbd2PHdT0PO48v7q11DmVpivavkq7BP79SfeGe%2Buni%2BlsnCWb0wj2onG48DuQO0bmw8FKaVU8Q%2BMGYyNREMx0E4rSE8DesyR01SpKE5NJNk%2BF3h6PYIOhrWRb2ZYgI%2FwIzA5LJg3NK%2FK5PL593Y1NBKI65C6%2BL8vDRcsyYk4DkIbwyata7Te1TEQl2%2BqhgpRe3R8S5MsZcqtthY%2FhGQPt1EdFrtpug7pJ91dMEdET9XsDzstdJgmG4vLeqTEmBRBA9WPsXOmQllMBh8danEBqk4yFshFwCC8YLEStKmegBCL1FmTq8vMr%2FyE%2BfIBFWDf%2B2GT3oF0CjM2VAcHw6VXngUuoCfwU69vTaNaEg94sPFuiEM5gk%2F6GcrKPsXnbYnYR5XEegvGwJ6vN9uJ%2B7MC4pbD5ATZ%2FNvt0n9s5%2FwW1Ix3aB2GmMCvEwK8wNwMFIOfUClg7XcvSUfteHxWBo03VQbw0WA4kscgolsWBWimLwSOoMiZnfF96yxWEiJfVCCKTSjulI8i6MQ7IeGY0CEPifB%2BwQM5YJ4rA3AIoN0nxZgCOZIJ5MUnDZBUtpkLgTiqgcdg1I4NwiUiIyNh%2FKxKhTUpzNkSzoGeOIa3cNV8BsrEQ3ne58RRMsJUNWD%2BwU%2FynKvBwCB4hDb3uNwiAAXSAA%3D%3D%3D) |
-| off-hand                 | 4       | 22            | any              | any      | general | `y = -0.8154206101027381 + 0.8306900043436485x - 0.00029042355648253686x^2 - 0.000009668965907691205x^3 + 4.243652454960742e-8x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-0.8154206101027381&b=0.8306900043436485&c=-0.00029042355648253686&d=-0.000009668965907691205&e=4.243652454960742e-8&min-x=0&max-x=400&min-y=0&max-y=400&order=4&graph-title=Epic+-+Off+Hand&plot=NobwRAHmBcBMDs8A0YCeNYFYAMA6AbPAL5LhRyIrpw66YAcJZG%2BALFRrPgcaZC%2BzSdumVk3416HOAEZuhceSxShskWL5LWmaTICc83szjbdBuhuOwAzHt31GmjLfv1c2R1euxd8Nwqc4b183ekxFDBlrXUxDCNlo1RlY3HhreNhsbF1Wa1xrdMDM7KTc3FZ8eOTBahlseFwHKtFdD2aamDqGpsCZCtbC4z78AfdPCSiR1T0GgKGbaT0ZDMpVLDw5iS4OuC4eDIZpWDl9otMk802lFySerx8kv1OrKJi4oqycvIL21vHyYYDKrWKbUGbPCYLabLIqrajrCFKNhHPZXDCHNYnNEmHQXd5eOy3f7OB61J7Y46JWopCmfUp5ViWLZ02plH69FpJNq9fpcwYTEGLWZGSFUmBLeL4UEwVgNPRMpRw9F4BgrZBrWgUpU0FXEuDItZ7UQZA3w1EipE7WBGhUCFH4rYY%2BFYi3olTO9QHGRHbCYfL8rS42rmY1nIOdS6uoKE2p3LY3WN6mwxzoOMYZYKPULhIqZsn%2BKPHFPQOQByJikspWIZV5JFJpGsV5IOpQszplCoZNslsqVD4lVkMvtWbt9b5lys7Op66qtbozzm1eqNBdT7lDXlLieAvnpnnSkvYbebzpHqqsb1cvDsoaC6bC4E7SPA0niv2q3pQsEw4wOaTwGRERgPxpEwPRyj1EDVDAiDJQPVg9XwcNoFYWA1SOWgQXQjU8FgJNTWEVI9BNK1zQOd1Im4XJyKOF0MnOYMqInWAGIjbhbAzYsZDTY5ONcf0M1fEsnj0Zi806J56GIopa2pJjGzeIC4FHMoWK7Ad2zyXj%2By%2BASOTXNxsGHCZF1PbpjIBE9Dy0n8Jisuo8iM88Dwc5zRic3o7zBBoc3mCslncKMZDqaQwnyGddHiDToGwIgAF0gA%3D%3D) |
-| thrown                   | 4       | 25            | any              | any      | general | `y = -0.12483151990909214 + 1.605551235747681x - 0.008135377299559524x^2 + 0.000023833062012799013x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-0.12483151990909214&b=1.605551235747681&c=-0.008135377299559524&d=0.000023833062012799013&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Epic+-+Thrown&plot=NobwRAHmBcBMBsAWANGAnjWBORA6A7LAL7LhRxKoZw4GIlmaXqa2EOSYCsAjFU%2FFw4O5WIi784XLri4BmEZnGTY02fEVxlLKTK4bSnOHNgqTueAsOiTZ2AQAcm2LZ0v7cp9cyvq7x848cioADHIWPIHBbmG4iMTecCEhkjwOgnJYzsmp6bJZiTxcKDo8iCG4qppFJdRlFQjViPCpcuFYXE18pXIVcgaM0EEtpQhCCYNBtTA8qrj91aqpsCGL0XVpcRNGPEWpQUJWk3ulZdU5pSEy4popOquFqUQAukA%3D) |
-| ranged: guns & crossbows | 4       | 26            | any              | 3, 18    | general | `y = -2.9838107517317654 + 1.044765562039762x - 0.003913212784379925x^2 + 6.090860438060731e-7x^3 + 5.016590029076527e-8x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-2.9838107517317654&b=1.044765562039762&c=-0.003913212784379925&d=6.090860438060731e-7&e=5.016590029076527e-8&min-x=0&max-x=400&min-y=0&max-y=400&order=4&graph-title=Epic+-+Ranged+-+Guns+%26+Crossbows&plot=NobwRAHmBcBMDs8A0YCeNYA4CcBfJ4UcAbACwrpwCspAdPMfoRmRRlVbQIzxOQvk07AMy0ADJj5FYrIdVE8p7TGzikxtYngL9qKubHWbtzPasMbivHdKpdzsWLUzCl1ewcfG3hqua5Owq42GKR%2BBgG0wrA%2BYf6BMSFq4ZSwkWLWprDC2OZiGkE%2B0apcmJm62bAlZbSGRVVypfC1pPXV5dLFjZjEtNiMSZXVvf1t3c11gzIlDLVcPly5jaTNVAtLlFwrtKTzg4sl24X7GzBbzbsLwodctBxXN3c%2B%2BSWw2E%2BDL41vmh0YX5sfmRnmJXu9SJJPqDvuDIaYuDRVNhVm4tsQkQo%2FtAth5KNgNFRgvDhIJKDVJsSGmTesI4boAtCybcEaiEap4O8MqixCkYPBODRuYy%2BaIsVwASL6G58aoqHSiJhcTA5fQ1klFbLML83BzZb14ETdPB9JQOM4BqZjbLOD0dbzoIS5jrhdBSO9sm5iCaYNsvZ77WEdp6XaRAoaiHLVLtxOGfd7oCTtYNMKSYMIxCYKohzDgfPAlXB4E4rHmCwhLFiZKnqJxFINIwYjPmfA3Uk29llW6EKy34xYk1k4hEw7F7WkEqP4lFEoOx%2BlK0PUvOiqc4Pk7q1Bjk8gVY3AupsymNDxNN1kD2dyWeKhfsUeTocLh2KlxrstbsRn9JX481VkJdiQLXtIAEBO8JZJAi1bIh88KkOicjYJiqLwRi4jAWcuxIpYmZEK%2BCFklqdbwtkqiYE4oasvaHLcF%2BZwAQaqpuDgqhWLBRrxmatpJFachcRaRrIHxf5GlSyoaIqOoFlQYioiUbgurJAC6QA%3D%3D) |
-| ranged: wands            | 4       | 26            | 1 to 94          | 19       | general | `y = -0.19588388531408696 + 1.413551669030605x - 0.014741678597083266x^2 + 0.00017194361662129607x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-0.19588388531408696&b=1.413551669030605&c=-0.014741678597083266&d=0.00017194361662129607&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Epic+-+Ranged+-+Wands+-+Vanilla&plot=NobwRAHmBcBMDs8A0YCeMAsA2ADAOlgA4BfJcKOLDFdaDARizwGYBOU8mWKmzRvAKwkykLjzR8mzLB1GVqEuvyGyKsAfV7RmiPFmaquGrTviDDcDAJNZ6LWBdhWbdto%2BeLprhyLXNYJkR6wpxw%2FoGEePACjuGeQbaxAfGRhPSO9KwmODgZzFpEZvAhcrD0%2BYqF5r5c5QWERSVqdZUN1aFlFbRV%2Bo45Bfp66TXQ9AIKtJmRzAYjYxMwU3iMFvTYWvSErHgY8KsMG4QYLLOh5Vgb8Ntlq8wLo7ozt8mT0Xp7c%2BobWOyfXYtYMy9OZjb7DM70HAbARmJ4jVgvRZueFQxTlZh4HBNGCEf6jcrvCzFDY4WDLX6haJaVgCPSnOTwVG0Qi02AUhlMnG06QWLCELSEHyhLDWRTwJji3l4%2BAY9TEAC6QA) |
-| ranged: wands            | 4       | 26            | 95 to 300        | 19       | general | `y = 38.01542852693626 + 1.5934000590768418x - 0.007732119057129331x^2 + 0.000027000350802930127x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=38.01542852693626&b=1.5934000590768418&c=-0.007732119057129331&d=0.000027000350802930127&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Epic+-+Ranged+-+Wands+-+TBC+%26+WOTLK&plot=NobwRAHmBcBMAM8A0YCeNYDYDMA6TAjAL5LhTQECsALCuhQJwAcu22JZMVtaXzuBTB0hdqmOlyYNc1AOzDyBagQkUm1Vu1IiK2cbwqzpsYtsXYe9ArNmaFXbLFXXK%2BeWa6xKzzA3sVYbB9bHH8CKh9TTgoCZAMqWzZ%2FBid47D8POBtVMXhcWCZ%2FLEsYZUxWDOjinMFcSkLM6oMy1iFGzBLoFvqiyhUDbBt8LSq%2B1UHbSiLqbwHCVlhp2fo9Agql8fnHIsdxgvwGqt2B%2FdkpxuOV%2FcId1KuWJiidEwZxxCKCIIMC21lD58%2Bqh%2BdQ%2BX3owL%2BoKBTEmUO%2BMOGyTiVjYuHg%2F3ITDBXE%2Bbn8f2c8FgAkqOjOqgYrlCmVkyJgTFcsFJ5FpqgZrX8mCYbMWmUwyxgsnKQs52OgsjwXiIAF0gA%3D%3D) |
+## Why the data tables are necessary
 
-| rare weapons             | quality | InventoryType | item level range | subclass | purpose | formula     | link |
-|--------------------------|---------|---------------|------------------|----------|---------|-------------|------|
-| one-hand                 | 3       | 13            | 1 to 115         | any      | general | `y = -0.20849222965398617 + 0.5638012041071734x + 0.006185098993217638x^2 - 0.00010529221983632224x^3 + 4.856933421922349e-7x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-0.20849222965398617&b=0.5638012041071734&c=0.006185098993217638&d=-0.00010529221983632224&e=4.856933421922349e-7&min-x=0&max-x=400&min-y=0&max-y=400&order=4&graph-title=Rare+-+One+Hand+-+Vanilla+%26+TBC&plot=NobwRAHmBcBMAM8A0YCeMCMBmeA6WAbAL5LhRyIrrTZ4YCcJZMCyamOTkLl7NOuBl3KsqHeMMwAOAOxiaCSTVnyMDXDNhKMKvhkWluyuXvUyM23dX0TD5HVlUYZ2mfScAWXB613Mbz28PVwBWJwwNLFDw7yi%2FGhkw0wi3aOSNYnjnJOs1XAIXLJkPJzx6YKKS5Ncq3Ii1VwxVeHpBOOYEpr14KVx6dqMMAuaCXBDMjqGTa3hRmQnBggJmkL6KyaWR7QJHbq9Z7d2Zr1gB%2Bx3mr31t2GasfIsskPdulIX7ELZqehlcA6yPMs%2BPRVrApNosFJ5PQIlhGFkMDkYOZ8oVJoj5Cj5toMXwsWdMLjqCiQuCEUjoPicRSUQVqZiUgSaETkRE6eSGZF6Xi2WjBizKSkQtziYyRazUeLBVyOTzJbLRTL0TS2VLaXz7AKsfDlZyZEy1Cr5bq5diFRL2SbFfq1bzbUr%2BUbLY7OVJhebpakPVTvXbfRodS65VJ1kHrYHNUaQqHI5znbHTRHCU6Ncm9UnmSmcbc%2BARWvHCTnqHmxtoWvICoIMxhy7mIoCyy9i6Nyo2K3Nq7Xm2sy1Dc6M4WWjjACLBcFIDfBh9BR%2BPHpMpxWx%2B9MIvc8v3QuviO8KSy9uZ3gsPPBrxi3gY6uDwQ8LBLzQzzv8JvT9fdxmfvJSbgsEzP3xvx6JRyi%2FUYC2gECANGF9yEg6hxnyYDahgBDwLglDRg8P9kOgVDUwgrp4NBMkOikPt4P2fC3S%2FMcpAzaiANokijAY%2BDaJXGdyJgDwvC9DoCC46AePHJQBPkYTNFEikfA0E9yAIaSx2eKTxLHcwVL4GTlPiBTVPyDNdM0tS5JHRT8mY%2BSzJgkdpw8et8IuTSImsmdbIiWAXMc6g7O8US3NiPzxNhQKnN8nT%2FKwTyIqZLzuNhCybKCn8ONioT6wS1ykqipLfxC7z6my0KPAc6K8riwRCvy0twqS4qyrSn8DKLbi8ESUTmqE992vEvAMtHHrxyagadm6zS8AE0bvPGmKOo8caHNm1qTJnRbxxiwiWtEjbOvwe8CG2uatoG3x%2BIOo9lv2nqjrGn8LrO0SDzhH9PMe1o6p016gge%2BRBw%2Bn63vw54ft6folCBvhIXHFzweoSG6LBpsYEhtr4lJYHBDBwTIdgQGsd6XLUemJHfmhonoCwEmMxCMmKfyE6jGpn7fnAxmIZJsGgVh34gNRznib%2BaG%2BfJuZBZ%2Blt6fIcYmb%2BDipYhsDAYpLBMNlpXMKZEI1Z%2FDWtfgRWxbGe9NYN6GcMivplujH7VgnMGzdWPiGftta7et2TXYhh2qed1tUed9S%2Fbd32OhCadzaEVGw%2BhqOqzBmOwTjt3TkTz3Y8jpONZjiOQ6jsGOqwLxZfzwuJZQ4vENR8vRzB7bfz6WXa%2F2I3a%2FueHUce%2B4CZDjuwu7n77h8MGe67hme7vJQPER8nlwzSefrHYOjDniHaInqesHYiesbHDB7w8bf8FLoSab9Dpip%2B5yMvPiHnI46%2FYdhWehePQQr%2BfsplsBC%2FBE%2FpXbzvv%2B%2BAr6AKwhPQBFMwE%2FVvFfHCsBWjFAnmbWwZ9YH5nwlheQcCfxHwwXwLBhAJ7TiwdceIPhMG9HQdtBOpCqG%2FEXuQOy5CZYTwPDjQ%2BSg4SYOgveTheDoIZl4dQQg3gOKCJYJhfCkJME2yZFIvBDtlpyKETbDhgkPLmQ4WTO8Lt4gU2kRwoWpx64GMwU3ExeCTiKMMfcUGujDE8IpLAWiijHELyPpFTB9x4AOM8Rw2B%2BwXIF0wWOf4HQgl4J3jw2BEQyJ%2BOCcw3RRD6yyKST%2BDhqSdAcI6ggMYsjsldV0fk3JHDtpmAEaU%2FMPCKkaCqaoVoyddEHh0H0QJTSQaKKaa0UJRgcCqF6G3DocC%2Bm9yMEMvQ%2BMmRglUOzeIUy9CUyUHM6wzMMw42mYII%2Baz5l%2FAyls5Zgh7yEFUArRZQshhjFWWciRpzjnGlGVcjQLkPK3MybMikQxFnvNGJsr5z5Pm3JHiIHCiIxi7OBasaMizwVjA4neVQELDnQomrM6FodFnTkROi%2BF%2BBlqnHhVivQqxjwEusKCVZHVd7eHwk41QXg7KLIpXSw5pSzGzNKTYyZ7LjFstpYsrlKNBlNIHosoVIjLCqDHMSrIglrgAF0gA%3D%3D%3D) |
-| one-hand                 | 3       | 13            | 116 to 300       | any      | general | `y = -1129.4203195277557 + 28.231290187427803x - 0.24779778144598605x^2 + 0.0009711032569160498x^3 - 0.0000014022912601703806x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-1129.4203195277557&b=28.231290187427803&c=-0.24779778144598605&d=0.0009711032569160498&e=-0.0000014022912601703806&min-x=0&max-x=400&min-y=0&max-y=400&order=4&graph-title=Rare+-+One+Hand+-+WOTLK&plot=NobwRAHmBcBMAM8A0YCeMCMBmeA6WAbAL5LhRyIrrTZ4YCcJZMCyamOTkLl7NOuBl3KsqHeMMwAOAOxiaCSTVnyMDXDNhKMKvhkWluyuXvUyM23dX0TD5HVlUYZ2mfScAWXB613Mbz28PVwBWJwwNLFDw7yi%2FGhkw0wi3aOSNYnjnJOs1XAIXLJkPJzx6YKKS5Ncq3Ii1VwxVeHpBOOYEpr14KVx6dqMMAuaCXBDMjqGTa3hRmQnBggJmkL6KyaWR7QJHbq9Z7d2Zr1gB%2Bx3mr31t2GasfIsskPdulIX7ELZqehlcA6yPMs%2BPRVrApNosFJ5PQIlhGFkMDkYOZ8oVJoj5Cj5toMXwsWdMLjqCiQuCEUjoPicRSUQVqZiUgSaETkRE6eSGZF6Xi2WjBizKSkQtziYyRazUeLBVyOTzJbLRTL0TS2VLaXz7AKsfDlZyZEy1Cr5bq5diFRL2SbFfq1bzbUr%2BUbLY7OVJhebpakPVTvXbfRodS65VJ1kHrYHNUaQqHI5znbHTRHCU6Ncm9UnmSmcbc%2BARWvHCTnqHmxtoWvICoIMxhy7mIoCyy9i6Nyo2K3Nq7Xm2sy1Dc6M4WWjjACLBcFIDfBh9BR%2BPHpMpxWx%2B9MIvc8v3QuviO8KSy9uZ3gsPPBrxi3gY6uDwQ8LBLzQzzv8JvT9fdxmfvJSbgsEzP3xvx6JRyi%2FUYC2gECANGF9yEg6hxnyYDahgBDwLglDRg8P9kOgVDUwgrp4NBMkOikPt4P2fC3S%2FMcpAzaiANokijAY%2BDaJXGdyJgDwvC9DoCC46AePHJQBPkYTNFEikfA0E9yAIaSx2eKTxLHcwVL4GTlPiBTVPyDNdM0tS5JHRT8mY%2BSzJgkdpw8et8IuTSImsmdbIiWAXMc6g7O8US3NiPzxNhQKnN8nT%2FKwTyIqZLzuNhCybKCn8ONioT6wS1ykqipLfxC7z6my0KPAc6K8riwRCvy0twqS4qyrSn8DKLbi8ESUTmqE992vEvAMtHHrxyagadm6zS8AE0bvPGmKOo8caHNm1qTJnRbxxiwiWtEjbOvwe8CG2uatoG3x%2BIOo9lv2nqjrGn8LrO0SDzhH9PMe1o6p016gge%2BRBw%2Bn63vw54ft6folCBvhIXHFzweoSG6LBpsYEhtr4lJYHBDBwTIdgQGsd6XLUemJHfmhonoCwEmMxCMmKfyE6jGpn7fnAxmIZJsGgVh34gNRznib%2BaG%2BfJuZBZ%2Blt6fIcYmb%2BDipYhsDAYpLBMNlpXMKZEI1Z%2FDWtfgRWxbGe9NYN6GcMivplujH7VgnMGzdWPiGftta7et2TXYhh2qed1tUed9S%2Fbd32OhCadzaEVGw%2BhqOqzBmOwTjt3TkTz3Y8jpONZjiOQ6jsGOqwLxZfzwuJZQ4vENR8vRzB7bfz6WXa%2F2I3a%2FueHUce%2B4CZDjuwu7n77h8MGe67hme7vJQPER8nlwzSefrHYOjDniHaInqesHYiesbHDB7w8bf8FLoSab9Dpip%2B5yMvPiHnI46%2FYdhWehePQQr%2BfsplsBC%2FBE%2FpXbzvv%2B%2BAr6AKwhPQBFMwE%2FVvFfHCsBWjFAnmbWwZ9YH5nwlheQcCfxHwwXwLBhAJ7TiwdceIPhMG9HQdtBOpCqG%2FEXuQOy5CZYTwPDjQ%2BSg4SYOgveTheDoIZl4dQQg3gOKCJYJhfCkJME2yZFIvBDtlpyKETbDhgkPLmQ4WTO8Lt4gU2kRwoWpx64GMwU3ExeCTiKMMfcUGujDE8IpLAWiijHELyPpFTB9x4AOM8Rw2B%2BwXIF0wWOf4HQgl4J3jw2BEQyJ%2BOCcw3RRD6yyKST%2BDhqSdAcI6ggMYsjsldV0fk3JHDtpmAEaU%2FMPCKkaCqaoVoyddEHh0H0QJTSQaKKaa0UJRgcCqF6G3DocC%2Bm9yMEMvQ%2BMmRglUOzeIUy9CUyUHM6wzMMw42mYII%2Baz5l%2FAyls5Zgh7yEFUArRZQshhjFWWciRpzjnGlGVcjQLkPK3MybMikQxFnvNGJsr5z5Pm3JHiIHCiIxi7OBasaMizwVjA4neVQELDnQomrM6FodFnTkROi%2BF%2BBlqnHhVivQqxjwEusKCVZHVd7eHwk41QXg7KLIpXSw5pSzGzNKTYyZ7LjFstpYsrlKNBlNIHosoVIjLCqDHMSrIglrgAF0gA%3D%3D%3D) |
-| bows                     | 3       | 15            | any              | 2        | general | `y = -0.743084783011632 + 0.7736504766853647x - 0.002608641911723087x^2 + 0.000008555961584640232x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-0.743084783011632&b=0.7736504766853647&c=-0.002608641911723087&d=0.000008555961584640232&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Rare+-+Bows&plot=NobwRAHmBcBMAM8A0YCeMCMGDsA6ArAJwC%2BS4UciK60WeAbNqeZgBzbWbyu4DMvzSJmyFOteL1wAWeoIoZ69MYXy5WGOZnqxlkpmSG1tugvpa0M%2BMYukCD8y9fq3NFnWhj0pBVq6zuaLwI%2FeFEPaG01X3sYQg5w%2FFVsKVdCDDF8SRSY6DSMrNd6VjEpSUI7c3peEvg1CsMqsV5YPlhC6vCpWtZ6ikbO7t7PAJgu3Dac%2BnTw3kI1CcrpmlncRULkGbmMIYiN5bnYWRyiJp4vVxOZs%2FwL4qvcbYurGecsC47lm%2BOPmF5vVgWhkyTW8IneINwYJyUniyww4y%2B5hhTQ00J%2BcB42ERhlKYlgmOxFCkSxgsAYqKRJLgeCIrlmeNeJByvDuNFgql4R3M%2FDx8PZdPRsD5hN%2BI0o4yZ3LFCHG0XMhzEClWZkM7MVrwpqqkitUPVcsHRlnGmooBp1xv1VIw3mJfkVrj2MHgxAAukA%3D) |
-| two-hand: non-staff      | 3       | 17            | any              | !10      | general | `y = -1.4407940637747765 + 0.9868570871805012x - 0.0023989071048527186x^2 + 0.00000872913868341514x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-1.4407940637747765&b=0.9868570871805012&c=-0.0023989071048527186&d=0.00000872913868341514&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Rare+-+Two-Hand+-+Non+Staff&plot=NobwRAHmBcBMAM8A0YCeMCMA2AnAOgwHYBfJcKORFdabfI08zADkOswFYsCAWRyTIQ7taPDr34UMHHCIwBmWHg6TOwtJlj5cq0Vjmx5eQhl0LmcjMzxZTZAbWkicR2H3tSnG6C7xuzXjS%2BGDgB6kFGIWHOkaEemIEwvlrR3sFxTI7hSa7umRiJPq4ZDgWwzvB4PPJm8LLerHjyWLX1NI3yeaV1Io2wJPG08PK9GFUD%2BVTehNYcNYM4PCKERiqDzBbTlYq6hMjeWJU8XRRYmzQcsxMOZyKXVS2DWCPec3jMsLrPd0YfXy8XX52TLfV6%2FEqnAEwN44YE3KHQN5YE4wUGAvCw%2F4%2FYxrEEIt7MLFg964%2BHYoRE9E4a6Q7HMeZ4uk01H4oyLSnQ36fJ74lHQNGc94QlnYnDckHlYl1L6Si5KYX8%2FYXMbim5K6Eq3QyO6VDh8y4iHj4CmDA3eI02Qmmtjm6zMUkULiG6zwK2ZJ22ggMhx6w3cHhun0IsTGQOOjCGnh%2BBVGw1KLCPTIBw1jZh8sQieTGuEUY6Zu2q3NLbzyO1hmA8WUweSEaO6Hjq6DycRceuN5s2HMV9stwvVtrVqNzXQ1zNKGQj4s0WDWHAO6sI%2FrGb0URQiWDcLDMuDnGCGPDwPn9ddKSu6DfrsZb8%2F6bywMaEPtwbJwLtwBEhYznj%2FaFd7iPeFYTR%2FpQci1omDgIGByjnlMNB0E0b4II2CEMIMyFyLgBDbhhgFYWh%2BSsHIXAHhBUiEAOojWCa%2BRmvB8ipuWWQxHWgwFC%2ByQKuxLFRGxhTpKkEQEFx%2FGxIJOSsfkonAQEVY%2BJU%2FS1I2MzKNuizLEYti6PaIhnO8ZEwCYuljM0Xwvhw4gJhyiJctZBIKgKNnvNujkEiBrngnZvzzvyckcPKLl%2BZEXwAXKBBvocdwmQZiKURwRz6ru0AWisWpJSlb4cDaNABkKWq3jl1gKPlzoHkxFmGrW1RalOFb%2Btu%2FmGj58WGkYpZao21RNDGlGVl%2BgwZiW2j1rVTaziBlaZrWvFJj2xh8qOJbjiO2XVstgzNpmlQEQ4nTrrOb57XeCoMeulkgVo65GDRkFJbA8pPoYcjZueoUsDJ6FvbQ1iKehKHgTFuHwfhOFwZgINmERgEkQUZhCHIIYMWYvqASkbGDfB90Yny3FpMU4lFJJpTSVYBPBExuNCWjUkcfjfG0x9kyUR0PnUssllqat0BCDY246QcBZfEl9wBkLdzWNVPJ3HyHl5U8QUECFdxKDsTxff5fhPpFrwqj52vKk0MX6xqTTNXFCUlZ6pOmgVFY%2FZlo08NwFlanJxwkq7TVal97s7Y6nVtUxsbmkohAxcm5qphN6VjDg4dcw2GITaNpbvG2maWT5WaZlGzCHbbTYmeelH7lgPkzldXrnlzWP3ueclAXH9dyLOoMoVhdd%2Fe39Bt5h%2BDU6UUPwSRwxw19GA8LHOPSf49M8SJDMD54DMzcTi842D3MS0xbPTC2Cr8zQel%2FIMey6RbTzmedXnvO5rLvFr9%2FslLxKYvL2Kj%2B%2FrwPUr38SE8jYOBjEliCQBKoFR0QrNoBqCc7QwNKs%2Fd0BdcrFVNMGcQLhPbmmam7HBkYPYDV6vGHqcZlBBxjhicOKdxr1jkjWPw25J6Zmdk%2BBsGdlBPkWjQRQygToFwYkTVcL55DbW3PIRctYw4ji%2BrASySES5snkZXG6FAK53iUBsG8l5OxaLvA%2BJCBd7zGEei%2BIxn9MhPUAsNT6Lc%2FA4zkLoRs8BiAAF0gA) |
-| two-hand: druid staff    | 3       | 17            | any              | 10       | general | `y = -1.5589456685719236 + 0.9962799588626463x - 0.002586859275705108x^2 + 0.000009472522985824832x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-1.5589456685719236&b=0.9962799588626463&c=-0.002586859275705108&d=0.000009472522985824832&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Rare+-+Two-Hand+-+Staff+%28Druid%29&plot=NobwRAHmBcBMAM8A0YCeMCMA2AnAOgGYAOAXyXCjkRXWm32LIpgWTU1zwwBYnJMiAdhqYArFjzxe5fnUE4RdbkTyDRfShjWKeovN1gbM29kr0FDMzaKI6CGPEQJG6GUYpwFCzq5jcevAh9mV3dTT28XDHgFUyE8WBwomMV4i2SCVIdRSxCcYVM1PCxBFxwMRUEHHCwXIjDaLBUnFywGmFE9Ntb26E7i9V9oNsVRbn1c2SxM01EvIiSh6dGvfNaZ2jm8NaWNjvmMdZXHQ6XYY%2FhgqfPZq8osG82vU5CsCtnYLmlX983PnlabE2Dm4LymQI6Dlgg1eEL6DkYSzhohBYMoolim3g%2Bhhshsim4%2BCw3zxWAJKlgJPR3AJEhsLjGtP0pSGcwJeiItVZe2g3A5d327NUixCbNMfMcXNFPIlnIZjxg3HG9Xl7NV4tx6N%2BivG6VZcO4XjmLm4BVooMkItkpoJDgwpCGNvF2M8JrJzoSVso3Hd5uxhpNvQI%2BGNjp5xC4JvDKjRioV0AIggSJrhBC6LJCwcUBHGVRcxGzRozskT2c%2BBnzvpg9k9%2BZ5sCTgilJfrjeblAsilgEhK%2Bfj3eKsYT2rgXQFcExLC8ahcDa7nz1ITnplgC6H3a7DkEk0o0M3CXXNJX%2FqpLCPtAQeE1Z672MRS%2FPLDvp7gPIwROLu7fH9n3%2BK7anHQiQAuB43fLhPxYEd7UiIZoJcOF4BIABdIA%3D%3D%3D) |
-| main-hand: caster        | 3       | 21            | any              | 4, 7, 15 | general | `y = 0.9195580731155433 + 0.7492658962645824x - 0.005319339993856751x^2 + 0.000017593004422642952x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0.9195580731155433&b=0.7492658962645824&c=-0.005319339993856751&d=0.000017593004422642952&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Rare+-+Main-Hand+-+%28Caster%29&plot=NobwRAHmBcBMAM8A0YCeMDsAWAdBgHAL5LhRyIrrQYCsxpMCyamuB9kjFL1dJn5ZlQCcARhwBmYRzJNKmPg0HzeOWEX5lR%2BDCowScWDUu26eANmFqJMmKb0Hat6PYtXRsZ6IzCV58zjw0pp2tH64NIoC3jThasEmYRa4sAnR2H4G%2BKJekX7wOPg2IS40WH74OOY5JaKisTxY4nVe9SpNalFabY3NNSY9VB0ttYMww%2F3RY9ATrQ1DfXPt4rBddtMdxQPz4%2BJbUzsze0u9OCPby2eT3Yezo7eL95fnB5f7N5fmGCcLVd9Ppxo5h%2BuxwQJBRzBwNGsBUUj%2BXiCbzWLiRgOhJngEmeaS0WOe1zs%2BNOWH%2BmKEoIk7xgwnKJOp0FpbwZTNO2mcrKGlRoZIEYkuqw5okuWCFbwxAnw%2BAFzilzK8KkJ0ApysIAF0gA%3D%3D) |
-| main-hand: non-caster    | 3       | 21            | any              | any      | general | `y = 0.7081542428231806 + 0.6667863115619928x - 0.0007860876748404416x^2 + 0.000003503709149771536x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0.7081542428231806&b=0.6667863115619928&c=-0.0007860876748404416&d=0.000003503709149771536&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Rare+-+Main-Hand+-+%28melee%29&plot=NobwRAHmBcBMAM8A0YCeMCMBmeA6DAnAL5LhRyIrrTZ6ElmYDsArFZhhrgBzcOSYWbNDAIFcTYqQE0s3dtAJd4TfuU7DqTLkyxqOmmNtwA2fTQyHoxk6unrLC47vManOvfdFMFLbrlg7RmgTeRFoABYuLBZzUIUo%2FClg%2BPDE2FivELDqRNs4kwTlIJkTK0SsZNLynSryMqLcLE8UrEaIltLYBLwmEvrutN7MlMHcvBNO%2BoweuJmhpLjkcMqmviyTZepV2CmYFgIFOQlzA6P%2Fbjr9nxWmXAPTm%2B27%2FKyWNpWWAIxT%2Be2sXAEPbQFhbGDNXARWDmCIRBSwcTcH5ZSrwkwSK7QGLw2A8Mwoj7UWBcDrmXYKSxNZHBP6Ycxg6DwIgAXSAA%3D%3D) |
-| off-hand                 | 3       | 22            | any              | any      | general | `y = 0.31862967197133674 + 0.6822091250858717x - 0.0007913172544140505x^2 + 0.000003122564997039902x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0.31862967197133674&b=0.6822091250858717&c=-0.0007913172544140505&d=0.000003122564997039902&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Rare+-+Off-Hand&plot=NobwRAHmBcBMAM8A0YCeMCMBmeA6DAnAL5LhRyIrrTbwlkwLJqY72SOUs1ukfQA2LFRgAWDLizE%2B5JiJ55C7WV2q1lmABwB2eRgQaaAVgJ74EzZsPZR8zQVzjrGI%2FO0TtWZ6%2B7vcRgW83CQFtIN8QsJkYE3ksTVx7QyNYONFHUUM5blpcWCtoimY1XgZBVO5RPG0osow9Q2KYOgBdIA%3D) |
-| thrown                   | 3       | 25            | any              | any      | general | `y = 0.625697055774282 + 0.8215995459019617x - 0.0005425910100895496x^2 + 0.0000032710921570688796x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0.625697055774282&b=0.8215995459019617&c=-0.0005425910100895496&d=0.0000032710921570688796&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Rare+-+Thrown&plot=NobwRAHmBcBMAM8A0YCeMCMA2AnAXyXCmgwA4B2FdEgVhoDocMCjMKrM7GaXJNyALBxICB9HoT4lBwjKPoBmBb2IZyGWQIz1yWFZiyxZCseXyTVNZGkyws9WBNYkMNYTgX0Myi5lfvPMn0XIxtoHHhFZl8Xa2pSUnotYIx4HGEKB3IU%2BAUM7QU9GJwhMPJPGmzijTLtBOCmYXV6episOJgaAqLnK2EBCpTZYI7oeDwAXSA%3D%3D) |
-| ranged: guns & crossbows | 3       | 26            | any              | 3, 18    | general | `y = -0.2913340491058385 + 0.7574162727175957x - 0.0024457905894126005x^2 + 0.000008067767939268019x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-0.2913340491058385&b=0.7574162727175957&c=-0.0024457905894126005&d=0.000008067767939268019&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Rare+-+Guns+%26+Crossbows&plot=NobwRAHmBcBMAM8A0YCeMCMGDsA6ArAJwC%2BS4UciK60WeAbNqeTAsmpjgSWZJgBzZqmeP1wBmHi1rZ8w2olyFxzPrUbzC9Cf1UUM9epvy5%2BGPZnqxN43FYu1x%2Fef1i5Y9B1jkdoh3AAs%2BF4YPjT%2B4iq8%2BqHy%2FrDB0ZxhMPGJ0ljWvvQBdp5JtBhZ4bnpahjwhHFu%2FLoFFc7ZbqJe8OLyRO6t7DT4eGUUtR1uA6mNNAG2yg70KdABGEr50lbyAfA6MxjyknlbO4R2TAX44zBOuPABDvhGvuLahLA3cw%2B4WDft97nYddL4Xxo4h%2B5hOPXObi0DgCQnui1C0MBrDE2CkagCxWR7lB0nEc1gkKiuIC8gJ72eBUipMWRLUsCqvgwYg8DlgsJoXBwrO2jNysFpFDY8joR1ZVEZXAWXmwJMZigeITmEQFyTi2kiirVgRx5Vi2W0UvqevC6tG0EIPN6tnsBVma2aKr8SPmGwtM2d4jcbJmmJdEmutst50O%2FDNRB2KLDdyB2mwx2kATO0HEi2wjvWpPjak9pI2%2BADGWFDnB0HgxAAukA%3D) |
-| ranged: wands            | 3       | 26            | any              | 19       | general | `y = 1.8294537711042669 + 0.7318471260336387x + 0.004969814407876487x^2 - 0.000017145838654172353x^3 + 1.7205349213855612e-8x^4` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=1.8294537711042669&b=0.7318471260336387&c=0.004969814407876487&d=-0.000017145838654172353&e=1.7205349213855612e-8&min-x=0&max-x=400&min-y=0&max-y=400&order=4&graph-title=Rare+-+Wands&plot=NobwRAHmBcBMAM8A0YCeNYGYCcA6AjAOwC%2BS4UciK6cOBJZkM%2BAHIdRgrgKwBsp5Zmw5wufAU2it2aTvB79GFaSNhdemCcsLdV8brlgstzQgBY9Zk1POX61ohdmUzueIsE2nNBK6IPbZ197JWZeXhF8bFdCD0l8cMjo3FiHXlgk%2BTNuB25sSLYeXORnIhZcTE1QqXxdUtg8Mytq%2FFrIhtwmhzb67G6M%2BoMjfvah4xb4fPr8AnwHSfaZ1vmpmnxYJZyJ1eYN2fnMSPxMNziKbBk1%2BBPsLc9sfBFsXlwWcfvH5wv96oenwh%2BHyeL2wsGsvBYIkIM14DE8EKhM3E1Q0Il4zXhh2cGled0k6TRsFwGnBAxo6WJfRRZJgFLxFAJ2KJlXBn3J8mi4JKNDyKQxkjyIm45S61WFQpehCpnm4lxg3AMLCqMrl0AVxLhAoizgV1j4Qtc6L1WJ5RPp8ppapmmDBYrZ8vgeu5MDMIttMud0FdxLm1TMOy9ALU1jMlromHekjM9ugEbckYoZk9mAB%2BH5ieTqfTLszBGlUdzURDuZZ1RwIkwBkImooEYrBjy1krFZOGyb3hgNteZwwAYa1lgqsHgMkalUzN9ng2qiRPcoekM%2BeUkWsnsdAF0gA) |
+World of Warcraft does not use one fixed amount of power for every quality, slot, level, or weapon type. A chest, ring, staff, and wand at the same item level do not have the same room for stats. Their armor, damage, and price patterns also change across level ranges.
 
-| uncommon weapons         | quality | InventoryType | item level range | subclass | purpose | formula     | link |
-|--------------------------|---------|---------------|------------------|----------|---------|-------------|------|
-| one-hand                 | 2       | 13            | any              | any      | general | `y = 0.4042050606136029 + 0.49734508151683776x + 0.0007876333296000732x^2 - 0.0000013811950352316454x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0.4042050606136029&b=0.49734508151683776&c=0.0007876333296000732&d=-0.0000013811950352316454&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Uncommon+-+One-Hand+-+All&plot=NobwRAHmBcCMAcAmANGAnjWAGAbAOgHYBmAX2XCjgPlQziwBY9FTzJMCHbMtY8BORGQocu6Hn3jxh7Klm7R%2B%2FPDiFtKsHDgX8CeAKwyNqnfoPT1mfTXGKiKw5bj6xdfn2JGr82%2FGXxYLzgGbV89fhwg2BCFKTwsCxFglF98Ikck2CIbOngmAKjs2PzWTKJXGHh7BMKfXL4XKMQ6mBwM2VhYAgUcexCo6J6PUo7OhX1lVSiE8b0paZyYfTnIp2x9cbMCAmmUun17eHaNLD2l%2BwJjmCVxvkEgiIUGf0CnfiIn%2BEIru0%2B8I4eH1sDC%2BOB2bxa0AYc0Ssng3WB%2BE8TjyTy24KSqOBZn0q0xsCeTCmThwFWgRDmI0oJlsFPiDCCOAJtPwPyZCiI%2BH6JOZdE5eCIaiS1g5TGWQWWHPs7glG1piBUVKWcr5Cpw%2FAlZMF8R%2B%2BjO5KwAlewt5MCIhsQeNkIIUiC%2B4qcMVsiD0iCF1rJiDMVSCDH1iCYWAxsiKzsNIKCobozUVkYRdFgkyV5JVmC%2BWUjZK6hGT5QU2ZwsMoRCBCb0nUj%2Bs0KmDxarrKLZtNcHwFacRGb1eiQUQ%2FHzPxd%2BcO7solqHzAHWYV2R7U7wDGNshY%2BYaI5giE7hraPc3BitGkWih1UUPylga6osRUUVT0BWN4UMIftj01CiZPLi40pda%2FwvWR6AR90wZtgLgJB81wHMomoSCmBYGCs14AR%2F04SDJEbKgkNQpC7lQyElBUf8tB0PQfk0fV%2BBxTDYBFWx3gcG8yXcaC1n0SE%2FH%2BL9MCdXJwgZNZeMqL4akE0I%2BK499xOE%2BIaL9WI0nIqNKnybi4GU6A8gFGiNK0nSySqWTaliBoBMyZoenIroej6MDOjJJlWMyMZbAmIiFlmf4aKwW99HRXZxkOH4blcvCHmkqFlG2cKnheQE%2FgBN4fyhL5LgeSFoS8oJ4SeJFkyxOgGH8lFmwYIkL3ZFkBQlQ9ymvJw%2FI5BV4DAxr5QMWUmv%2BVqtQVRMJWSjsVDUvUOTU55bWUL1fT7Z0z1rGBoVtdMfiE6AXQ6x1b0teqkgYZLpsdSE3WYC8iFm6M%2BH2uN82UB0kk5W7IwihBvkjW9XpLSNO3wLBc0hWiDDMpdD2iecwK9fNmp7D7moh2H%2FhhqHCEwt0VzwbsnDR2xOgxtTsYTPhMaSDdIN2pcAawKILuuWM1lPZgTx0DHgYPZmuhgq8FsvXwgc53myv53I3rWeNKgMbnNCvDM1gi9MaNvPRtzYx8nI6RXNsyDWmUKQCNTWZL8ES8zAOutZ9S5GjmzMGU1mt%2F5Jftn16arKDkUyWCccYZhky6XCUMQyCcPQgPRf9%2BZRYIyZiIi3RNY6Gk3Gom9T3sZWtdTgxfZcHRhiY3O93z%2Bi87Yji4rE2I5Ll8I7LW%2BEBFZnj9RagUlMPPS1KydumAXQpu8kg3%2B5nQfigHsoh%2F02Jqh0jjTKaSF09GMXoF6cGBgckvnOt6OBm37SPNcpXyJmQ%2BsrWE%2F9jI6ZfOKzJTkC%2F5gpp6B9DCt5n9f%2F5G8UCLnjH2R3gJR%2BDlREatKAgMKvgME2UyRFUINzAIhJ3IklvHSKijJITpBFkkHAmDvTJlwRyG2alCG0i2GyPB%2FxkwTCIRKZeJYjR0NFPSTUXVDomg5IaDsvpDx2izjw5ahBfTbSgcI20rJv77VtKtZsJ0Ii%2BlkdUSRx0%2BrKNtNOXMvCuGaNtFuH4j0cZfFtg9F6qV9EfS%2BC6Ss%2BYoHcztPmMUA5l5ZG6j2F69gDhIxxnDLxCZoZYznLgWcyNBTBO8RjfWJM5xWKxlWfGu4io9kpkksmG4Ule2pszYkmRn7KGhEzeijN6bMywJEjoy9UpRDlswOy1SZaZDqbU6W2dVbZI6B%2BZgZSNAdP%2FIbUOJtbCsi6SBHo0xxjzm8uMr659xl%2BhPK7PKMFQbewQmHEO9xI46B3rLWOV9ZaUWTmxTOi8NA52LmA7wsRy6ZHkqkVufdR4FANgZaexlfBzzthvC5cAXL7G2XfQ8ywz53xvvAjBRCqHWJxqyOyECeBRW%2FggBZhA7KewTN7XuayvYKiCVi9FdxEVoWxSzQOxLcUe2wiSvFEgG4wSjoQTuJF6JHyqQczpKcdAeOzscyWdE3BcqLm4DwdkzlCvnNnZifBoGlx0FTCuYRXHyokvwRFdcRK1zllXSu8QNXatEjczVOr3zN1bDpfupIHm%2BB7oi3SPdO62pUDa%2FugsR5WvnPa51TrR7SrKC85gNrZ4ovnpZAYy9V6eM%2BUMINds94EE7hfJYLLz6AqVsM%2BgKb44nFBQQNN6xNjAo6D5fNzsQX5rjdfYtvt76uWHAFGtw0Hgf2FY224X8YrAiimpR4HbkFJG7YVSY39AHAi%2BEgeKI7%2Fhpv4JCNywUMpJsxMvEI84EGwJxGmxBwImDlpKkgggFUtT8UZINPZOD9T8hVeCshNYr18i2CQyhEwmG0jTtzV%2BnCBTUOOpMNNS1nSYSKuI8wYjnS2N9J6e9voDqrX9LWx0iijVHXUZ%2ByMWj%2BHtjQ3aVDuiBRgQpLdec38DEJlBNzYjaYBC5izKekM9ZsEhgBpBrGz9AbsJBg43tS5nEXAHO4htWM%2BMupJgjN8WMEY%2BqXMlXG%2BTYnox8uk9FCnaYWqxsktYuSb3qayYi5%2B6ZfYaZk5kdulGCnCz8KZ2m5KOiniFuLCTGgKnoa1qrci2tXOtMlh0%2FqglHzvlVlZ78gECB2WSpLPpaVzaAWmc5UZdtxmXri4MsZrkBTxqmcmSEcrMj5hIAAXSAA%3D%3D) |
-| bow                      | 2       | 15            | any              | 2        | general | `y = 0.22444917005698017 + 0.5822163577210446x - 0.0006990769934425673x^2 + 0.0000024109481894875313x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0.22444917005698017&b=0.5822163577210446&c=-0.0006990769934425673&d=0.0000024109481894875313&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Uncommon+-+Bow&plot=NobwRAHmBcCMAcAmANGAnjAnANgHQBZ4BfZcKOAdnlQ2k310WxLJlgvxq0UcRcjYcudHu37l2ndN1yx84wVNqZR80gMoAGYZk2zMCuNmzD48WQFZDsbCmnR4eAMzWL1e%2FAb41rOG9MMVuoSFkowSLhUrtoesLKw1vgm9hSYuNgUiXa0FBS4ONZO7jl4FkG%2BsEXCFHiEhcUwNbhl9dW1xMFsVSml5RqVYdAUFvqFMTlOkdaI4zDYcbAJnXDswtia1nLCbs18y4uw23jwfRKaDdBluE6Z%2B%2BfbI8x3F1f4p2yaFtsMmrcVmtkYBYePglr5MJhtnpMC5ljhhPg0kxDPD7IjGE9wU4EeZgSjsWjcX8NLoEbUUbNoPg8lFlvAKGT0sTyJ4ESMLJiNPBDmivD4uZTvIx%2BeRsF97EUMYZsATaDd8iK5rKYIg0oroPNhE48CppZTtYx3hr9c5OeQLAyJV4zUDxXLJsjlhZldAnHECk6eXK9BxDBYvTAnHoOr5EcJVc1DNTw%2BYnAZlm9w8HYaG7SrjntQy7ECMnOrQeHJtgQxo4%2BGeJp1U403BzJgjdXhLA0otDHmm%2BZ5m3AZRrszAz32JHlk5B3k3W3KTZriXyEGm%2B1DKqmyN6UvIfZYCNMGCNIgLluZ0vLbQt0uXbAeDclwGVgR%2B9AZk3oSn%2BhvT3oOdZkrRzEhXKYUz7DWf6JIB%2BCZv0PbjpBEi3jqsFsPBkRGos1S4JW1hNoYlIbAAukAA) |
-| two-handed: melee        | 2       | 17            | any              | any      | general | `y = -1.2469017714620838 + 0.7595359183093786x - 0.00052x^2 + 0.0000031790771502211193x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=-1.2469017714620838&b=0.7595359183093786&c=-0.00052&d=0.0000031790771502211193&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Uncommon+-+Two-Handed+-+Melee&plot=NobwRAHmBcCMAcAmANGAnjWBmeA6A7LAL7LhRz7yoZxYCsud%2BJZm%2BALNZloo86ZDad03XnRaCKwmtl4A2dhPKwOXWmP6spa2Y3hKhOnnwPaR6vaZXTRJgctXndCq45nHx9w04%2BbJ1o14OVxsLOgBOVwAGHURwgmIvODk5WLlceDkrORQnRHZcOKs6KjzYOy1YEtjyuT9larKK%2F0aZRFr6zFbMduaG0rby%2FERi0NhYeKKkqrGJwqzpulnJyMXl3BVRnTmpyqXt%2BM21g43FRZinWHTMq3ZUy4L2LFv7mVgCuUTKu%2B2Cuk9vq9MO9cE8Xr9LNMfg9GAtARCwVCgXAQXVwTCSui3h9OnB2Lk3rxdv4cNsoqcrKTLuSqpSBsCaWdKlS3jSAST6SiabjsJzxoy6WSNjyWQyKdMsGMovoJRcZFF0u8rIg5TB4AVCFYVGokH1gaF4ALpu8dTSZZUTeZDeKLQaaatbaabf5LTRrYhzS67c7lOM1Ph8AkrNL%2FQwldMQ%2BZ8GG4f5IzRoxt2cp4zBE%2BHKqnoNHg5z00y43mY8G6P6NMGCWmoqZwuE1HU9dBa%2FXA8mYM3zA2mDW653A5Key3Gx2aF3B33h73R4H8TXkQoMrHyOEsPWsMPV531%2BwvpIV2vh6roDkfe2jwHQbvl0eTxnJPB8PXyTckg%2BnwQC%2BR1WoIqDnq%2FNxoEpF1MeBYB%2FT0v3A8xgIVUDoKAyC1QQmAlgyNtoDAiDcCiB1JDkUtzHYSYlxgORAJgdg8BXUxyLUYjaIo6AqNwcJcTooi8HgPDyByejA3CDC%2BM4wpPzIlDmJnEYkk%2BfjCloiT2H7f8tDkI87lhWj1PST4tPo9J8BUyQInohgkOgEyiIYfAeNQzl2AKJBTG6ZiMKYeiCkQUiLMfIjPNsizkSeXAsCM8g6CC7dpK0CL6PXLAAv%2BeixHMpKiKCK9UNCHcMjCrL6PKJykn2IjCsyizK2Y8ksFxOhKvYclZ2K%2BrGryir6Oq1KJJq3A5FSo8cAIUxiLUQaojE5ipxgHq2OGzkeuJcgqNGwMvOG3yaCwdJ2Aw6FNoYcjhuRegPyO0aDt2wjNo1aLJAc0b12GYbQlC3rbqWl7127JInlGsRhqY4weABv7GGGyqsHKRB3soiGofK%2FFRqhmHmLhwpdu67lhsx09mJxxA2p3UasZ%2BzHseJjZvIatRFsoo8PVY3b6a4lHqfMBnuNMBKacDNEklFaAvN63Eapphhvq0UX2YOkXkXyAgUa2mmPnMpX2Y1cq1ZoeW5ACrWYB1ib6Bp9dwiNq6DfXB8udCaHWO8yUad4eBVdt9dxptp3Ga5pi7eB%2FnKt6PnJcD2pNdDhWuYk3pcKjmnyjvchIZp8lZv56Pylj%2Fn6fJD0uZzkKHYLpTTDiHR4nVUuprgeJgiSMunFrqvy%2BF0u%2BWo3EPRbqI2q7xucICvuZA70uNswPBacFse4An8zEGnhBRNHnQ8AmZenDwBL1%2BHpf6%2BRFRevKrydFbUv95nI%2BLeSVjS6vq4CG8xA74Mzvn4yOe36KrQn50a4Jp%2Fpw6RB5jHSFnb%2BICcKPzGGZOe0D7alyYlUEKR9EFhn%2Fqg4UCCdDFnrhg2kuDsFYKcAweepdKogn%2BGQnQHwqFOEeP%2FCS2BeoYXaEYIM9dGGPRYZw9h38jxMI9vXfhvdhE4REWwuCQijCl1EUfURPcZFsLkRIue8jB7yP%2FsIxReRvbTGrrAf6ejYiMAChMYx3kzE6MxEYqxVh9HyCsHycoZtHHbAyCjBAbibKuMuAQHkTjWLlU8b4%2BAbVglvHfj4iJX9%2FAL3KKFVwbj2iJN8TubIOhnxhP3uSOulRsm8P8Pkuq6SnA5KCUUjxd9qyLAybjKotSjh7AaRY0I8Q6BhNaaCCxTF4iSOZGoXpYSemQMpDqViQyxkvn6VaAgpjKp4CosqMZCTpjzMKGEtZKyLT%2BgKb6HZEQtQ7LAsGHZCiIw7MTpgc8mDzlRhwjyG8rEPE6FMEeasABdIAA) |
-| two-handed: caster staff | 2       | 17            | any              | 10       | caster  | `y = 0.5878275909223474 + 0.6486638702862207x - 0.0008183156661210863x^2` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0.5878275909223474&b=0.6486638702862207&c=-0.0008183156661210863&min-x=0&max-x=400&min-y=0&max-y=400&order=2&graph-title=Uncommon+-+Staff+-+Caster&plot=NobwRAHmBcCMDsAWANGAnjAHATgHS0QF9lwo4lUNod95jSYEV0s8BmN%2ByRil69ziW7lmVGhy5kmlVrglCpAVkwzqAJlzwAbJMbLVmDQAY6CvaKxHci3XERbV8eHMEM7Dvk5e2CHql%2Fk3X0dnQOFgz1DXcPsQ6x9YyO8zODYVT0R4lNg0x0ybbNyMrKCi%2F3yfAlUtIx8jdKplXBxbbGxVRS1NUzdsPxhO3C1YVrYOrthMUY7FXGwC3rG%2BQZMfVRGUo1VagF0gA%3D%3D%3D) |
-| main-hand: melee         | 2       | 21            | any              | any      | general | `y = 0.1888986564358558 + 0.514467630955437x + 0.0001449871791498711x^2 + 0.0000022300382306673762x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0.1888986564358558&b=0.514467630955437&c=0.0001449871791498711&d=0.0000022300382306673762&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Uncommon+-+Main-Hand&plot=NobwRAHmBcCMDsAWANGAnjWAGATAX2XCjgFYAOVDaATgGYA6RAozEldGa2egNnmciZaFDtDKJ6ZWAOKxhlGOMkyhIqkqkq4CBdB4NEPLbBO6S1SdMKC4WNTBLxetY3bNOyR68WrUz3anxvTlpdRDJ6eBItOjCIqJjQ0XDJaOCxeDCeSJd0qTCJHiCWMSwC%2BiwvEqLdWicsNJKSHlqGWlySxBJdHGyqm0Qy0RwcelgmdNo%2FYe5EDpspntn54jrdWAskLXb1%2BomS2iGqWBJ6Zq0cTNE5ejoL7uvR%2BBWYHHZj0dpimzf1z7ILu9MJ8rCUcEljtx%2BsRwesofx0iN1lhJAiwTg4WNGjYNroLI5jA8qE5sbIgdAnJdjBCYNlqNDgbpsqTMLAzJIXnB1lojjAsHgALpAA%3D%3D) |
-| main-hand: caster        | 2       | 21            | any              | 4, 7, 15 | caster  | `y = 0.4835370552909741 + 0.8668090226204177x - 0.006599272125728605x^2 + 0.000020415414066691894x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0.4835370552909741&b=0.8668090226204177&c=-0.006599272125728605&d=0.000020415414066691894&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Uncommon+-+Main-Hand+-+Caster&plot=NobwRAHmBcCMAcAmANGAnjAbLAdAFgHYBfZcKOJVDabfY0yGWA%2BKrABh0QE4SymWbGpx59GcAniEBWePkxjyzKehjTuOWIkUCV1WTngKGSyTLnS8OiXrUWrJ3efnXlMjVtdnV0A5nr8Ns7YXra%2BcgTSocGwXuwyBDgAzFGOEvE%2B0okprpiYMph0ufmZhYS5KJl4OASxabCYlfrVta6yMtWe9e1VOOy83ay9XYGwPc3JSW1h0og43A6jljJz3KlLM3PwdRsr84viYxn6uATGS8dqp%2BeHeCX6nJjwrncyj8%2F1r5mPAbf3aj8Xv9fIDPsDpKDRngmjA8BpWp8YdA4TUdockkNqHg5EZXBihNicNIpvV8T5CbjSZjYTibkoyVi5P48dTkRYSaMGTScMyqQScQNOWFCPs8cLEgs8ZdkYl2HSmElpSK5a5EErcOV6mqCRrfkpmDqavK4AbyddXLBhbgEBarZoPqNYLBDZrHc6zUV6uxWXhrQ7Dt7DTavT6%2Fa52NIg%2F6lBGXRyA5GPcHRrGzeHE1iNfGYxnYVnw0jfZ6U4XcBGCy69TBuNwo9Ya3W0txgUXXeJm5X60lG4FuN2Pdom%2F3M%2Fauz32%2BrR03J8nxPACOPyPPFzB4Ha20v11XoNsV9BpexXEJYgBdIA%3D) |
-| off-hand                 | 2       | 22            | any              | any      | general | `y = 0.9718419506869891 + 0.41682208197155196x + 0.001587412068902008x^2 - 0.0000030964817997803457x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0.9718419506869891&b=0.41682208197155196&c=0.001587412068902008&d=-0.0000030964817997803457&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Uncommon+-+Off-Hand&plot=NobwRAHmBcDMCMAaMBPG8BsA6ADAVgF9Fwpp4B2AFmTTJwCYiT08AOGmATli3KchbVUXeFjyNiAspQwdorVlnix%2BpeDLmtyWVhlXpY7YfMo74%2Bsoc2nW5yWvo45GQvfQ4jtPNtfM69OTweVl8pTlljSk4zC04nSO0FC1YhWko8Xj43aHE5BFwsv1s5SlN6TgskYzs%2FeNocAgBdIA) |
-| thrown                   | 2       | 25            | any              | any      | general | `y = 2.766343576702119 + 0.46057309703714083x + 0.0031338924726831943x^2 - 0.000008297133052168907x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=2.766343576702119&b=0.46057309703714083&c=0.0031338924726831943&d=-0.000008297133052168907&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Uncommon+-+Thrown&plot=NobwRAHmBcCMAcAmANGAnjWBmeA6JAvsuFHAOzyoZxYCsutAnESZmQCxWZaK50uQ2ndN14A2LANKwOXGr1pShc7AqXkADCsSNcZWOthix2srg1jDYlCLiJ2uWIkO1Ktp7FzsyL4dViwuk4uWu5GepbEgnC0of7hZJGscOw28bwWhjgqsBpZbvEauDr5OXlR0lh%2BmBpmjOxZcTVijvCGiE3Q8A7sBhWYMnJIuGKK%2FXCw1V3lyQGwcmRmo4YaBTBkY7OrC5vRuWvQGysHR%2BO5tAviu9Iaaesz0YyMcmJm%2FOOMJrbLH1gvWAxJL9%2FiM%2BslGJ1rHxrjB4GQXkV4G1xt05ExHM4UfNbLQ6g1xmJOuwWlgktFaHdoOwiohkclqXJafgyaQsPDbIh6D9kmzGVyYdAOioAQhDM93Gozip1J08gBdIA%3D%3D) |
-| ranged: guns & crossbows | 2       | 26            | any              | 3, 18    | general | `y = 1.4129016032445012 + 0.4961550555995297x + 0.00032039463941715415x^2 - 8.224505599804983e-7x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=1.4129016032445012&b=0.4961550555995297&c=0.00032039463941715415&d=-8.224505599804983e-7&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Uncommon+-+Guns+%26+Crossbows&plot=NobwRAHmBcCMAcAmANGAnjAnANgHQBZ4BfZcKOAdnlQ2k310WxLJlgvxq0UcRcjYcudHrD6kBlAAzDMU3LEz9ysbNmHx4CgKzK22FOhjw8AZj1xt1I9HgN8%2BC7G2cbSXFScuNPTOYkq2jJusAqwTvjqNhSYuNiOAWyRwjG42uKscPiGtBQUuDhOpta5eLqJcMUpeIRFJTAUZXXVBMQVsKauudoKSu2mwbmmHk6IgzDYobDh7ezC2FJOczYLS10wVmkZktOwwtp48OWZu%2FuH2ypS9dDaPaYUTlLa%2BwxSD%2B1PL7hvjzkbPPgZplMJh9vIKEDJCCwQV%2FMCorR8LEmBY%2FMJCFtUeNoJECFj0flPBV4BR0XhsO9MnZ0T0DhZ4HsbA4CAkqdjmRcJqZhIhYqzJAthKYzMwKoKbMLcHCBdjJZybgiYKZhphjpIDkL%2BeR0kLQlr%2FjyGPKdTZEEaLCbaGbGBbZfJEPLCDytJhIeR8M9TfIrBYHDy8OxfetoExGG6YPhuaa7vqcYyrcMYr7sQ7cPA%2BplTKDTfKqqbQohw9B7jz7W1M6SvWlYyWq7UKsLhIoPDWo7R2AUa%2FH9AVRZnu3A8IUKrymz1NBYmE2jX3JGam8MpLPyIWm6EXJPsbB5CTN035MOTtn297l2xj2xvdKVIq6Db%2BhpRikwo95lKnEhZDVyzsqLIZ04Qg2JgPAOoBwYgQosbsBBojQRQ2JyL0ThqBoWjOChfy2GYXjXHYLK4RoDDKl4wbuESJzeG4PAcF42IMi%2B7TJNEsTxBEt6pGxTFYXkvbNNETT9NcjStPxpRpGqKh5uJkxFMGFA9IoRTYhQiajNikyMScyy0KsszBps6RLAOBxppJl7XLcUqUjsVz7HcNmXJ6tAuN8jmXlh6QEEW0I2EEsKoreSKMGedBthGWhGRUaJMloHr4kyhI%2FuQJJknE7m2MGHppKFDLovYsZ5UyxG5pWVqnpOZVJGZe42NuAXtFVd6RChshaTsPEEPKYjPqY3VNhY2KLAAukAA%3D) |
-| ranged: wands            | 2       | 26            | any              | 19       | general | `y = 3.4857134522863866 + 0.48418168318576166x + 0.005842172301613738x^2 - 0.000014078423351119631x^3` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=3.4857134522863866&b=0.48418168318576166&c=0.005842172301613738&d=-0.000014078423351119631&min-x=0&max-x=400&min-y=0&max-y=400&order=3&graph-title=Uncommon+-+Wands&plot=NobwRAHmBcCMAcAmANGAnjWBOArAOnngF9lwo4B2eVDOLWPCgNhLMwoBYbN4K8BmHK0jsu6HnyGkRlMbQSTh5WJ25xeeKW1lqFmpewAMu%2BPzyIOBuEya6KWPB1hXYTFOMr4cWFzmoeVBmZfOUwmeE1%2BX2MApi0ZWA5bWIYfaWUk3SYGQhdMlLwsS3TMDnd5P0iXfn8KrzTtWBrdHHwmKJK4ZoDWzQaE7rrGfuVEGPlYfEQRzBVdWEQBeOVE3UMHJxdVgPXzGbhYWDX6raOdk87YQ1rMQ0XDFkvrtcX%2BChdnncXEj5u4O7wDw%2BODUWAiSGBoIiFGWt3KMFwew%2B8OgiOmyNBU32VxRiP4zk6WCwoKCj20RJJmjJMiwyVoGkEVlpagZsNR%2FBZHEcBPJHI88C5bisvDU9jwC2FoWgzEc7068DOtAoZhwHW0CtFZhhwvGMAoiziViYUpwTFlRr5tF6FDl2iYuugqvMPJk9rUTtcVj87sMBGInRwFB9XstMA4XPDXsVYe%2BxW0OAdTgE%2BwTaiThltMnytDe4rjWbpMFz%2FDVWZBHkEeCYmfITjUJarNbDDv4Bv2HBbbasHfri21nX4xIrOXz5EGRZdY7%2B%2BMBbLe9d9NSs84rvu8y8L0GmjeX5doiHBc73MHRA6lB8B1LHKMQ%2BBty%2BjW7nj9vAn92n4Dos4qb0E%2Fam%2FRBJyLL8uRUKxpgAswSwgv5EEWeDYIAhDEAgoMPCAqkIM3MYkU6RAcN9U9tEQUNKCrNlSLsfR8JRVxClHE9H0mRhfyAlod3wh1Jgg7i2QQXQzGyFw%2FiaKt3wSUShOA9RBM0X85gCA0FPQ%2BQ%2Bwk5RVMwdSXE3Q5hl8eYBFLDI1gEK9SjM%2FFqlBN8bI8Bwl0uFEImrFwXPkrYWXFEzMF0KwHUMIgAF0gA) |
+The project keeps these observed differences in data tables. The tables answer questions such as:
 
-## Min/Max Damage Range Coefficients
+- Which capacity series belongs to this quality and inventory slot?
+- How expensive is this stat at this level?
+- How much budget does a socket consume?
+- Which damage curve and default speed belong to this weapon?
+- Which price samples apply to this armor or weapon?
 
-| InventoryType      | subclass       | quality | coefficient | item level range | detail                    |
-|--------------------|----------------|---------|-------------|------------------|---------------------------|
-| 13, 15, 21, 22, 25, 26 | any        | 2       | 0.60        | all              | uncommon one-hand/ranged  |
-| 17                 | any            | 2       | 0.40        | all              | uncommon two-hand         |
-| 13, 15, 22, 25, 26 | any            | 3, 4    | 0.54        | all              | default                   |
-| 17                 | 1, 5, 6, 8, 10 | 3, 4    | 0.65        | all              | default two-hand          |
-| 17                 | 10             | 3, 4    | 0.54        | 101 to 300       | default caster staff      |
-| 21                 | any            | 3, 4    | 0.54        | 1 to 100         | default main-hand         |
-| 21                 | any            | 3, 4    | 0.3125      | 101 to 300       | default main-hand         |
-| 13                 | 15             | 3       | 0.65        | 101 to 300       | rare one-hand daggers     |
-| 13                 | 15             | 4       | 0.54        | 1 to 100         | epic one-hand daggers     |
-| 13                 | 15             | 4       | 0.65        | 101 to 300       | epic one-hand daggers     |
-| 15                 | 2              | 4       | 0.54        | 1 to 100         | epic bows                 |
-| 15                 | 2              | 4       | 0.65        | 101 to 300       | epic bows                 |
-| 21                 | 13             | 3       | 0.54        | all              | default main-hand fist    |
-| 21                 | 13             | 4       | 0.65        | 200 to 300       | epic main-hand fist       |
-| 21                 | 4              | 4       | 0.155       | 115 to 164       | epic main-hand mace       |
-| 21                 | 15             | 4       | 0.155       | 101 to 200       | epic main-hand daggers    |
-| 21                 | 15             | 4       | 0.3125      | all              | epic main-hand daggers    |
-| 21                 | 0              | 4       | 0.54        | all              | epic main-hand axes       |
-| 25                 | 16             | 3, 4    | 0.65        | all              | rare and epic thrown      |
-| 26                 | 18             | 3, 4    | 0.65        | all              | rare and epic crossbows   |
+Once the correct row or curve is selected, formulas turn it into a continuous result. This separation matters: the tables preserve differences found in the game data, while the formulas fill the gaps between known item levels and apply the same rules in both calculator modes.
 
-## Attack Speeds per Weapon Type
+| File | Purpose |
+|---|---|
+| [`random-property-points.js`](random-property-points.js) | Exact uncommon reference rows from `RandPropPoints.dbc` and smooth capacity curves for uncommon, rare, and epic items |
+| [`budget-model.js`](budget-model.js) | Stat costs, socket costs, slot rules, item capacity, and item-level search |
+| [`uncommon-weapon-model.js`](uncommon-weapon-model.js) | Uncommon weapon DPS curves, observed caster-staff points, damage spreads, and default attack speeds |
+| [`weapon-specialization-model.js`](weapon-specialization-model.js) | Caster weapon spell power and passive druid form attack power |
+| [`pricing-model.js`](pricing-model.js) | Vendor-price samples, slot multipliers, subtype multipliers, and fallback price formulas |
+| [`script.js`](script.js) | Armor, shield block, rare and epic weapon damage, tooltip assembly, and browser interaction |
+| [`calculator-core.js`](calculator-core.js) | Reusable stat, level, damage, and price calculations without the browser interface |
 
-| inventorytype | subclass | avg delay | detail            |
-|---------------|----------|-----------|-------------------|
-|            21 |        0 |      2400 | main hand axe     |
-|            13 |        0 |      2300 | one hand axe      |
-|            22 |        0 |      2000 | off hand axe      |
-|            17 |        1 |      3400 | two hand axe      |
-|            21 |        4 |      2000 | main hand mace    |
-|            13 |        4 |      2300 | one hand mace     |
-|            17 |        5 |      3300 | two hand mace     |
-|            22 |        4 |      1500 | off hand mace     |
-|            21 |        7 |      1900 | main hand sword   |
-|            13 |        7 |      2200 | one hand sword    |
-|            22 |        7 |      1500 | off hand sword    |
-|            17 |        8 |      3300 | two hand sword    |
-|            21 |       15 |      1700 | main hand dagger  |
-|            13 |       15 |      1700 | one hand dagger   |
-|            22 |       15 |      1600 | off hand dagger   |
-|            21 |       13 |      2600 | main hand fist    |
-|            13 |       13 |      2000 | one hand fist     | 
-|            22 |       13 |      2000 | off hand fist     |
-|            17 |        6 |      3200 | two hand polearm  |
-|            17 |       10 |      2700 | two hand staff    |
-|            15 |        2 |      2700 | bow               |
-|            25 |       16 |      1900 | thrown            |
-|            26 |        3 |      2700 | ranged - gun      |
-|            26 |       18 |      2900 | ranged - crossbow |
-|            26 |       19 |      1700 | ranged - wand     |
+## Capacity at an item level
 
-## Default, Druid, and Caster Weapons
+The Wrath client table `RandPropPoints.dbc` provides stat-capacity values by item level, quality, and inventory group. The project retains the exact uncommon rows for comparison and uses fitted curves across item levels 10 through 300 for the live calculations. A curve has the general form:
 
-Build `2026.07.25.15` separates presentation rules from weapon damage.
-**Default** is selected automatically and uses the ordinary weapon model.
-**Druid** uses exactly the same damage as Default; it only adds the gray
-class-context tooltip line when the passive conversion produces attack power.
-**Caster** selects the lower empirical caster-DPS series and adds a locked base
-spell-power amount. Any Spell Power added through the normal stat editor still
-uses the ordinary stat budget and is summed into the displayed spell-power
-line. The **Heroic** control is also presentation-only: it adds the green
-tooltip designation without changing item budget, damage, or spell power.
+$$
+C(q,s,L) =
+c_4L^4 + c_3L^3 + c_2L^2 + c_1L + c_0
+$$
 
-### Druid passive attack power
+Here \(L\) is item level, \(q\) is quality, \(s\) is the inventory slot group, and the \(c\) values come from the matching data table. Some modelled properties use fewer or more terms when the source pattern requires it.
 
-AzerothCore applies the druid bonus at runtime to weapon InventoryTypes 13, 17,
-21, and 22. It is not an item stat and does not consume or refund item budget:
+The capacity becomes the maximum item budget:
 
-```math
-FeralAP =
-\max\left(0,\operatorname{trunc}\left((DPS + ExtraDPS)\times14\right)-767\right)
-```
+$$
+B_{\max}(q,s,L) = C(q,s,L)^p
+$$
 
-The calculator suppresses the line when the result is zero, so it first
-appears at displayed DPS of approximately `54.9`. See AzerothCore's
-[`ItemTemplate::getFeralBonus`](https://www.azerothcore.org/doxygen/d4/d69/structItemTemplate.html)
-and the player item-mod application path in
-[`Player`](https://www.azerothcore.org/doxygen/d2/d4b/classPlayer.html).
+If the item contains sockets, their costs are reserved first:
 
-### Caster DPS trade and locked spell power
+$$
+B_{\text{stats}} =
+B_{\max} -
+\sum_j m_{\text{socket},j}^{\,p}
+$$
 
-The local 3.3.5 item corpus contains 559 uncommon, rare, or epic one-hand,
-main-hand, and staff records with spell power. Early items are irregular:
-spell power on a low-level caster weapon is not automatically free. For
-Vanilla/TBC item levels, only the amount supported by the observed DPS
-sacrifice is granted without stat-budget cost:
+Socket costs vary by quality, level, socket color, and whether the item is an accessory, armor piece, or weapon. This prevents a socketed item from receiving the same ordinary stats as an otherwise identical item with no sockets.
 
-```math
-DPS_{sacrificed} =
-\max(0,DPS_{default\ weapon}-DPS_{caster\ weapon})
-```
+## Calculating item level from stats
 
-```math
-SP_{credit} = \operatorname{ceil}(4\times DPS_{sacrificed})
-```
+For each candidate level from 1 through 300, the calculator selects the matching capacity and stat multipliers. It chooses the first level where the entered stats fit:
 
-The four-to-one exchange is the historical weapon-DPS trade documented by the
-[archived item-level research](https://classic-wow-archive.fandom.com/wiki/Item_level).
-To stop polynomial noise from creating excess free power, that credit is
-capped by the standard full-weapon spell-power series:
+$$
+L_{\text{result}} =
+\min \left\{
+L :
+\sum_i
+\operatorname{sgn}(a_i)
+\left(\lvert a_i\rvert m_i(L)\right)^p
+\leq
+C(q,s,L)^p
+\right\}
+$$
 
-```math
-SP_{ceiling} =
-\operatorname{round}\left(\frac{12}{5}\times
-RandPropPoints_{full}(Quality,ItemLevel)\right)
-```
+This repeated check is important because some stat and socket costs change at particular level boundaries. Evaluating each level with its own table values avoids applying a later rule to an earlier item.
 
-```math
-SP_{base} =
+## Calculating stats from an item level
+
+In Calculate Stats mode, each percentage \(r_i\) receives part of the budget left after sockets:
+
+$$
+B_i = B_{\text{stats}}\frac{r_i}{100}
+$$
+
+The amount of that stat is the reverse of the cost equation:
+
+$$
+a_i =
+\operatorname{sgn}(B_i)
+\frac{\lvert B_i\rvert^{1/p}}{m_i}
+$$
+
+Tooltip stats must be whole numbers, so the calculator first rounds down and then considers the remaining fractional amounts in order. It adds a point only when that point still fits inside the total budget. The generated item is then sent back through Calculate Level as a check.
+
+## Armor and shield block
+
+Armor is modelled separately for cloth, leather, mail, plate, and shields. The selected quality and armor type choose a level curve \(f_{q,t}(L)\). The inventory slot supplies a fraction \(s_{\text{armor}}\), because a chest naturally has more armor than bracers:
+
+$$
+\text{Armor} =
+\max\left(
+\left\lceil
+f_{q,t}(L)s_{\text{armor}}
+\right\rceil,
+0
+\right)
++
+\text{BonusArmor}
+$$
+
+Bonus Armor entered as a stat is added after the base armor calculation and is shown in green.
+
+Shield block uses a quality-specific curve \(g_q(L)\) and never displays less than 7:
+
+$$
+\text{Block} =
+\max\left(
+\left\lceil g_q(L)\right\rceil,
+7
+\right)
+$$
+
+The coefficients for these curves are stored with the live calculator because they are display properties rather than part of the ordinary stat-budget exchange.
+
+## Weapon damage
+
+Weapon type, quality, item level, and weapon profile select a DPS curve or a pair of nearby observed points. Let \(D\) be the selected damage per second, \(T\) the attack delay in milliseconds, and \(w\) the width of the damage range. Average damage per attack is:
+
+$$
+\text{AverageSwing} = D\frac{T}{1000}
+$$
+
+The minimum and maximum values are placed evenly around that average:
+
+$$
+\text{MinimumDamage} =
+\text{AverageSwing}\left(1-\frac{w}{2}\right)
+$$
+
+$$
+\text{MaximumDamage} =
+\text{AverageSwing}\left(1+\frac{w}{2}\right)
+$$
+
+One-hand, two-hand, ranged, caster, and uncommon random-enchantment weapons use different rows where the source data shows different behavior. Custom attack speed changes the damage per swing while preserving the selected DPS. Bonus elemental damage is displayed on its own line and does not inflate the physical damage range.
+
+### Druid weapons
+
+Eligible weapons can display the passive attack power used by Cat, Bear, Dire Bear, and Moonkin forms. The conversion follows the AzerothCore 3.3.5 rule:
+
+$$
+\text{FeralAttackPower} =
+\max\left(
+0,
+\left\lfloor
+14(D + D_{\text{bonus}})
+\right\rfloor
+- 767
+\right)
+$$
+
+Here \(D_{\text{bonus}}\) is the DPS contributed by separately displayed bonus damage.
+
+### Caster weapons
+
+Caster staves, maces, swords, and daggers use a caster damage profile that cannot exceed the ordinary physical profile for the same weapon. At Wrath item levels, base spell power follows the full-weapon capacity:
+
+$$
+\text{BaseSpellPower} =
+\operatorname{round}\left(
+\frac{12}{5}C(q,\text{two-hand},L)
+\right)
+\quad\text{for } L > 165
+$$
+
+For earlier items, the calculator grants spell power only for DPS given up by the caster profile, at four spell power per point of sacrificed DPS, capped by the same full-weapon ceiling:
+
+$$
+\text{BaseSpellPower} =
+\min\left(
+\left\lceil
+4\max(D_{\text{default}}-D_{\text{caster}},0)
+\right\rceil,
+\operatorname{round}\left(
+\frac{12}{5}C(q,\text{two-hand},L)
+\right)
+\right)
+$$
+
+This base spell power is locked because it comes from the weapon profile. Additional spell power selected as a normal stat still uses the editable item budget.
+
+## Vendor prices
+
+Uncommon random-enchantment weapons and armor use observed AzerothCore sell-price points. When the requested level falls between two points, the calculator fills the gap with a straight line:
+
+$$
+P(L) =
+P_0 +
+\frac{L-L_0}{L_1-L_0}
+(P_1-P_0)
+$$
+
+Other supported items use a quality-based base price:
+
+$$
+P_{\text{base}}(L)=
 \begin{cases}
-\min(SP_{credit},SP_{ceiling}), & ItemLevel \le 165 \\
-SP_{ceiling}, & ItemLevel > 165
+439L & \text{uncommon}\\
+500+525L & \text{rare}\\
+10{,}000+600L+(0.16L)^2 & \text{epic}
 \end{cases}
+$$
+
+The sell price is:
+
+$$
+P_{\text{sell}} =
+\left\lfloor
+P_{\text{base}}
+\times
+M_{\text{slot}}
+\times
+M_{\text{subtype}}
+\right\rfloor
+$$
+
+Vendor buy price is five times the sell price for most items and four times the sell price for necks, rings, and held off-hand armor:
+
+$$
+P_{\text{buy}} =
+\begin{cases}
+4P_{\text{sell}} & \text{neck, ring, or held off-hand armor}\\
+5P_{\text{sell}} & \text{other supported items}
+\end{cases}
+$$
+
+All price calculations are performed in copper and converted to gold, silver, and copper for the tooltip.
+
+## Accuracy and limits
+
+The calculator describes the regular patterns found across large groups of items. It does not claim that every Blizzard item follows those patterns. Quest rewards, boss drops, proc effects, set bonuses, deliberately unusual items, and source-data mistakes can all produce real items that appear above or below their labelled item level.
+
+For that reason, the result is best used as a consistent baseline for custom-item design and as a warning that an existing item deserves closer inspection. It should not be treated as proof that an unusual original item is wrong.
+
+The live equations and tables in the JavaScript modules are authoritative. Supporting audits explain the source coverage and known exclusions:
+
+- [`docs/UNCOMMON_RANDOM_ENCHANTMENT_AUDIT.md`](docs/UNCOMMON_RANDOM_ENCHANTMENT_AUDIT.md)
+- [`docs/SOCKET_BUDGET_AUDIT.md`](docs/SOCKET_BUDGET_AUDIT.md)
+- [`docs/EPIC_BUDGET_AUDIT.md`](docs/EPIC_BUDGET_AUDIT.md)
+
+## Running and testing
+
+The calculator is a static web application. It can be served by any local web server or opened through the hosted link above. The model tests use Node's built-in test runner:
+
+```powershell
+node --test .\tests\*.test.js
 ```
 
-The pre-Wrath comparison stays within the selected weapon family: staves are
-compared with ordinary staves, while main-hand and one-hand caster weapons are
-compared with the ordinary one-hand curve. This prevents the caster-heavy
-main-hand sample from becoming its own counterfactual and lets low-level
-caster staves receive credit from the staff DPS they actually give up. Integer
-spell-power credit rounds upward, with a small floating-point tolerance so a
-zero trade cannot create one free point.
+The browser loads the model files before [`script.js`](script.js), which connects them to the form and tooltip. Keep that load order when embedding or repackaging the calculator.
 
-Uncommon caster-staff DPS now interpolates representative corpus anchors
-instead of the former quadratic. These include Staff of the Hand at item level
-20 and `12.954545` DPS, plus observed leveling staves at item levels 25, 40,
-62, 81, 99, 114, 138, 146, 154, 158, and 174. Epic Wrath caster staves use a
-separate anchor series from item level 190 through 300. Dying Light is the
-clean ICC reference: its normal item-level 264 version anchors at `219.047619`
-DPS and its heroic item-level 277 version anchors at `250` DPS. Proc-bearing
-weapons such as Nibelung are not averaged into this base curve because their
-proc consumes damage independently of the ordinary caster-weapon exchange.
+## Sources and attribution
 
-The `12/5` multiplier is fitted from the repeated spell-power series shared by
-caster staves and one-hand weapons in the local WotLK corpus. Representative
-epic outputs are 405 at item level 200 versus 408 observed, 518 at item level
-226 versus 520 observed, and 836 at item level 277 versus 837–838 observed.
-The small residuals reflect the continuous `RandPropPoints` fit rather than a
-hard-coded tier lookup.
+The model draws on the Wrath 3.3.5 `RandPropPoints.dbc` table, AzerothCore `item_template` data and code, observed in-game items, and earlier community research into itemization:
 
-Caster mode is available for staves and for observed caster one-hand families
-(maces, swords, and daggers). In the standardized WotLK range, one-hand and
-two-hand caster weapons receive the same locked base spell power at the same
-quality and item level; their damage curves remain slot-specific. AzerothCore's
-[`item_template`](https://www.azerothcore.org/wiki/item_template) documentation
-distinguishes ordinary Spell Power stat `45` from older on-equip spell fields,
-which is why the calculator treats the locked base and editable additional
-spell power separately.
+- [AzerothCore item_template documentation](https://www.azerothcore.org/wiki/item_template)
+- [AzerothCore ItemTemplate source reference](https://www.azerothcore.org/doxygen/d4/d69/structItemTemplate.html)
+- [AzerothCore Player source reference](https://www.azerothcore.org/doxygen/d2/d4b/classPlayer.html)
+- [Turtle WoW forum discussion](https://forum.turtle-wow.org/viewtopic.php?t=1567)
+- [Allakhazam itemization formulas](https://wow.allakhazam.com/wiki/Itemization_Formulas_%28wow%29)
+- [WowWiki archive: Item level](https://wowwiki-archive.fandom.com/wiki/Item_level)
+- [WoWpedia archive: Stat budget](https://wowpedia.fandom.com/wiki/Stat_budget)
+- [Elitist Jerks item-level mechanics archive](https://web.archive.org/web/20111109062432/http://elitistjerks.com/f15/t44718-item_level_mechanics/)
+- [RS_Degen's WotLK random-item spreadsheet](https://old.reddit.com/r/wowservers/comments/wipl9j/wotlk_random_item_generator/)
 
-## Sell Value Calculation
-
-Build `2026.07.25.5` uses empirical, inventory/subclass-specific anchors for
-uncommon random-enchantment weapons and a normalized armor base curve. The
-quality formulas below remain the fallback outside those observed uncommon
-series.
-
-| Quality | Formula | Graph |
-|---------|---------|-------|
-|       2 | `y = 439x` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=0&b=439&min-x=0&max-x=400&min-y=0&max-y=400000&order=1&graph-title=Uncommon+Gold+Sell+Value&plot=NobwRAHmBcAsBsAaMBPGBGATAZmwBgF9Fwo4AOZNadBWAViJJlgHZKNtZ15HJnN20AJx4hPYn2h10g9CyGxCE0nTaoYmOkPRlepWLFl5V6PczqydeJUzhDZreLuUw6h9dEx4y2Z7boUHpraDC5SAh466EKh%2FhZBXqJm0PB4gpg%2BqsnwEVSYIeK28NiC%2BPA52fF5QmRkmMmq6b5CLNlpkU6YsA3tVNxyNpKp6ZmtYTnpLXjdYbAlHkKafpKwgX1z2GP%2B7nnWLLGSWiPYAdnzebVkWysyHmQB2D2y8HJCDecaeF2Fh2p59HQDqQJh58Jh4EDmEhIjpag1bn0yF9lipoXlwXNsgiYPhvI9xlUNGIKmERIInEiUTBirJ7uUGmsNPA5m8wugvoJWKxIdAyNjoM0kckyDscftpsK%2FsxRNxkmTQYs6INSEIPnBMCx9nK0eYMjyhPYPAY6PS2RyjSwsKzbOzCXAcvdkuzGeQRPU2eh%2BaxVfibTRBErUr7JJ6pVJWJhTGyvAHMHGfqRbZyHVGbcZOXUcHK1XNVAmYFdOXhYU7PQH2TVhfzNi8ZrY%2BaVUgond5OSwrnWQ62jWRVfnqP6ewFronu1RVmJlRgx8xtIo5Ybx8z52zfOS8Jtg4m1x4XmJ3Tad1RUkGnfgAyKuGfRSkdBqzy7UiL%2BzRctS5hK2Qhydh0ICnUq5LlI6bJuOSdDYE4AGPr28DWiGILHiwrBUtQ5SCJaf6piGLC9DALBOHBTrIRh2BdFuGDthh2g6E6dQYXQODwduj64F4D4BvIJwcbuxYvDxx4biBh6PlgBECa4BGVl%2BOopPAuHYYm367oC0ROspx7MqcMk%2Ftg0k2hp1JYNIElSO2BjqW%2BKRKjQAE3uUzR2eSlr3qB9lkKknaJiRHgEbUPLcFZ8lKiOGCIdSSKuTa4XQJhpo2gEzmRi%2BiUqTEqF%2FnhKRlBluEYbABoHjhN7tk%2BxElQEspsj5VCWsyU7UDV%2BGMb25UMSaugALpAA%3D%3D) |
-|       3 | `y = 500 + 525x` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=500&b=525&min-x=0&max-x=400&min-y=0&max-y=400000&order=1&graph-title=Rare+Gold+Sell+Value&plot=NobwRAHmBcAsCcAaMBPGBGeAGA7LAvouFHAEzJrTrUBs6hxMArLBTKQlgBwOTNKoYAZlhYxvEizbQONIUInMm00jlLwFRPtDnShOHE3iLoTHCvjpS9LSV2CZqmj1vNWD0kyzwXjHVj15HxMjPXQubhM6PVgDGiihPRYcLATpcOsmNIdw2HQs1x1EnK5S%2BML7SiEvHF9tSuEmOhs%2FUId5WHUo8naaPDq7ZXaWbGyquUjClL0uJtIx4RosMxN0LBppJlnYAYx0d0oadS4CQuohw9ghS1X86TouG8LZ6VgEIxNLV64hLHnnrjfJhCFraNbFShNLg0YxnLAQ5jXLg4W49SEGWq3C4wI6zUEkF4OWK4XbQQmUWIcFFnO4OJa1f5%2Bc73KxCRlg2mHaxHLH3UgTXkOIxXU5Mzk4jiTJliTZbfarGVC%2FLwanSgSQ%2BA0JYmUrfUi4T4HZjwpjskhrdXMLj5TR%2BLhomBXeAsBWW0zOa6uzYpLyCw7VYE6wFEiKkW0c7GmeCxVUR%2B7rNZ%2BnHyGGrJiRiLefEYHBux5bcPmoTBw7wbmrZHSZ2wVNnSsOeDR0QV8w5LCs0n6gIN7B4Exd9LLFVm9iKygqyzZmRjjBDkH9mdUP7UKcDntvApMrXSE44PqrPo7ozys65qtBUVgs8NuWX8318daxNnLY7hBatMlmARLWx%2B%2Bt8cDF%2BFsqx2FIDwAmBexwVdFzWPJMAPDYHGhdA2SQncaFgU0F27Sg1iaToILfLVCwwH4qw9Kdwkgpc%2FnkfAAF0gA%3D) |
-|       4 | `y = 10000 + 600x + 0.16x^2` | [graph](https://dewmguy.github.io/PolynomialVisualizer/?a=10000&b=600&c=0.16&min-x=0&max-x=400&min-y=0&max-y=400000&order=2&graph-title=Epic+Gold+Sell+Value&plot=NobwRAHmBcBsBMAaMBPGAWAHABgOwEYBfRcKOWZNaAVnmtwGZjSZYLUZr9tNNnIYudlXqxMREgOhDKnAJwMu%2FMnOyzo%2BfA0y5cymL3UJ4udPuiGOcfLtjnd66tUzwzkso0ewn1c7DVW6LD48HzurMIY1HJs9khW1LBBduHQcvFUYtTYvqnpRvSYTKk4jrr4uSwW1EYMsHXmqrXYDHqpWgFUCophVdy46kLwiuYhA1aYcujw2KNB6twz%2FqMV6uKwuJVSmjUT1AzwcqOha3KMs%2B3a6nLZjHP4C9jYsOmjXAvcDFOjT0Y3r%2B1VhNhjwVrsqEVxL1tjlBrRaD9wYI2Ohin1YVZcK5gojBtp9vdHs8AX0TlYpvh0BdSZhruh0JtRgwGHSsW0%2BtFHrQWm85FzgmjtkkPoccLyPjZvOKrJo6Jg3H0gRD6BVjkiLGICOYZp0YFoXEJtb8ZcyNtCyDqFlSGKDUvAtFbFF9tQ6ZehEjcXSy3VNnXbXVRKYx0BIqvbvYGvptQ1Jw1bcC54NraAt6tg5EdAer5YkUmGA3rtDEFbGCxpUTlzTB4PBIhp9mJBRbawtaFgYxb8HyZVwdOzYy2e9h7VsLV9W1j0Jn893Awz6dPS7O9VP8C9tYPA85XKPq%2B6Frhh%2Bu7c5U3IdE29%2Bq1zWYsnaTLznIO1fUyiX9A5Qeijy7cbI6iSh2vuMpsMOu6fiBgYIAwWjalBer1LQVafqeoFsFi94LDgJiLhaaGBuI%2BwoTurbPhs8HXtECZJsB17%2BF8JEIRo3jTBBpHoeBlFvkkH7DBkiFBCE2oHK29CenRqbcGc3E9uR%2Fadsu5bTL%2BM6tjwkzasKMrrKEWnoNha7iPp2F1FgIkCSxNgzBZE4ICRok9iEel2g4OlEXmsZuYRkw5Nq3l6pM4nJg8oGHKYIUHpq7HaYGuAxDidqxYF9SxElBk6YeJiRY%2BIQEulB70n5BWPmc2QmY%2BSSojl0E6FONV6gQmCxAAukAA%3D%3D) |
-
-The executable epic expression currently squares the product:
-`10000 + 600x + (0.16x)^2`, equivalent to a quadratic coefficient of
-`0.0256`. The historical `0.16x^2` row above remains a separate hypothesis to
-validate against vendor data.
-
-The chest InventoryType has the highest sell value of all slots, similar to the weight of slotMod. Sell value is determined by taking the highest value item (chest) and dividing its cost by the cost of the other items of an equivalent item level and subclass. Weight coefficients for plate, mail, leather, and cloth are derived by dividing the plate chest piece against the chest of each other subclass to determine the difference between.
-
-| Item Name       | InventoryType | sellMod |
-|-----------------|---------------|---------|
-| Neck            |             2 |    8/16 |
-| Waist           |             6 |    8/16 |
-| Feet            |             8 |   12/16 |
-| Hands           |            10 |    8/16 |
-| Finger          |            11 |    8/16 |
-| Trinket         |            12 |   28/16 |
-| Shield          |            14 |   15/16 |
-| Back            |            16 |   12/16 |
-| Head            |             1 |   12/16 |
-| Shoulder        |             3 |   12/16 |
-| Shirt           |             4 |    4/16 |
-| Chest           |             5 |   16/16 |
-| Legs            |             7 |   16/16 |
-| Wrists          |             9 |    8/16 |
-| Tabard          |            19 |    4/16 |
-| Chest (Robe)    |            20 |   16/16 |
-| Off-hand        |            23 |    8/16 |
-| Relic           |            28 |    4/16 |
-
-Rings, Amulets, and Off-hand items sell for 25% of the buy price.
-All othe armor types sell for 20% of the buy price.
-
-| name    | subclass | sellMod |
-|---------|----------|---------|
-| Misc    |        0 |   28/16 |
-| Cloth   |        1 |    9/16 |
-| Leather |        2 |   11/16 |
-| Mail    |        3 |   14/16 |
-| Plate   |        4 |   16/16 |
-| Shield  |        6 |   16/16 |
-| Relic   | 7,8,9,10 |   16/16 |
-
-## Sources & Attribution
-
-The inspiration for the calculations and formulas above probably wouldn't have happened if it weren't for the hard work of the individuals who took the time to write wiki articles and forum threads outlined below. Their work was heavily influenced by the mathematics introduced by a Zul'jin player known as Hyzenthlei.
-
-- [TurtleWoW Forums](https://forum.turtle-wow.org/viewtopic.php?t=1567)
-- [Allakhazam Forums](https://wow.allakhazam.com/wiki/Itemization_Formulas_%28wow%29)
-- [Wowwiki Archive](https://wowwiki-archive.fandom.com/wiki/Item_level)
-- [Wowpedia](https://wowpedia.fandom.com/wiki/Stat_budget)
-- [Classic WoW Archive](https://classic-wow-archive.fandom.com/wiki/Item_level)
-- [Wowwiki (HU)](https://wowwiki.fandom.com/hu/wiki/Level_(Item)#Calculating_Item_Level)
-- [Elitist Jerks (archive)](https://web.archive.org/web/20111109062432/http://elitistjerks.com/f15/t44718-item_level_mechanics/)
-- [Elitist Jerks Summary](https://web.archive.org/web/20120510064628/http://elitistjerks.com/f15/t6928-looking_good_summary_known_info_itemization/#11)
-
-The images for item display were compiled by [reynoldscahoon](https://github.com/ReynoldsCahoon).
-
-A not insignificant amount of inspiration for this application was derived from a spreadsheet created by [RS_Degen](https://old.reddit.com/r/wowservers/comments/wipl9j/wotlk_random_item_generator/).
-
-The polynomial expressions used in these calculations were created with [Polynomial Visualizer](https://github.com/dewmguy/PolynomialVisualizer), a web application I wrote specifically to help me calculate, fine-tune, and graph polynomial regression based on plottable item data.
+Item-display images were compiled by [ReynoldsCahoon](https://github.com/ReynoldsCahoon). The fitted expressions were developed and checked with [Polynomial Visualizer](https://github.com/dewmguy/PolynomialVisualizer).
