@@ -29,9 +29,9 @@ An item budget is a common unit used to compare different stats. One point of St
 
 Let:
 
-- \(a_i\) be the amount of stat \(i\);
-- \(m_i\) be that stat's cost multiplier;
-- \(p\) be the shared power, defined as:
+- $a_i$ be the amount of stat $i$;
+- $m_i$ be that stat's cost multiplier;
+- $p$ be the shared power, defined as:
 
 $$
 p = \frac{\log(2)}{\log(1.5)} \approx 1.7095
@@ -51,7 +51,7 @@ $$
 B_{\text{used}} = \sum_i B_i
 $$
 
-The power \(p\) makes a large amount of one stat cost more than spreading similar power across several stats. With equal multipliers, the following two sides are close:
+The power $p$ makes a large amount of one stat cost more than spreading similar power across several stats. With equal multipliers, the following two sides are close:
 
 $$
 100^p \approx 2{,}624
@@ -106,7 +106,7 @@ C(q,s,L) =
 c_4L^4 + c_3L^3 + c_2L^2 + c_1L + c_0
 $$
 
-Here \(L\) is item level, \(q\) is quality, \(s\) is the inventory slot group, and the \(c\) values come from the matching data table. Some modelled properties use fewer or more terms when the source pattern requires it.
+Here $L$ is item level, $q$ is quality, $s$ is the inventory slot group, and the $c$ values come from the matching data table. Some modelled properties use fewer or more terms when the source pattern requires it.
 
 The capacity becomes the maximum item budget:
 
@@ -144,7 +144,7 @@ This repeated check is important because some stat and socket costs change at pa
 
 ## Calculating stats from an item level
 
-In Calculate Stats mode, each percentage \(r_i\) receives part of the budget left after sockets:
+In Calculate Stats mode, each percentage $r_i$ receives part of the budget left after sockets:
 
 $$
 B_i = B_{\text{stats}}\frac{r_i}{100}
@@ -162,7 +162,7 @@ Tooltip stats must be whole numbers, so the calculator first rounds down and the
 
 ## Armor and shield block
 
-Armor is modelled separately for cloth, leather, mail, plate, and shields. The selected quality and armor type choose a level curve \(f_{q,t}(L)\). The inventory slot supplies a fraction \(s_{\text{armor}}\), because a chest naturally has more armor than bracers:
+Armor is modelled separately for cloth, leather, mail, plate, and shields. The selected quality and armor type choose a level curve $f_{q,t}(L)$. The inventory slot supplies a fraction $s_{\text{armor}}$, because a chest naturally has more armor than bracers:
 
 $$
 \text{Armor} =
@@ -178,7 +178,7 @@ $$
 
 Bonus Armor entered as a stat is added after the base armor calculation and is shown in green.
 
-Shield block uses a quality-specific curve \(g_q(L)\) and never displays less than 7:
+Shield block uses a quality-specific curve $g_q(L)$ and never displays less than 7:
 
 $$
 \text{Block} =
@@ -192,7 +192,7 @@ The coefficients for these curves are stored with the live calculator because th
 
 ## Weapon damage
 
-Weapon type, quality, item level, and weapon profile select a DPS curve or a pair of nearby observed points. Let \(D\) be the selected damage per second, \(T\) the attack delay in milliseconds, and \(w\) the width of the damage range. Average damage per attack is:
+Weapon type, quality, item level, and weapon profile select a DPS curve or a pair of nearby observed points. Let $D$ be the selected damage per second, $T$ the attack delay in milliseconds, and $w$ the width of the damage range. Average damage per attack is:
 
 $$
 \text{AverageSwing} = D\frac{T}{1000}
@@ -227,7 +227,7 @@ $$
 \right)
 $$
 
-Here \(D_{\text{bonus}}\) is the DPS contributed by separately displayed bonus damage.
+Here $D_{\text{bonus}}$ is the DPS contributed by separately displayed bonus damage.
 
 ### Caster weapons
 
