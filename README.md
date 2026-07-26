@@ -222,8 +222,7 @@ $$
 0,
 \left\lfloor
 14(D + D_{\text{bonus}})
-\right\rfloor
-- 767
+\right\rfloor - 767
 \right)
 $$
 
