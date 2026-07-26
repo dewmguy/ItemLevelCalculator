@@ -554,7 +554,7 @@ input.artifact:not(:placeholder-shown) { color: #E6B453 !important }
 
 .tooltip * {
   font-family: Verdana, "Open Sans", Sans-Serif;
-  line-height: 1.25em;
+  line-height: 1.5em;
   cursor: default;
 }
 
