@@ -130,14 +130,14 @@ For each candidate level from 1 through 300, the calculator selects the matching
 
 $$
 L_{\text{result}} =
-\min \left\{
+\min \left\lbrace
 L :
 \sum_i
 \mathrm{sgn}(a_i)
 \left(\lvert a_i\rvert m_i(L)\right)^p
 \leq
 C(q,s,L)^p
-\right\}
+\right\rbrace
 $$
 
 This repeated check is important because some stat and socket costs change at particular level boundaries. Evaluating each level with its own table values avoids applying a later rule to an earlier item.
