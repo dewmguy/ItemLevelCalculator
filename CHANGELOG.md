@@ -4,6 +4,7 @@ This changelog is grouped from the repository's pushed commit history. Commit ha
 
 ## 2026-07-26
 
+- Added hundredth-percent stat allocation, contextual one-stat arrow-key stepping, and automatic bottom-row budget balancing.
 - Refined caster and druid weapon calculations and improved tooltip presentation (`763ca08`).
 
 ## 2026-07-25

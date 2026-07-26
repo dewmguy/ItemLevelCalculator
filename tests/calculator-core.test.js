@@ -86,7 +86,7 @@ test('verbose output exposes each forward allocation equation', () => {
   );
 });
 
-test('JSON validation failures are structured and do not throw', () => {
+test('percentage totals are normalized instead of rejected', () => {
   const result = calculator.calculate({
     mode: 'stats',
     itemClass: 2,
@@ -96,8 +96,78 @@ test('JSON validation failures are structured and do not throw', () => {
     stats: [{ type: 6, percent: 99 }]
   });
 
-  assert.equal(result.ok, false);
-  assert.match(result.errors[0], /not 100/);
+  assert.equal(result.ok, true);
+  assert.equal(result.input.stats[0].percent, 99);
+  assert.equal(result.result.stats[0].percent, 100);
+  assert.equal(result.equations.allocations[0].balancing, true);
+});
+
+test('non-bottom percentages snap to whole stat points and bottom balances', () => {
+  const result = calculator.calculate({
+    mode: 'stats',
+    itemClass: 4,
+    inventoryType: 5,
+    quality: 2,
+    level: 100,
+    stats: [
+      { type: 7, percent: 30 },
+      { type: 5, percent: 30 }
+    ]
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.equations.allocations[0].exactAmount, 35);
+  assert.equal(result.equations.allocations[0].roundedAmount, 35);
+  assert.equal(result.equations.allocations[0].balancing, false);
+  assert.equal(result.equations.allocations[1].balancing, true);
+  assert.equal(
+    result.result.stats.reduce((sum, stat) => sum + stat.percent, 0),
+    100
+  );
+  for (const stat of result.result.stats) {
+    assert.equal(Number(stat.percent.toFixed(2)), stat.percent);
+  }
+});
+
+test('percentage arrow steps move exactly one contextual stat point', () => {
+  const request = {
+    itemClass: 4,
+    inventoryType: 5,
+    quality: 2,
+    level: 100,
+    type: 7,
+    percent: 13.45
+  };
+  const up = calculator.stepStatPercentage({
+    ...request,
+    direction: 1
+  });
+  const nextUp = calculator.stepStatPercentage({
+    ...request,
+    percent: up.result.percent,
+    direction: 1
+  });
+  const backDown = calculator.stepStatPercentage({
+    ...request,
+    percent: nextUp.result.percent,
+    direction: -1
+  });
+
+  assert.equal(up.ok, true);
+  assert.equal(
+    up.result.targetAmount,
+    Math.ceil(up.equations.currentExactAmount)
+  );
+  assert.equal(nextUp.ok, true);
+  assert.equal(nextUp.result.isAtStatPoint, true);
+  assert.equal(nextUp.result.targetAmount, up.result.targetAmount + 1);
+  assert.equal(backDown.ok, true);
+  assert.equal(backDown.result.currentAmount, nextUp.result.targetAmount);
+  assert.equal(backDown.result.targetAmount, up.result.targetAmount);
+  assert.equal(
+    Number(up.result.percent.toFixed(2)),
+    up.result.percent
+  );
 });
 
 test('Invasion Blade price uses the canonical uncommon weapon series', () => {

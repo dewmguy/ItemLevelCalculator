@@ -348,7 +348,7 @@ $(document).ready(function() {
     }
   };
   function calculateLevel(itemClass, slot, quality) {
-    console.info("calculating level from stats");
+    console.info(`calculating level from stats`);
 
     const stats = [];
     $('#stats .group').each(function() {
@@ -412,8 +412,11 @@ $(document).ready(function() {
       return null;
     }
 
-    calculation.result.stats.forEach(stat => {
+    const statGroups = $('#stats .group.stat');
+    calculation.result.stats.forEach((stat, index) => {
       statValues[stat.type] = stat.amount;
+      statGroups.eq(index).find('.stat-amount')
+        .val(Number(stat.percent).toFixed(2));
     });
     console.log('Stat equation:', calculation.equations);
     return statValues;
@@ -669,7 +672,9 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
     const itemSlotObj = $('#item-slot');
     let name = itemClass == '4' ? 'Armor' : 'Weapon';
     let array = itemClass == '4' ? armorClass : weaponClass;
-    itemSlotObj.empty().append(`<option value="">Choose ${name} Type</option>`);
+    itemSlotObj.empty().append(
+      `<option value="">Choose ${name} Slot</option>`
+    );
     $.each(array, function(key, data) {
       itemSlotObj.append(`<option data-class="${itemClass}" value="${key}">${data.name}</option>`);
     });
@@ -677,6 +682,9 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
 
   function populateSubClass(subClass, itemClass) {
     const subClassObj = $('#item-subclass');
+    const selectedSubClass = String(subClassObj.data('item-class')) === String(itemClass)
+      ? subClassObj.val()
+      : null;
     subClassObj.empty();
     const array = itemClass == 4 ? armorSubClass : weaponSubClass;
 
@@ -689,7 +697,9 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
       }
     }
     else {
-      subClassObj.append(`<option value="">Choose ${$("#item-slot option:selected").data('class') == 2 ? 'Weapon' : 'Armor'} Type</option>`);
+      subClassObj.append(
+        `<option value="">Choose ${$("#item-slot option:selected").data('class') == 2 ? 'Weapon' : 'Armor'} Class</option>`
+      );
       $.each(subClass, function(_, classKey) {
         let classData = array[classKey];
         if (classData) {
@@ -698,6 +708,15 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
       });
       subClassObj.prop('disabled', false);
     }
+
+    const selectedOptionStillAvailable = selectedSubClass !== null &&
+      subClassObj.find('option').filter(function() {
+        return $(this).val() === selectedSubClass;
+      }).length > 0;
+    if (selectedOptionStillAvailable) {
+      subClassObj.val(selectedSubClass);
+    }
+    subClassObj.data('item-class', itemClass);
   }
 
   function populateWeaponDamageTypes() {
@@ -783,7 +802,7 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
         const rowId = statRowId++;
         const statHtml = `
           <div class="group pill stat" id="stat-group-${rowId}">
-            <input type="number" class="stat-amount" data-calc="" id="stat-amount-${rowId}" min="-10000" max="10000" value="0" />
+            <input type="number" class="stat-amount" data-calc="" id="stat-amount-${rowId}" min="-10000" max="10000" step="${$("#selectStats").is(":checked") ? '0.01' : '1'}" value="0" />
             ${createStatDropdown(rowId)}
             <div class="delete"><i class="stage1 fa-solid fa-ellipsis-vertical"></i><i class="stage2 fa-regular fa-trash-can"></i></div>
           </div>`;
@@ -881,12 +900,6 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
     return null;
   }
 
-  function sumStats() {
-    let sum = 0;
-    $('#stats .group.stat .stat-amount').each(function() { sum += parseFloat($(this).val()) || 0; });
-    return sum;
-  }
-
   function sumSockets() {
     return $('#stats .group.socket').length;
   }
@@ -951,11 +964,6 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
         $("#item-level").addClass('error');
         err = true;
       }
-      if ($('#stats .group.stat').length > 0 &&
-          Math.abs(sumStats() - 100) > 1e-9) {
-        $("#stats .group.stat .stat-amount").addClass('error');
-        err = true;
-      }
     }
     if (!$('#item-slot').val()) {
       $('#item-slot').addClass('error');
@@ -990,7 +998,7 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
       const statValue = parseFloat(statValueObj.val());
       const validStatValue = calcMethod === 'level'
         ? Number.isInteger(statValue) && statValue !== 0
-        : Number.isFinite(statValue) && statValue !== 0;
+        : Number.isFinite(statValue);
       if(statType && !validStatValue) {
         statValueObj.addClass('error');
         err = true;
@@ -1210,7 +1218,58 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
     'End'
   ]);
 
+  function stepStatAmountInput(input, direction) {
+    const itemClass = Number(
+      $('#item-slot option:selected').data('class')
+    );
+    const inventoryType = Number($('#item-slot').val());
+    const quality = Number(
+      $('input[name="itemQuality"]:checked').data('quality')
+    );
+    const level = Number($('#item-level').val());
+    const type = $(input).closest('.group.stat').find('.stat-type').val();
+    const sockets = [];
+    $('#stats .group.socket .stat-type').each(function() {
+      if ($(this).val()) {
+        sockets.push($(this).val());
+      }
+    });
+
+    const calculation = calculatorCore.stepStatPercentage({
+      itemClass,
+      inventoryType,
+      quality,
+      level,
+      sockets,
+      type,
+      percent: Number(input.value || 0),
+      direction,
+      exponent
+    });
+    if (!calculation.ok) {
+      return false;
+    }
+
+    $(input)
+      .val(Number(calculation.result.percent).toFixed(2))
+      .trigger('input');
+    return true;
+  }
+
   $(document).on('keydown', '#stats .stat-amount', function(event) {
+    const isStatPercentage =
+      $("#selectStats").is(":checked") &&
+      $(this).closest('.group').hasClass('stat');
+    if (isStatPercentage &&
+        (event.key === 'ArrowUp' || event.key === 'ArrowDown') &&
+        stepStatAmountInput(
+          this,
+          event.key === 'ArrowUp' ? 1 : -1
+        )) {
+      event.preventDefault();
+      return;
+    }
+
     const modifierShortcut = (event.ctrlKey || event.metaKey) &&
       !event.altKey &&
       ['a', 'c', 'v', 'x', 'y', 'z'].includes(event.key.toLowerCase());
@@ -1221,12 +1280,14 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
     }
 
     const leadingNegative = event.key === '-' &&
-      $("#selectLevel").is(":checked") &&
       (this.value === '' || this.value === '0');
     if (leadingNegative && this.value === '0') {
       this.value = '';
     }
-    if (!leadingNegative) {
+    const decimalPoint = event.key === '.' &&
+      $("#selectStats").is(":checked") &&
+      !this.value.includes('.');
+    if (!leadingNegative && !decimalPoint) {
       event.preventDefault();
     }
   });
@@ -1236,7 +1297,9 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
     const pastedText = clipboard?.getData('text') ?? '';
     const validText = $("#selectLevel").is(":checked")
       ? /^-?[0-9]+$/.test(pastedText)
-      : /^[0-9]+$/.test(pastedText);
+      : /^-?(?:[0-9]+(?:\.[0-9]{0,2})?|\.[0-9]{1,2})$/.test(
+          pastedText
+        );
     const addsLeadingNegative = pastedText.startsWith('-') &&
       this.value !== '';
 
@@ -1254,30 +1317,37 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
 
   $(document).on('change input', '#stats .stat-amount', function() {
     const val = 10000;
-    const pct = 100;
-    let sum = 0;
 
     if($("#selectStats").is(":checked")) {
       $('.group.stat .stat-amount').attr({
         min: -val,
-        max: val
+        max: val,
+        step: '0.01'
       });
-      $('.group.stat .stat-amount').each(function() { sum += parseFloat($(this).val()) || 0; });
-      if(sum != pct) { $('.group.stat .stat-amount').addClass('error'); }
-      else { $('.group.stat .stat-amount').removeClass('error'); }
     }
     else {
       $('.group.stat .stat-amount').attr({
         min: -val,
-        max: val
+        max: val,
+        step: '1'
       });
       if ($(this).val() > val) { $(this).val(val); }
       if ($(this).val() < -val) { $(this).val(-val); }
     }
   });
 
+  $(document).on('change', '#stats .group.stat .stat-amount', function() {
+    if ($("#selectStats").is(":checked") && this.value !== '') {
+      const percent = Number(this.value);
+      if (Number.isFinite(percent)) {
+        this.value = percent.toFixed(2);
+      }
+    }
+  });
+
   $('#reset').on('click', function() {
     HTMLFormElement.prototype.reset.call($('#calculator')[0]);
+    $('#item-subclass').removeData('item-class');
     $('#stats .group').remove();
     $('#item-subclass, #output, #item-level').hide();
     $('.textStats').hide();
@@ -1385,7 +1455,9 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
     $(".textLevel").show();
     $("#statMethod").html("an integer");
     $("#item-level").attr("required", false);
-    $('.stat-amount').removeClass('error');
+    $('.group.stat .stat-amount')
+      .attr('step', '1')
+      .removeClass('error');
   });
   $("#selectStats").click(function() {
     $("#item-level").val('').show();
@@ -1394,11 +1466,12 @@ const coefficient = uncommonDamage?.coefficient ?? (() => {
     $("#statMethod").html("a percentage");
     $("#item-level").attr("required", true);
     $("#item-level").focus();
-    let sum = 0;
-    $('.stat-amount').each(function() {
-      sum += parseFloat($(this).val()) || 0;
+    $('.group.stat .stat-amount').attr('step', '0.01').each(function() {
+      const percent = Number(this.value);
+      if (Number.isFinite(percent)) {
+        this.value = percent.toFixed(2);
+      }
     });
-    if(sum != 100) { $('.stat-amount').addClass('error'); }
   });
   $('#item-level').on('change input', function() {
     const level = Number($(this).val());

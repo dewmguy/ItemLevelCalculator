@@ -15,9 +15,9 @@ It also calculates armor, shield block, weapon damage, attack speed, caster weap
 
 ## Using the calculator
 
-Choose armor or weapon, then select the quality, slot, and subtype. In **Calculate Level** mode, enter the actual amount of each stat. In **Calculate Stats** mode, enter the share of the item assigned to each stat; the shares must total 100%.
+Choose armor or weapon, then select the quality, slot, and subtype. In **Calculate Level** mode, enter the actual amount of each stat. In **Calculate Stats** mode, enter each stat's share to the nearest hundredth of a percent. The shares do not need to total 100% before calculation: each row except the bottom one snaps to the nearest whole stat point, and the bottom stat receives the remaining balance. In a percentage field, the Up and Down arrow keys move to the percentage for the next or previous whole stat point at the selected item level.
 
-A negative stat is treated as a sacrifice. Its cost is subtracted from the item, leaving more room for positive stats. Negative and positive percentages must still add up to 100%. For example, `-20%` assigned to one stat allows the positive allocations to total `120%`.
+A negative stat is treated as a sacrifice. Its cost is subtracted from the item, leaving more room for positive stats. For example, a negative allocation above the bottom row increases the balance available to the bottom stat.
 
 Sockets use part of the same available power as ordinary stats. Optional tooltip fields, such as item name, required level, flavor text, bonus armor, and bonus elemental damage, affect the display only when they are provided. Leaving Required Level blank leaves that line out of the tooltip.
 
@@ -144,7 +144,7 @@ This repeated check is important because some stat and socket costs change at pa
 
 ## Calculating stats from an item level
 
-In Calculate Stats mode, each percentage $r_i$ receives part of the budget left after sockets:
+In Calculate Stats mode, each requested percentage $r_i$ receives part of the budget left after sockets:
 
 $$
 B_i = B_{\text{stats}}\frac{r_i}{100}
@@ -158,7 +158,9 @@ a_i =
 \frac{\lvert B_i\rvert^{1/p}}{m_i}
 $$
 
-Tooltip stats must be whole numbers, so the calculator first rounds down and then considers the remaining fractional amounts in order. It adds a point only when that point still fits inside the total budget. The generated item is then sent back through Calculate Level as a check.
+For every row except the bottom one, the calculator rounds this amount to the nearest whole stat point and replaces its requested share with that point's exact budget share. The bottom row receives the budget left after those snapped allocations. Displayed percentages are rounded to hundredths and the bottom display absorbs any hundredth-percent rounding remainder, so the visible total is exactly 100%.
+
+Tooltip stats must be whole numbers, so the calculator reconciles the balancing row without exceeding the total budget. The generated item is then sent back through Calculate Level as a check.
 
 ## Armor and shield block
 

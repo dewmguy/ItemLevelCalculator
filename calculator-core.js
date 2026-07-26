@@ -103,8 +103,17 @@
     };
   }
 
-  function calculateStats(request) {
-    const mode = 'stats';
+  function roundToHundredth(value) {
+    return Math.sign(value) * (
+      Math.round((Math.abs(value) + Number.EPSILON) * 100) / 100
+    );
+  }
+
+  function nearestInteger(value) {
+    return Math.sign(value) * Math.round(Math.abs(value));
+  }
+
+  function statCalculationContext(request, mode = 'stats') {
     const common = normalizeCommon(request);
     const level = finiteNumber(request.level);
     const sockets = normalizedSockets(request);
@@ -119,9 +128,6 @@
         `level must be an integer from 1 to ${budgetModel.MAXIMUM_ITEM_LEVEL}.`
       );
     }
-    if (!Array.isArray(request.stats) || request.stats.length === 0) {
-      return error(mode, 'stats must contain at least one percentage allocation.');
-    }
     if (sockets === null) {
       return error(mode, 'sockets must be an array of socket type strings.');
     }
@@ -130,6 +136,193 @@
       modelMath.DEFAULT_EXPONENT;
     if (!modelMath.isFinitePositive(exponent)) {
       return error(mode, 'exponent must be a positive finite number.');
+    }
+
+    const distributableBudget = budgetModel.itemBudgetAtLevel({
+      ...common,
+      level,
+      socketTypes: sockets,
+      exponent
+    });
+    if (!modelMath.isFinitePositive(distributableBudget)) {
+      return error(mode, 'No positive item budget exists for this configuration.');
+    }
+
+    return {
+      ok: true,
+      common,
+      level,
+      sockets,
+      exponent,
+      distributableBudget
+    };
+  }
+
+  function normalizeStatAllocations(
+    stats,
+    common,
+    level,
+    distributableBudget,
+    exponent
+  ) {
+    const allocations = [];
+    let assignedBudget = 0;
+
+    for (const [index, stat] of stats.entries()) {
+      const statMod = budgetModel.statMod(
+        stat.type,
+        common.inventoryType,
+        common.quality,
+        level,
+        common.itemClass
+      );
+      if (!modelMath.isFinitePositive(statMod)) {
+        return {
+          ok: false,
+          message: `Unsupported stat type: ${stat.type}.`
+        };
+      }
+
+      const isBalancingStat = index === stats.length - 1;
+      let allocatedBudget;
+      let exactAmount;
+      if (isBalancingStat) {
+        allocatedBudget = distributableBudget - assignedBudget;
+        exactAmount = modelMath.statAmountFromBudget(
+          allocatedBudget,
+          statMod,
+          exponent
+        );
+      }
+      else {
+        const requestedBudget =
+          distributableBudget * stat.percent / 100;
+        exactAmount = nearestInteger(modelMath.statAmountFromBudget(
+          requestedBudget,
+          statMod,
+          exponent
+        ));
+        allocatedBudget = modelMath.statBudget(
+          exactAmount,
+          statMod,
+          exponent
+        );
+        assignedBudget += allocatedBudget;
+      }
+
+      allocations.push({
+        type: stat.type,
+        requestedPercent: stat.percent,
+        percent: allocatedBudget / distributableBudget * 100,
+        statMod,
+        allocatedBudget,
+        exactAmount,
+        balancing: isBalancingStat
+      });
+    }
+
+    let displayedTotal = 0;
+    allocations.forEach((allocation, index) => {
+      if (index === allocations.length - 1) {
+        allocation.displayPercent = roundToHundredth(100 - displayedTotal);
+      }
+      else {
+        allocation.displayPercent = roundToHundredth(allocation.percent);
+        displayedTotal += allocation.displayPercent;
+      }
+    });
+
+    return { ok: true, allocations };
+  }
+
+  function stepStatPercentage(request) {
+    const mode = 'stat-percentage-step';
+    const context = statCalculationContext(request, mode);
+    if (!context.ok) {
+      return context;
+    }
+
+    const percent = finiteNumber(request.percent);
+    const direction = finiteNumber(request.direction);
+    if (request.type == null || percent === null) {
+      return error(mode, 'type and percent are required.');
+    }
+    if (direction !== -1 && direction !== 1) {
+      return error(mode, 'direction must be -1 or 1.');
+    }
+
+    const statMod = budgetModel.statMod(
+      request.type,
+      context.common.inventoryType,
+      context.common.quality,
+      context.level,
+      context.common.itemClass
+    );
+    if (!modelMath.isFinitePositive(statMod)) {
+      return error(mode, `Unsupported stat type: ${request.type}.`);
+    }
+
+    const currentExactAmount = modelMath.statAmountFromBudget(
+      context.distributableBudget * percent / 100,
+      statMod,
+      context.exponent
+    );
+    const currentAmount = nearestInteger(currentExactAmount);
+    const currentPointPercent = roundToHundredth(
+      modelMath.statBudget(
+        currentAmount,
+        statMod,
+        context.exponent
+      ) / context.distributableBudget * 100
+    );
+    const isAtStatPoint =
+      roundToHundredth(percent) === currentPointPercent;
+    const targetAmount = isAtStatPoint
+      ? currentAmount + direction
+      : direction > 0
+        ? Math.ceil(currentExactAmount)
+        : Math.floor(currentExactAmount);
+    const exactPercent = modelMath.statBudget(
+      targetAmount,
+      statMod,
+      context.exponent
+    ) / context.distributableBudget * 100;
+
+    return {
+      ok: true,
+      mode,
+      input: {
+        ...context.common,
+        level: context.level,
+        sockets: context.sockets,
+        type: request.type,
+        percent,
+        direction,
+        exponent: context.exponent
+      },
+      result: {
+        currentAmount,
+        targetAmount,
+        exactPercent,
+        percent: roundToHundredth(exactPercent),
+        isAtStatPoint
+      },
+      equations: {
+        statMod,
+        distributableBudget: context.distributableBudget,
+        currentExactAmount
+      }
+    };
+  }
+
+  function calculateStats(request) {
+    const mode = 'stats';
+    const context = statCalculationContext(request, mode);
+    if (!context.ok) {
+      return context;
+    }
+    if (!Array.isArray(request.stats) || request.stats.length === 0) {
+      return error(mode, 'stats must contain at least one percentage allocation.');
     }
 
     const stats = request.stats.map(stat => ({
@@ -142,55 +335,23 @@
     )) {
       return error(mode, 'Every stat requires a type and finite percent.');
     }
-    const percentTotal = stats.reduce(
-      (sum, stat) => sum + stat.percent,
-      0
+
+    const normalized = normalizeStatAllocations(
+      stats,
+      context.common,
+      context.level,
+      context.distributableBudget,
+      context.exponent
     );
-    if (Math.abs(percentTotal - 100) > 1e-9) {
-      return error(mode, `Stat percentages total ${percentTotal}, not 100.`);
+    if (!normalized.ok) {
+      return error(mode, normalized.message);
     }
-
-    const capacity = capacityDetails(common, level, exponent);
-    const distributableBudget = budgetModel.itemBudgetAtLevel({
-      ...common,
-      level,
-      socketTypes: sockets,
-      exponent
-    });
-    if (!modelMath.isFinitePositive(distributableBudget)) {
-      return error(mode, 'No positive item budget exists for this configuration.');
-    }
-
-    const allocations = [];
-    for (const stat of stats) {
-      const statMod = budgetModel.statMod(
-        stat.type,
-        common.inventoryType,
-        common.quality,
-        level,
-        common.itemClass
-      );
-      if (!modelMath.isFinitePositive(statMod)) {
-        return error(mode, `Unsupported stat type: ${stat.type}.`);
-      }
-      const allocatedBudget = distributableBudget * stat.percent / 100;
-      allocations.push({
-        type: stat.type,
-        percent: stat.percent,
-        statMod,
-        allocatedBudget,
-        exactAmount: modelMath.statAmountFromBudget(
-          allocatedBudget,
-          statMod,
-          exponent
-        )
-      });
-    }
+    const allocations = normalized.allocations;
 
     const reconciled = modelMath.reconcileIntegerStatAmounts(
       allocations,
-      distributableBudget,
-      exponent
+      context.distributableBudget,
+      context.exponent
     );
     if (!reconciled) {
       return error(mode, 'Integer stat reconciliation failed.');
@@ -198,48 +359,54 @@
 
     const outputStats = allocations.map((allocation, index) => ({
       type: allocation.type,
-      percent: allocation.percent,
+      percent: allocation.displayPercent,
       amount: reconciled.amounts[index]
     }));
     const recalculatedLevel = budgetModel.calculateLevel({
-      ...common,
+      ...context.common,
       stats: [
         ...outputStats,
-        ...sockets.map(type => ({ type, amount: 1 }))
+        ...context.sockets.map(type => ({ type, amount: 1 }))
       ],
-      exponent
+      exponent: context.exponent
     });
-    const socketBudget = capacity.thresholdBudget - distributableBudget;
+    const capacity = capacityDetails(
+      context.common,
+      context.level,
+      context.exponent
+    );
+    const socketBudget =
+      capacity.thresholdBudget - context.distributableBudget;
 
     return {
       ok: true,
       mode,
       input: {
-        ...common,
-        level,
+        ...context.common,
+        level: context.level,
         stats,
-        sockets,
-        exponent
+        sockets: context.sockets,
+        exponent: context.exponent
       },
       result: {
-        level,
+        level: context.level,
         stats: outputStats,
-        sockets: sockets.map(type => ({ type, amount: 1 })),
+        sockets: context.sockets.map(type => ({ type, amount: 1 })),
         recalculatedLevel
       },
       equations: {
-        exponent,
+        exponent: context.exponent,
         capacity,
         totalBudget: capacity.thresholdBudget,
         socketBudget,
-        distributableBudget,
+        distributableBudget: context.distributableBudget,
         allocations: allocations.map((allocation, index) => ({
           ...allocation,
           roundedAmount: reconciled.amounts[index],
           roundedBudget: modelMath.statBudget(
             reconciled.amounts[index],
             allocation.statMod,
-            exponent
+            context.exponent
           )
         })),
         usedBudget: reconciled.usedBudget,
@@ -488,6 +655,7 @@
   return Object.freeze({
     calculate,
     calculateStats,
+    stepStatPercentage,
     calculateLevel,
     calculatePrice,
     calculateDamage
